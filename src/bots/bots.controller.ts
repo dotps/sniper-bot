@@ -2,6 +2,7 @@ import { Body, Controller, Post } from "@nestjs/common"
 
 import { BotProvider } from "../providers/bots/BotProvider"
 import { CommandHandler } from "../Commands/CommandHandler"
+import { ResponseData } from "../data/ResponseData"
 
 @Controller("bots")
 export class BotsController {
@@ -11,11 +12,8 @@ export class BotsController {
   ) {}
 
   @Post()
-  async query(@Body() data: any): Promise<string> {
+  async query(@Body() data: any): Promise<ResponseData | null> {
     const queryData = await this.botProvider.handleUpdate(data)
-    console.log(queryData)
-    // TODO: внедрить commandHandler
-    await this.commandHandler.handleQuery(queryData)
-    return "query"
+    return await this.commandHandler.handleQuery(queryData)
   }
 }
