@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common"
 import { BotsController } from "./bots.controller"
-// import { BotsService } from "./bots.service"
+import { BotsService } from "./bots.service"
 import { TelegramApiProvider } from "../providers/bots/telegram/TelegramApiProvider"
 import { WebRequestFetchService } from "../providers/WebRequestFetchService"
 import { Model } from "../Model/Model"
@@ -29,6 +29,6 @@ const commandHandler = {
 
 @Module({
   controllers: [BotsController],
-  providers: [botProvider, commandHandler],
+  providers: [botProvider, commandHandler, BotsService],
 })
 export class BotsModule {}

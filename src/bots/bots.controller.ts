@@ -22,6 +22,7 @@ export class BotsController {
   @HttpCode(HttpStatus.OK)
   @UsePipes(ValidationPipe)
   async query(@Body() data: QueryDto): Promise<void> {
+    // TODO: перенести в BotsService
     console.log(data)
     const queryData = await this.botProvider.handleUpdate([data])
     console.log(queryData)
