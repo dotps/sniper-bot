@@ -1,11 +1,9 @@
-import { Body, Controller, Post } from "@nestjs/common"
-// import { IBotProvider } from "../providers/bots/IBotProvider"
-import { TelegramApiProvider } from "../providers/bots/telegram/TelegramApiProvider"
+import { Body, Controller, Inject, Post } from "@nestjs/common"
+import { IBotProvider } from "../providers/bots/IBotProvider"
 
 @Controller("bots")
 export class BotsController {
-  // constructor(private readonly botProvider: IBotProvider) {}
-  constructor(private readonly botProvider: TelegramApiProvider) {}
+  constructor(private readonly botProvider: IBotProvider) {}
 
   @Post()
   async query(@Body() data: any): Promise<string> {

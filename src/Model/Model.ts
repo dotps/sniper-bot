@@ -1,23 +1,22 @@
-import {IModel} from "./IModel"
+import { IModel } from "./IModel"
 
-export class Model implements  IModel {
+export class Model implements IModel {
+  private isRunning: boolean = true
+  private isBotRunning: boolean = false
 
-    private isRunning: boolean = true
-    private isBotRunning: boolean = false
+  isAppRunning(): boolean {
+    return this.isRunning
+  }
 
-    isAppRunning(): boolean {
-        return this.isRunning
-    }
+  stopApp(): void {
+    this.isRunning = false
+  }
 
-    stopApp(): void {
-        this.isRunning = false
-    }
+  isBotInit(): boolean {
+    return this.isBotRunning
+  }
 
-    isBotInit(): boolean {
-        return this.isBotRunning
-    }
-
-    botWasInit(): void {
-        this.isBotRunning = true
-    }
+  botWasInit(): void {
+    this.isBotRunning = true
+  }
 }
