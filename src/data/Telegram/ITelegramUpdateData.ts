@@ -1,5 +1,5 @@
 export interface ITelegramUpdateData {
-    updateId: number
-    chatId: number
-    text: string
+  updateId: number
+  chatId: number
+  text: string
 }

@@ -1,3 +1,3 @@
 export interface IQueryData {
-    text: string
+  text: string
 }
