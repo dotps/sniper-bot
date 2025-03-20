@@ -1,17 +1,21 @@
-import { Body, Controller, Inject, Post } from "@nestjs/common"
-import { IBotProvider } from "../providers/bots/IBotProvider"
+import { Body, Controller, Post } from "@nestjs/common"
+
+import { BotProvider } from "../providers/bots/BotProvider"
+import { CommandHandler } from "../Commands/CommandHandler"
 
 @Controller("bots")
 export class BotsController {
-  constructor(private readonly botProvider: IBotProvider) {}
+  constructor(
+    private readonly botProvider: BotProvider,
+    private readonly commandHandler: CommandHandler,
+  ) {}
 
   @Post()
   async query(@Body() data: any): Promise<string> {
-    console.log("query")
-    console.log(data)
     const queryData = await this.botProvider.handleUpdate(data)
     console.log(queryData)
-    // await this.commandHandler.handleQuery(queryData)
+    // TODO: внедрить commandHandler
+    await this.commandHandler.handleQuery(queryData)
     return "query"
   }
 }

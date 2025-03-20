@@ -8,9 +8,7 @@ import { TelegramGetUpdatesResponse } from "../../../data/Telegram/TelegramGetUp
 import { TelegramQueryData } from "../../../data/Telegram/TelegramQueryData"
 import { IQueryData } from "../../../data/IQueryData"
 import { TelegramConfig } from "./TelegramConfig"
-import { Injectable } from "@nestjs/common"
 
-// @Injectable()
 export class TelegramApiProvider implements IBotProvider {
   private readonly apiUrl: string = "https://api.telegram.org/bot"
   private readonly token: string = TelegramConfig.token

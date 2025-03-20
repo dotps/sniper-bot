@@ -25,7 +25,7 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
-В работе сервиса использован функционал из задания 3 (телеграм бот для курсов валют), в частности: TelegramApiProvider (IBotProvider) и WebRequestFetchService(IWebRequestService) 
+В работе сервиса использован функционал из задания 3 (телеграм бот для курсов валют), в частности: TelegramApiProvider (IBotProvider) и WebRequestFetchService(IWebRequestService). Функционал легко интегрировался в DI Nest с помощью абстрактного класса вместо интерфейса. 
 
 ## Project setup
 
