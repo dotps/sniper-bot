@@ -11,3 +11,8 @@ export interface IBotProvider {
 
   isUseWebhook(): boolean
 }
+
+export enum BotType {
+  TELEGRAM = "TELEGRAM",
+  VK = "VK",
+}

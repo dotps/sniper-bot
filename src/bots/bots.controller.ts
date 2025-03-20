@@ -1,7 +1,15 @@
-import { Body, Controller, Post } from "@nestjs/common"
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  UsePipes,
+  ValidationPipe,
+} from "@nestjs/common"
 import { BotProvider } from "../providers/bots/BotProvider"
 import { CommandHandler } from "../Commands/CommandHandler"
-import { ResponseData } from "../data/ResponseData"
+import { QueryDto } from "./query.dto"
 
 @Controller("bots")
 export class BotsController {
@@ -11,8 +19,19 @@ export class BotsController {
   ) {}
 
   @Post()
-  async query(@Body() data: any): Promise<ResponseData | null> {
-    const queryData = await this.botProvider.handleUpdate(data)
-    return await this.commandHandler.handleQuery(queryData)
+  @HttpCode(HttpStatus.OK)
+  @UsePipes(ValidationPipe)
+  async query(@Body() data: QueryDto): Promise<void> {
+    console.log(data)
+    const queryData = await this.botProvider.handleUpdate([data])
+    console.log(queryData)
+    const response = await this.commandHandler.handleQuery(queryData)
+    console.log(response)
+    //TODO: донастроить бота
+    if (!response) return
+    const responseData = response?.data || []
+    for (const text of responseData) {
+      await this.botProvider.sendResponse(text, queryData)
+    }
   }
 }

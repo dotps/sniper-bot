@@ -11,16 +11,15 @@ import { CommandHandler } from "../Commands/CommandHandler"
 const model = new Model()
 const webRequestService = new WebRequestFetchService()
 
-const telegramApiProvider = {
+const botProvider = {
   provide: BotProvider,
-  useFactory: () => {
-    return new TelegramApiProvider(model, webRequestService)
+  useFactory: async () => {
+    const bot = new TelegramApiProvider(model, webRequestService)
+    return await bot.init()
   },
 }
 
 const commandFactory = new CommandFactory(model)
-// const commandHandler = new CommandHandler(commandFactory)
-
 const commandHandler = {
   provide: CommandHandler,
   useFactory: () => {
@@ -30,6 +29,6 @@ const commandHandler = {
 
 @Module({
   controllers: [BotsController],
-  providers: [telegramApiProvider, commandHandler],
+  providers: [botProvider, commandHandler],
 })
 export class BotsModule {}
