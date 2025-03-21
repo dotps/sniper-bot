@@ -26,6 +26,10 @@ const commandHandler = {
   },
 }
 
+// TODO: как запустить BotsService.start()
+// const bot = new TelegramApiProvider(model, webRequestService)
+// const botsService = new BotsService(bot, new CommandHandler(commandFactory))
+
 @Module({
   controllers: [BotsController],
   providers: [botProvider, commandHandler, BotsService],

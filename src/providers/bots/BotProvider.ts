@@ -11,4 +11,5 @@ export abstract class BotProvider implements IBotProvider {
   abstract handleUpdate(requestData: any): Promise<IQueryData>
 
   abstract isUseWebhook(): boolean
+  abstract isUseUpdate(): boolean
 }

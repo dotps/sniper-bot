@@ -15,6 +15,7 @@ export class TelegramApiProvider implements IBotProvider {
   private readonly baseUrl: string = this.apiUrl + this.token + "/"
   private readonly webRequestService: IWebRequestService
   private readonly canUseWebhook = TelegramConfig.canUseWebhook
+  private readonly canUseUpdate = TelegramConfig.canUseUpdate
   private model: IModel
   private lastUpdateId: number = 0
   private errorMessage: string = "Telegram не ok: "
@@ -96,5 +97,9 @@ export class TelegramApiProvider implements IBotProvider {
 
   isUseWebhook(): boolean {
     return this.canUseWebhook
+  }
+
+  isUseUpdate(): boolean {
+    return this.canUseUpdate
   }
 }

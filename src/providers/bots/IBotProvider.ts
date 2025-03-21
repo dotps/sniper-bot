@@ -10,6 +10,7 @@ export interface IBotProvider {
   handleUpdate(requestData: any): Promise<IQueryData>
 
   isUseWebhook(): boolean
+  isUseUpdate(): boolean
 }
 
 export enum BotType {
