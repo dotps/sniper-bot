@@ -14,7 +14,6 @@ const webRequestService = new WebRequestFetchService()
 const botProvider = {
   provide: BotProvider,
   useFactory: () => {
-    // return await TelegramApiProvider.create(model, webRequestService)
     return new TelegramApiProvider(model, webRequestService)
   },
 }

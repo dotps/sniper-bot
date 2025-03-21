@@ -26,15 +26,6 @@ export class TelegramApiProvider implements IBotProvider {
     console.log(webRequestService)
   }
 
-  static async create(
-    model: IModel,
-    webRequestService: IWebRequestService,
-  ): Promise<TelegramApiProvider> {
-    const instance = new TelegramApiProvider(model, webRequestService)
-    await instance.init()
-    return instance
-  }
-
   async init(): Promise<void> {
     const response = await this.webRequestService.tryGet(
       this.baseUrl + TelegramCommands.GET_ME,
