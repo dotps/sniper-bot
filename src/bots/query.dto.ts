@@ -1,4 +1,5 @@
 import {
+  IsArray,
   IsBoolean,
   IsInt,
   IsNotEmpty,
@@ -80,7 +81,7 @@ export class MessageQueryDto {
   text: string
 }
 
-export class QueryDto {
+export class ResultQueryDto {
   @IsNotEmpty()
   @IsInt()
   update_id: number
@@ -89,4 +90,16 @@ export class QueryDto {
   @ValidateNested({ each: true })
   @Type(() => MessageQueryDto)
   message: MessageQueryDto
+}
+
+export class QueryDto {
+  @IsNotEmpty()
+  @IsBoolean()
+  ok: string
+
+  @IsNotEmpty()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ResultQueryDto)
+  result: ResultQueryDto[]
 }
