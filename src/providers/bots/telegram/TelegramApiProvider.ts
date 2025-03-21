@@ -2,7 +2,6 @@ import { IBotProvider } from "../IBotProvider"
 import { IWebRequestService } from "../../IWebRequestService"
 import { Logger } from "../../../Utils/Logger"
 import { TelegramCommands } from "./TelegramCommands"
-import { IModel } from "../../../Model/IModel"
 import { TelegramBaseResponse } from "../../../data/Telegram/TelegramBaseResponse"
 import { TelegramGetUpdatesResponse } from "../../../data/Telegram/TelegramGetUpdatesResponse"
 import { TelegramQueryData } from "../../../data/Telegram/TelegramQueryData"
@@ -16,12 +15,11 @@ export class TelegramApiProvider implements IBotProvider {
   private readonly webRequestService: IWebRequestService
   private readonly canUseWebhook = TelegramConfig.canUseWebhook
   private readonly canUseUpdate = TelegramConfig.canUseUpdate
-  private model: IModel
   private lastUpdateId: number = 0
   private errorMessage: string = "Telegram не ok: "
+  private isBotRunning: boolean = false
 
-  constructor(model: IModel, webRequestService: IWebRequestService) {
-    this.model = model
+  constructor(webRequestService: IWebRequestService) {
     this.webRequestService = webRequestService
   }
 
@@ -31,7 +29,7 @@ export class TelegramApiProvider implements IBotProvider {
     )
     const initResponse = new TelegramBaseResponse(response)
     if (initResponse.ok) {
-      this.model.botWasInit()
+      this.isBotRunning = true
       return
     } else {
       Logger.error("Не удалось инициализировать бота.")
@@ -39,7 +37,7 @@ export class TelegramApiProvider implements IBotProvider {
   }
 
   async sendResponse(text: string, queryData: IQueryData): Promise<void> {
-    if (!this.model.isBotInit()) {
+    if (!this.isBotRunning) {
       Logger.log("Бот не инициализирован.")
       return
     }
@@ -81,6 +79,8 @@ export class TelegramApiProvider implements IBotProvider {
         queryData = new TelegramQueryData(lastUpdate)
       }
     }
+
+    console.log(queryData)
 
     return queryData
   }

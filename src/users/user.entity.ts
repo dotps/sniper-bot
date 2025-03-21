@@ -18,6 +18,9 @@ export class User {
   @Column()
   readonly chatId: number
 
+  @Column()
+  readonly userId: number
+
   @Column({
     type: "enum",
     enum: BotType,

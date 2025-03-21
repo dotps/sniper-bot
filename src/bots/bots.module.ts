@@ -3,31 +3,34 @@ import { BotsController } from "./bots.controller"
 import { BotsService } from "./bots.service"
 import { TelegramApiProvider } from "../providers/bots/telegram/TelegramApiProvider"
 import { WebRequestFetchService } from "../providers/WebRequestFetchService"
-import { Model } from "../Model/Model"
 import { BotProvider } from "../providers/bots/BotProvider"
-import { CommandFactory } from "../Factory/CommandFactory"
-import { CommandHandler } from "../Commands/CommandHandler"
+import { UserModule } from "../users/user.module"
 
-const model = new Model()
 const webRequestService = new WebRequestFetchService()
+
+// TODO: реализовать регистрацию ботов telegram, vk в  сервис локаторе?
+// TODO: переписать бота используя возможности nest
 
 const botProvider = {
   provide: BotProvider,
   useFactory: () => {
-    return new TelegramApiProvider(model, webRequestService)
+    return new TelegramApiProvider(webRequestService)
   },
 }
 
-const commandFactory = new CommandFactory(model)
-const commandHandler = {
-  provide: CommandHandler,
-  useFactory: () => {
-    return new CommandHandler(commandFactory)
-  },
-}
+// const commandFactory = new CommandFactory()
+// const commandHandler = {
+//   provide: CommandHandler,
+//   useFactory: () => {
+//     return new CommandHandler(commandFactory)
+//   },
+// }
 
 @Module({
+  // imports: [forwardRef(() => UserModule)],
+  imports: [UserModule],
   controllers: [BotsController],
-  providers: [botProvider, commandHandler, BotsService],
+  // providers: [botProvider, commandHandler, BotsService],
+  providers: [botProvider, BotsService],
 })
 export class BotsModule {}

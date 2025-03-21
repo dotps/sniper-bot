@@ -1,25 +1,22 @@
-import {
-  Body,
-  Controller,
-  HttpCode,
-  HttpStatus,
-  Post,
-  UsePipes,
-  ValidationPipe,
-} from "@nestjs/common"
-import { QueryDto } from "./query.dto"
+import { Body, Controller, HttpCode, HttpStatus, Post, UsePipes, ValidationPipe } from "@nestjs/common"
+import { RequestTelegramDto } from "./telegram/request-telegram.dto"
 import { BotsService } from "./bots.service"
 
 @Controller("bots")
 export class BotsController {
   constructor(private readonly botsService: BotsService) {}
 
-  @Post()
+  @Post("telegram")
   @HttpCode(HttpStatus.OK)
   @UsePipes(ValidationPipe)
-  async query(@Body() data: QueryDto): Promise<void> {
-    await this.botsService.handleQuery(data)
+  async handleTelegram(@Body() data: RequestTelegramDto): Promise<void> {
+    await this.botsService.handleRequest(data)
   }
+
+  @Post("vk")
+  @HttpCode(HttpStatus.OK)
+  @UsePipes(ValidationPipe)
+  async handleVkontakte(@Body() data: any): Promise<void> {}
 }
 
 /*

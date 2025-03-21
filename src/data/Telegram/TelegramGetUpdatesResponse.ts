@@ -9,10 +9,11 @@ export class TelegramGetUpdatesResponse {
       return
     }
 
-    // TODO: все проверить
+    // TODO: все проверить и реализовать проще, по идее это все не нужно т.к есть QueryDto в bots контроллере
     this.updates = data.map((update) => ({
       updateId: update.update_id || 0,
       chatId: update.message?.chat?.id || 0,
+      userId: update.message?.from?.id || 0,
       text: update.message?.text || "",
     }))
   }
