@@ -4,7 +4,7 @@ import { StartCommand } from "../Commands/StartCommand"
 import { ExitCommand } from "../Commands/ExitCommand"
 import { ICommandFactory } from "./ICommandFactory"
 import { IModel } from "../Model/IModel"
-import { CommandData } from "../data/CommandData"
+import { Command } from "../Commands/CommandHandler"
 
 export class CommandFactory implements ICommandFactory {
   private readonly model: IModel
@@ -13,12 +13,12 @@ export class CommandFactory implements ICommandFactory {
     this.model = model
   }
 
-  createCommand(commandData: CommandData): ICommand | null {
-    switch (commandData.input) {
+  createCommand(commandData: Command): ICommand | null {
+    switch (commandData.command) {
       case Commands.EXIT:
         return new ExitCommand(this.model)
       case Commands.START:
-        return new StartCommand()
+        return new StartCommand(commandData)
       default:
         return null
     }

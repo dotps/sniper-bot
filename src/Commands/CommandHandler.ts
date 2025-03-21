@@ -1,7 +1,7 @@
 import { ICommandFactory } from "../Factory/ICommandFactory"
 import { ResponseData } from "../data/ResponseData"
 import { IQueryData } from "../data/IQueryData"
-import { CommandData } from "../data/CommandData"
+import { Commands } from "./Commands"
 
 export class CommandHandler {
   private defaultResponse: string = "Неизвестная команда."
@@ -9,11 +9,29 @@ export class CommandHandler {
   constructor(private commandFactory: ICommandFactory) {}
 
   async handleQuery(queryData: IQueryData): Promise<ResponseData | null> {
-    const input = queryData.text.toLowerCase().trim()
-    const params = {}
-    const commandData = new CommandData(input, params)
-    const command = this.commandFactory.createCommand(commandData)
-
+    const parsedCommand = this.parseCommand(queryData.text)
+    const command = this.commandFactory.createCommand(parsedCommand)
     return command ? await command.execute() : new ResponseData([this.defaultResponse])
   }
+
+  parseCommand(input: string): Command {
+    const commands = input.toLowerCase().trim().match(/\/\w+/g)
+    let params: string[] = []
+
+    if (!commands) throw new Error("Команды не найдены.")
+    if (commands.length > 1) throw new Error("В запросе должна быть только одна команда.")
+
+    const command = commands[0] as Commands
+    params = input.replace(command, "").trim().split(" ")
+
+    return {
+      command: command,
+      params: params,
+    }
+  }
+}
+
+export type Command = {
+  command: Commands
+  params?: string[]
 }

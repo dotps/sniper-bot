@@ -23,7 +23,6 @@ export class TelegramApiProvider implements IBotProvider {
   constructor(model: IModel, webRequestService: IWebRequestService) {
     this.model = model
     this.webRequestService = webRequestService
-    console.log(webRequestService)
   }
 
   async init(): Promise<void> {
