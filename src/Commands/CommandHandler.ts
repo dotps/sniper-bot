@@ -14,8 +14,6 @@ export class CommandHandler {
     const commandData = new CommandData(input, params)
     const command = this.commandFactory.createCommand(commandData)
 
-    return command
-      ? await command.execute()
-      : new ResponseData([this.defaultResponse])
+    return command ? await command.execute() : new ResponseData([this.defaultResponse])
   }
 }

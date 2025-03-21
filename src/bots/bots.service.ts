@@ -2,6 +2,7 @@ import { Injectable, OnModuleInit } from "@nestjs/common"
 import { QueryDto } from "./query.dto"
 import { BotProvider } from "../providers/bots/BotProvider"
 import { CommandHandler } from "../Commands/CommandHandler"
+import { Logger } from "../Utils/Logger"
 
 @Injectable()
 export class BotsService implements OnModuleInit {
@@ -24,12 +25,12 @@ export class BotsService implements OnModuleInit {
   }
 
   async handleQuery(data: QueryDto) {
-    console.log(data)
-    const queryData = await this.botProvider.handleUpdate([data])
-    console.log(queryData)
+    if (!data.ok || !data.result) {
+      Logger.error("Данные от бота не получены.")
+      return
+    }
+    const queryData = await this.botProvider.handleUpdate(data.result)
     const response = await this.commandHandler.handleQuery(queryData)
-    console.log(response)
-    //TODO: донастроить бота
     if (!response) return
     const responseData = response?.data || []
     for (const text of responseData) {
@@ -38,11 +39,16 @@ export class BotsService implements OnModuleInit {
   }
 
   private getBotUpdates() {
-    setInterval(async () => {
-      const queryData = await this.botProvider.getUpdates()
-      console.log(queryData)
-      if (!queryData.text) return
-      await this.commandHandler.handleQuery(queryData)
+    setInterval(() => {
+      this.handleBotUpdate().catch((error) => {
+        Logger.error(error)
+      })
     }, this.updateInterval)
+  }
+
+  private async handleBotUpdate() {
+    const queryData = await this.botProvider.getUpdates()
+    if (!queryData.text) return
+    await this.commandHandler.handleQuery(queryData)
   }
 }

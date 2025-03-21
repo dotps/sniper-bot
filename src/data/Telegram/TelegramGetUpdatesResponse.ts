@@ -9,6 +9,8 @@ export class TelegramGetUpdatesResponse {
       return
     }
 
+    console.log(data)
+
     this.updates = data.map((update) => ({
       updateId: update.update_id || 0,
       chatId: update.message?.chat?.id || 0,
