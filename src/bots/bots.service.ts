@@ -1,16 +1,20 @@
-import { Injectable } from "@nestjs/common"
+import { Injectable, OnModuleInit } from "@nestjs/common"
 import { QueryDto } from "./query.dto"
 import { BotProvider } from "../providers/bots/BotProvider"
 import { CommandHandler } from "../Commands/CommandHandler"
 
 @Injectable()
-export class BotsService {
+export class BotsService implements OnModuleInit {
   private updateInterval: number = 5000
 
   constructor(
     private readonly botProvider: BotProvider,
     private readonly commandHandler: CommandHandler,
   ) {}
+
+  async onModuleInit() {
+    await this.start()
+  }
 
   async start(): Promise<void> {
     await this.botProvider.init()

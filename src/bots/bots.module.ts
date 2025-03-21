@@ -13,8 +13,9 @@ const webRequestService = new WebRequestFetchService()
 
 const botProvider = {
   provide: BotProvider,
-  useFactory: async () => {
-    return await TelegramApiProvider.create(model, webRequestService)
+  useFactory: () => {
+    // return await TelegramApiProvider.create(model, webRequestService)
+    return new TelegramApiProvider(model, webRequestService)
   },
 }
 
@@ -25,10 +26,6 @@ const commandHandler = {
     return new CommandHandler(commandFactory)
   },
 }
-
-// TODO: как запустить BotsService.start()
-// const bot = new TelegramApiProvider(model, webRequestService)
-// const botsService = new BotsService(bot, new CommandHandler(commandFactory))
 
 @Module({
   controllers: [BotsController],

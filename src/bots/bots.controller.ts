@@ -7,8 +7,6 @@ import {
   UsePipes,
   ValidationPipe,
 } from "@nestjs/common"
-import { BotProvider } from "../providers/bots/BotProvider"
-import { CommandHandler } from "../Commands/CommandHandler"
 import { QueryDto } from "./query.dto"
 import { BotsService } from "./bots.service"
 
