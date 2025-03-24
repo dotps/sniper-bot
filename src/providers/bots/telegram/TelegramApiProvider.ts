@@ -8,12 +8,14 @@ import { QueryData } from "../../../data/Telegram/QueryData"
 import { IQueryData } from "../../../data/IQueryData"
 import { TelegramConfig } from "./TelegramConfig"
 import { RequestDto } from "../../../bots/bots.service"
+import { TelegramRequestDto } from "../../../bots/telegram/telegram-request.dto"
+import { Injectable } from "@nestjs/common"
 
+@Injectable()
 export class TelegramApiProvider implements IBotProvider {
   private readonly apiUrl: string = "https://api.telegram.org/bot"
   private readonly token: string = TelegramConfig.token
   private readonly baseUrl: string = this.apiUrl + this.token + "/"
-  private readonly webRequestService: IWebRequestService
   private readonly canUseWebhook = TelegramConfig.canUseWebhook
   private readonly canUseUpdate = TelegramConfig.canUseUpdate
   private lastUpdateId: number = 0
@@ -21,12 +23,10 @@ export class TelegramApiProvider implements IBotProvider {
   private isBotRunning: boolean = false
   private updateInterval: number = 5000
 
-  constructor(webRequestService: IWebRequestService) {
-    this.webRequestService = webRequestService
-  }
+  constructor(private readonly webRequestService: IWebRequestService) {}
 
   async init(): Promise<void> {
-    const response = await this.webRequestService.tryGet<TelegramBaseResponse>(this.baseUrl + TelegramCommands.GET_ME)
+    const response = await this.webRequestService.tryGet<TelegramRequestDto>(this.baseUrl + TelegramCommands.GET_ME)
     if (response.ok) {
       this.isBotRunning = true
       return
@@ -46,22 +46,36 @@ export class TelegramApiProvider implements IBotProvider {
     if (!response?.ok) Logger.error(this.errorMessage + JSON.stringify(response))
   }
 
-  async getUpdates(): Promise<IQueryData> {
+  // async getUpdates(callback?: (queryDataList: IQueryData[]) => void): Promise<IQueryData[]> {
+  async getUpdates(): Promise<IQueryData[]> {
+    // const queryDataList = this.getUpdatesData(data)
     // TODO: переделать
-    let queryData = new QueryData()
-    // const offset = this.lastUpdateId ? `offset=${this.lastUpdateId + 1}&` : ``
-    // const botResponse = await this.webRequestService.tryGet(
-    //   `${this.baseUrl}${TelegramCommands.GET_UPDATES}?${offset}`,
-    // )
-    // const response = new TelegramBaseResponse(botResponse)
-    //
+    // let queryData: QueryData[] = []
+    const offset = this.lastUpdateId ? `offset=${this.lastUpdateId + 1}&` : ``
+    const updatesUrl = `${this.baseUrl}${TelegramCommands.GET_UPDATES}?${offset}`
+    // TODO: тут бы проверить на валидность объекта, ValidationPipes ?
+    const response = await this.webRequestService.tryGet<TelegramRequestDto>(updatesUrl)
+
+    if (!response?.ok) {
+      Logger.error(this.errorMessage + JSON.stringify(response))
+      return []
+    }
+
+    return this.getUpdatesData(response)
+
     // if (response.ok) {
-    //   queryData = await this.handleUpdate(response.result)
+    //   const queryDataList = this.getUpdatesData(response)
+    //   // console.log(queryDataList)
+    //   if (callback) {
+    //     callback(queryDataList)
+    //   }
+    //   // TODO: отправить в bots service
+    //   // queryData = await this.handleUpdate(response.result)
     // } else {
     //   Logger.error(this.errorMessage + JSON.stringify(response))
     // }
 
-    return queryData
+    // return queryData
   }
 
   async handleUpdate(requestData: any): Promise<QueryData[]> {
@@ -83,26 +97,18 @@ export class TelegramApiProvider implements IBotProvider {
     return this.canUseWebhook
   }
 
-  isUseUpdate(): boolean {
+  isUseIntervalUpdate(): boolean {
     return this.canUseUpdate
   }
 
-  getBotUpdates() {
-    // TODO: сделать подписку/отписку для отправки данных в сервис
-    setInterval(() => {
-      this.handleBotUpdate().catch((error) => {
-        Logger.error(error)
-      })
+  startIntervalUpdates() {
+    setInterval(async () => {
+      const queryDataList = await this.getUpdates()
+      console.log(queryDataList)
     }, this.updateInterval)
   }
 
-  async handleBotUpdate(): Promise<IQueryData | null> {
-    const queryData = await this.getUpdates()
-    if (!queryData.text) return null
-    return queryData
-  }
-
-  async getUpdatesData(requestData: RequestDto): Promise<IQueryData[]> {
+  getUpdatesData(requestData: RequestDto): IQueryData[] {
     const updateData = new TelegramGetUpdatesResponse(requestData.result)
     return updateData.updates
   }

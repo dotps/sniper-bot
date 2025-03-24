@@ -1,7 +1,7 @@
 import { IsArray, IsBoolean, IsInt, IsNotEmpty, IsOptional, IsString, ValidateNested } from "class-validator"
 import { Type } from "class-transformer"
 
-export class ChatTelegramDto {
+export class TelegramChatDto {
   @IsNotEmpty()
   @IsInt()
   id: number
@@ -23,7 +23,7 @@ export class ChatTelegramDto {
   type: string
 }
 
-export class UserTelegramDto {
+export class TelegramUserDto {
   @IsNotEmpty()
   @IsInt()
   id: number
@@ -49,20 +49,20 @@ export class UserTelegramDto {
   language_code: string
 }
 
-export class MessageTelegramDto {
+export class TelegramMessageDto {
   @IsNotEmpty()
   @IsInt()
   message_id: number
 
   @IsNotEmpty()
   @ValidateNested({ each: true })
-  @Type(() => UserTelegramDto)
-  from: UserTelegramDto
+  @Type(() => TelegramUserDto)
+  from: TelegramUserDto
 
   @IsNotEmpty()
   @ValidateNested({ each: true })
-  @Type(() => ChatTelegramDto)
-  chat: ChatTelegramDto
+  @Type(() => TelegramChatDto)
+  chat: TelegramChatDto
 
   @IsNotEmpty()
   @IsInt()
@@ -73,18 +73,18 @@ export class MessageTelegramDto {
   text: string
 }
 
-export class ResultTelegramDto {
+export class TelegramResultDto {
   @IsNotEmpty()
   @IsInt()
   update_id: number
 
   @IsNotEmpty()
   @ValidateNested({ each: true })
-  @Type(() => MessageTelegramDto)
-  message: MessageTelegramDto
+  @Type(() => TelegramMessageDto)
+  message: TelegramMessageDto
 }
 
-export class RequestTelegramDto {
+export class TelegramRequestDto {
   @IsNotEmpty()
   @IsBoolean()
   ok: string
@@ -92,6 +92,6 @@ export class RequestTelegramDto {
   @IsNotEmpty()
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => ResultTelegramDto)
-  result: ResultTelegramDto[]
+  @Type(() => TelegramResultDto)
+  result: TelegramResultDto[]
 }

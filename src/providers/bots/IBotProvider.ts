@@ -1,20 +1,19 @@
 import { IQueryData } from "../../data/IQueryData"
 import { RequestDto } from "../../bots/bots.service"
-import { ITelegramUpdateData } from "../../data/Telegram/ITelegramUpdateData"
 
 export interface IBotProvider {
   sendResponse(text: string, queryData: IQueryData): Promise<void>
 
-  getUpdates(): Promise<IQueryData>
-  getBotUpdates(): void
+  getUpdates(): Promise<IQueryData[]>
+  startIntervalUpdates(): void
 
   init(): Promise<void>
 
   handleUpdate(requestData: any): Promise<IQueryData[]>
-  getUpdatesData(requestData: RequestDto): Promise<ITelegramUpdateData[]>
+  getUpdatesData(requestData: RequestDto): IQueryData[]
 
   isUseWebhook(): boolean
-  isUseUpdate(): boolean
+  isUseIntervalUpdate(): boolean
 }
 
 export enum BotType {

@@ -1,11 +1,12 @@
 import { Injectable, NotFoundException, OnModuleInit } from "@nestjs/common"
-import { RequestTelegramDto } from "./telegram/request-telegram.dto"
+import { TelegramRequestDto } from "./telegram/telegram-request.dto"
 import { BotProvider } from "../providers/bots/BotProvider"
 import { CommandHandler } from "../Commands/CommandHandler"
 import { Logger } from "../Utils/Logger"
 import { TelegramApiProvider } from "../providers/bots/telegram/TelegramApiProvider"
 import { VkApiProvider } from "../providers/bots/vk/VkApiProvider"
 import { RequestVkDto } from "./vk/request-vk.dto"
+import { IQueryData } from "../data/IQueryData"
 
 @Injectable()
 export class BotsService implements OnModuleInit {
@@ -23,15 +24,17 @@ export class BotsService implements OnModuleInit {
 
   async onModuleInit() {
     this.addBot(TelegramApiProvider, this.telegramBot)
-    this.addBot(VkApiProvider, this.vkBot)
+    // this.addBot(VkApiProvider, this.vkBot)
     await this.start()
+    console.log("onModuleInit")
   }
 
   async start(): Promise<void> {
     for (const bot of this.bots.values()) {
       await bot.init()
-      if (bot.isUseUpdate()) {
-        bot.getBotUpdates()
+      if (bot.isUseIntervalUpdate()) {
+        // TODO: вынести интервальное обновление из бота в сервис
+        bot.startIntervalUpdates()
       }
     }
   }
@@ -45,17 +48,25 @@ export class BotsService implements OnModuleInit {
     const bot = this.bots.get(botClass)
     if (!bot) throw new NotFoundException("Бот не найден.")
 
-    const queryDataList = await bot.getUpdatesData(data)
+    const queryDataList = bot.getUpdatesData(data)
 
+    // TODO: его использовать при интервальном обновлении
+    await this.handleUpdatesAndResponse(bot, queryDataList)
+  }
+
+  async handleUpdatesAndResponse(bot: BotProvider, queryDataList: IQueryData[]) {
     for (const queryData of queryDataList) {
       const response = await this.commandHandler.handleQuery(queryData)
-      if (!response) return
+      if (!response) continue
       const responseData = response?.data || []
       for (const text of responseData) {
         await bot.sendResponse(text, queryData)
       }
     }
   }
+
 }
 
-export type RequestDto = RequestTelegramDto | RequestVkDto
+
+
+export type RequestDto = TelegramRequestDto | RequestVkDto
