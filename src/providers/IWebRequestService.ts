@@ -1,3 +1,6 @@
+// export interface IWebRequestService {
+//   tryGet(url: string): Promise<any>
+// }
 export interface IWebRequestService {
-  tryGet(url: string): Promise<any>
+  tryGet<T>(url: string): Promise<T>
 }

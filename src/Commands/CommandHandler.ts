@@ -2,7 +2,9 @@ import { ICommandFactory } from "../Factory/ICommandFactory"
 import { ResponseData } from "../data/ResponseData"
 import { IQueryData } from "../data/IQueryData"
 import { Commands } from "./Commands"
+import { Injectable } from "@nestjs/common"
 
+@Injectable()
 export class CommandHandler {
   private defaultResponse: string = "Неизвестная команда."
 

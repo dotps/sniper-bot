@@ -26,11 +26,8 @@ export class TelegramApiProvider implements IBotProvider {
   }
 
   async init(): Promise<void> {
-    const response = await this.webRequestService.tryGet(
-      this.baseUrl + TelegramCommands.GET_ME,
-    )
-    const initResponse = new TelegramBaseResponse(response)
-    if (initResponse.ok) {
+    const response = await this.webRequestService.tryGet<TelegramBaseResponse>(this.baseUrl + TelegramCommands.GET_ME)
+    if (response.ok) {
       this.isBotRunning = true
       return
     } else {
@@ -45,8 +42,7 @@ export class TelegramApiProvider implements IBotProvider {
     }
 
     const url = `${this.baseUrl}${TelegramCommands.SEND_MESSAGE}?chat_id=${queryData.chatId}&text=${text}`
-    const botResponse = await this.webRequestService.tryGet(url)
-    const response = new TelegramBaseResponse(botResponse)
+    const response = await this.webRequestService.tryGet<TelegramBaseResponse>(url)
     if (!response?.ok) Logger.error(this.errorMessage + JSON.stringify(response))
   }
 

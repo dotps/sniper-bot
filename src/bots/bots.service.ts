@@ -3,24 +3,19 @@ import { RequestTelegramDto } from "./telegram/request-telegram.dto"
 import { BotProvider } from "../providers/bots/BotProvider"
 import { CommandHandler } from "../Commands/CommandHandler"
 import { Logger } from "../Utils/Logger"
-import { CommandFactory } from "../Factory/CommandFactory"
-import { UserService } from "../users/user.service"
 import { TelegramApiProvider } from "../providers/bots/telegram/TelegramApiProvider"
 import { VkApiProvider } from "../providers/bots/vk/VkApiProvider"
 import { RequestVkDto } from "./vk/request-vk.dto"
 
 @Injectable()
 export class BotsService implements OnModuleInit {
-  private readonly commandHandler: CommandHandler
   private bots: Map<new (...args: any[]) => BotProvider, BotProvider> = new Map()
 
   constructor(
     private readonly telegramBot: TelegramApiProvider,
     private readonly vkBot: VkApiProvider,
-    private readonly userService: UserService,
-  ) {
-    this.commandHandler = new CommandHandler(new CommandFactory(this.userService))
-  }
+    private readonly commandHandler: CommandHandler,
+  ) {}
 
   addBot<T extends BotProvider>(botClass: new (...args: any[]) => T, bot: T): void {
     this.bots.set(botClass, bot)
@@ -28,7 +23,7 @@ export class BotsService implements OnModuleInit {
 
   async onModuleInit() {
     this.addBot(TelegramApiProvider, this.telegramBot)
-    // this.addBot(VkApiProvider, this.vkBot)
+    this.addBot(VkApiProvider, this.vkBot)
     await this.start()
   }
 
