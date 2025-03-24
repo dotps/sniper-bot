@@ -8,7 +8,7 @@ export abstract class BotProvider implements IBotProvider {
   abstract sendResponse(text: string, queryData: IQueryData): Promise<void>
 
   abstract getUpdates(): Promise<IQueryData>
-  abstract getBotUpdates()
+  abstract getBotUpdates(): void
 
   abstract init(): Promise<void>
 
