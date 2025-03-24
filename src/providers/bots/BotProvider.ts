@@ -17,4 +17,6 @@ export abstract class BotProvider implements IBotProvider {
 
   abstract isUseWebhook(): boolean
   abstract isUseIntervalUpdate(): boolean
+
+  abstract getUpdateInterval(): number
 }

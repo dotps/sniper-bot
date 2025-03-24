@@ -10,6 +10,7 @@ import { TelegramConfig } from "./TelegramConfig"
 import { RequestDto } from "../../../bots/bots.service"
 import { TelegramRequestDto } from "../../../bots/telegram/telegram-request.dto"
 import { Injectable } from "@nestjs/common"
+import * as console from "node:console"
 
 @Injectable()
 export class TelegramApiProvider implements IBotProvider {
@@ -49,7 +50,7 @@ export class TelegramApiProvider implements IBotProvider {
   // async getUpdates(callback?: (queryDataList: IQueryData[]) => void): Promise<IQueryData[]> {
   async getUpdates(): Promise<IQueryData[]> {
     // const queryDataList = this.getUpdatesData(data)
-    // TODO: переделать
+    // TODO: где-то перестал записываться последний lastUpdateId
     // let queryData: QueryData[] = []
     const offset = this.lastUpdateId ? `offset=${this.lastUpdateId + 1}&` : ``
     const updatesUrl = `${this.baseUrl}${TelegramCommands.GET_UPDATES}?${offset}`
@@ -101,15 +102,19 @@ export class TelegramApiProvider implements IBotProvider {
     return this.canUseUpdate
   }
 
-  startIntervalUpdates() {
-    setInterval(async () => {
-      const queryDataList = await this.getUpdates()
-      console.log(queryDataList)
-    }, this.updateInterval)
-  }
+  // startIntervalUpdates() {
+  //   setInterval(async () => {
+  //     const queryDataList = await this.getUpdates()
+  //     console.log(queryDataList)
+  //   }, this.updateInterval)
+  // }
 
   getUpdatesData(requestData: RequestDto): IQueryData[] {
     const updateData = new TelegramGetUpdatesResponse(requestData.result)
     return updateData.updates
+  }
+
+  getUpdateInterval(): number {
+    return this.updateInterval
   }
 }

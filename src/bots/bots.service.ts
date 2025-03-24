@@ -34,7 +34,13 @@ export class BotsService implements OnModuleInit {
       await bot.init()
       if (bot.isUseIntervalUpdate()) {
         // TODO: вынести интервальное обновление из бота в сервис
-        bot.startIntervalUpdates()
+        // bot.startIntervalUpdates()
+        setInterval(async () => {
+          const queryDataList = await bot.getUpdates()
+          if (!queryDataList) return
+          console.log(queryDataList)
+          await this.handleUpdatesAndResponse(bot, queryDataList)
+        }, bot.getUpdateInterval())
       }
     }
   }

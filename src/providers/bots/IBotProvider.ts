@@ -14,6 +14,8 @@ export interface IBotProvider {
 
   isUseWebhook(): boolean
   isUseIntervalUpdate(): boolean
+
+  getUpdateInterval(): number
 }
 
 export enum BotType {
