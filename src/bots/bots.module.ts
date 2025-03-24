@@ -11,12 +11,20 @@ const webRequestService = new WebRequestFetchService()
 // TODO: реализовать регистрацию ботов telegram, vk в  сервис локаторе?
 // TODO: переписать бота используя возможности nest
 
-const botProvider = {
+const telegramBot = {
   provide: BotProvider,
   useFactory: () => {
     return new TelegramApiProvider(webRequestService)
   },
 }
+
+const vkBot = {
+  provide: BotProvider,
+  useFactory: () => {
+    return new TelegramApiProvider(webRequestService)
+  },
+}
+
 
 // const commandFactory = new CommandFactory()
 // const commandHandler = {
@@ -31,6 +39,6 @@ const botProvider = {
   imports: [UserModule],
   controllers: [BotsController],
   // providers: [botProvider, commandHandler, BotsService],
-  providers: [botProvider, BotsService],
+  providers: [telegramBot, vkBot, BotsService],
 })
 export class BotsModule {}

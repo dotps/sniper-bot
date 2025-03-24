@@ -13,6 +13,7 @@ export class BotsService implements OnModuleInit {
 
   constructor(
     private readonly botProvider: BotProvider,
+    private readonly vkBot: BotProvider,
     private readonly userService: UserService,
     // private readonly commandHandler: CommandHandler,
   ) {
