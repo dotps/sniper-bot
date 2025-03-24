@@ -5,6 +5,7 @@ import { TelegramApiProvider } from "../providers/bots/telegram/TelegramApiProvi
 import { WebRequestFetchService } from "../providers/WebRequestFetchService"
 import { BotProvider } from "../providers/bots/BotProvider"
 import { UserModule } from "../users/user.module"
+import { VkApiProvider } from "../providers/bots/vk/VkApiProvider"
 
 const webRequestService = new WebRequestFetchService()
 
@@ -12,19 +13,18 @@ const webRequestService = new WebRequestFetchService()
 // TODO: переписать бота используя возможности nest
 
 const telegramBot = {
-  provide: BotProvider,
+  provide: TelegramApiProvider,
   useFactory: () => {
     return new TelegramApiProvider(webRequestService)
   },
 }
 
 const vkBot = {
-  provide: BotProvider,
+  provide: VkApiProvider,
   useFactory: () => {
-    return new TelegramApiProvider(webRequestService)
+    return new VkApiProvider(webRequestService)
   },
 }
-
 
 // const commandFactory = new CommandFactory()
 // const commandHandler = {

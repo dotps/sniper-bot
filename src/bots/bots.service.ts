@@ -1,75 +1,67 @@
-import { Injectable, OnModuleInit } from "@nestjs/common"
+import { Injectable, NotFoundException, OnModuleInit } from "@nestjs/common"
 import { RequestTelegramDto } from "./telegram/request-telegram.dto"
 import { BotProvider } from "../providers/bots/BotProvider"
 import { CommandHandler } from "../Commands/CommandHandler"
 import { Logger } from "../Utils/Logger"
 import { CommandFactory } from "../Factory/CommandFactory"
 import { UserService } from "../users/user.service"
+import { TelegramApiProvider } from "../providers/bots/telegram/TelegramApiProvider"
+import { VkApiProvider } from "../providers/bots/vk/VkApiProvider"
+import { RequestVkDto } from "./vk/request-vk.dto"
 
 @Injectable()
 export class BotsService implements OnModuleInit {
-  private updateInterval: number = 5000
   private readonly commandHandler: CommandHandler
+  private bots: Map<new (...args: any[]) => BotProvider, BotProvider> = new Map()
 
   constructor(
-    private readonly botProvider: BotProvider,
-    private readonly vkBot: BotProvider,
+    private readonly telegramBot: TelegramApiProvider,
+    private readonly vkBot: VkApiProvider,
     private readonly userService: UserService,
-    // private readonly commandHandler: CommandHandler,
   ) {
     this.commandHandler = new CommandHandler(new CommandFactory(this.userService))
   }
 
+  addBot<T extends BotProvider>(botClass: new (...args: any[]) => T, bot: T): void {
+    this.bots.set(botClass, bot)
+  }
+
   async onModuleInit() {
+    this.addBot(TelegramApiProvider, this.telegramBot)
+    // this.addBot(VkApiProvider, this.vkBot)
     await this.start()
   }
 
   async start(): Promise<void> {
-    await this.botProvider.init()
-    if (this.botProvider.isUseUpdate()) {
-      this.getBotUpdates()
+    for (const bot of this.bots.values()) {
+      await bot.init()
+      if (bot.isUseUpdate()) {
+        bot.getBotUpdates()
+      }
     }
   }
 
-  async handleRequest(data: RequestTelegramDto) {
+  async handleRequest<T extends BotProvider>(data: RequestDto, botClass: new (...args: any[]) => T) {
     if (!data.ok || !data.result) {
       Logger.error("Данные от бота не получены.")
       return
     }
 
-    for (const updateData of data.result) {
-      console.log(updateData)
-      const queryData = await this.botProvider.handleUpdate(updateData)
+    const bot = this.bots.get(botClass)
+    if (!bot) throw new NotFoundException("Бот не найден.")
+
+    const queryDataList = await bot.getUpdatesData(data)
+    console.log(queryDataList)
+
+    for (const queryData of queryDataList) {
       const response = await this.commandHandler.handleQuery(queryData)
       if (!response) return
       const responseData = response?.data || []
       for (const text of responseData) {
-        await this.botProvider.sendResponse(text, queryData)
+        await bot.sendResponse(text, queryData)
       }
     }
-
-
-
-    // const queryData = await this.botProvider.handleUpdate(data.result)
-    // const response = await this.commandHandler.handleQuery(queryData)
-    // if (!response) return
-    // const responseData = response?.data || []
-    // for (const text of responseData) {
-    //   await this.botProvider.sendResponse(text, queryData)
-    // }
-  }
-
-  private getBotUpdates() {
-    setInterval(() => {
-      this.handleBotUpdate().catch((error) => {
-        Logger.error(error)
-      })
-    }, this.updateInterval)
-  }
-
-  private async handleBotUpdate() {
-    const queryData = await this.botProvider.getUpdates()
-    if (!queryData.text) return
-    await this.commandHandler.handleQuery(queryData)
   }
 }
+
+export type RequestDto = RequestTelegramDto | RequestVkDto

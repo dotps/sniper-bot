@@ -1,7 +1,7 @@
-import { ITelegramUpdateData } from "./ITelegramUpdateData"
+import { IQueryData } from "../IQueryData"
 
 export class TelegramGetUpdatesResponse {
-  updates: ITelegramUpdateData[]
+  updates: IQueryData[]
 
   constructor(data: any) {
     if (!Array.isArray(data)) {
@@ -18,7 +18,7 @@ export class TelegramGetUpdatesResponse {
     }))
   }
 
-  getLastUpdate(): ITelegramUpdateData | null {
+  getLastUpdate(): IQueryData | null {
     if (this.updates.length === 0) return null
     return this.updates[this.updates.length - 1]
   }

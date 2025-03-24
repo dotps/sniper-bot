@@ -1,6 +1,6 @@
 import { IQueryData } from "../IQueryData"
 
-export class TelegramQueryData implements IQueryData {
+export class QueryData implements IQueryData {
   text: string
   updateId: number
   chatId: number

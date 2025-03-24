@@ -10,9 +10,7 @@ export class WebRequestFetchService implements IWebRequestService {
       const responseData = await response.json()
 
       if (!response.ok) {
-        Logger.error(
-          `${response.status} ${response.statusText} ${JSON.stringify(responseData)}`,
-        )
+        Logger.error(`${response.status} ${response.statusText} ${JSON.stringify(responseData)}`)
         return null
       }
 
