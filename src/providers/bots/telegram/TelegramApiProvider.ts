@@ -1,6 +1,6 @@
 import { IBotProvider } from "../IBotProvider"
 import { IWebRequestService } from "../../IWebRequestService"
-import { Logger } from "../../../Utils/Logger"
+import { Logger } from "../../../utils/Logger"
 import { TelegramCommands } from "./TelegramCommands"
 import { TelegramBaseResponse } from "../../../data/Telegram/TelegramBaseResponse"
 import { TelegramGetUpdatesResponse } from "../../../data/Telegram/TelegramGetUpdatesResponse"

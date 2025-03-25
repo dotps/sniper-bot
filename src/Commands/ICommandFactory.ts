@@ -1,6 +1,6 @@
-import { ICommand } from "../Commands/ICommand"
+import { ICommand } from "./ICommand"
 import { CommandData } from "../data/CommandData"
-import { Command } from "../Commands/CommandHandler"
+import { Command } from "./CommandHandler"
 
 export interface ICommandFactory {
   // createCommand(commandData: CommandData): ICommand | null
