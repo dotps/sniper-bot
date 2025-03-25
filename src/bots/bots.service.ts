@@ -26,21 +26,25 @@ export class BotsService implements OnModuleInit {
     this.addBot(TelegramApiProvider, this.telegramBot)
     // this.addBot(VkApiProvider, this.vkBot)
     await this.start()
-    console.log("onModuleInit")
   }
 
   async start(): Promise<void> {
     for (const bot of this.bots.values()) {
       await bot.init()
       if (bot.isUseIntervalUpdate()) {
-        setInterval(async () => {
-          const queryDataList = await bot.getUpdates()
-          if (!queryDataList) return
-          console.log(queryDataList)
-          await this.handleUpdatesAndResponse(bot, queryDataList)
+        setInterval(() => {
+          this.getUpdates(bot).catch((error) => {
+            Logger.error("Ошибка обработки данных от провайдера бота.")
+          })
         }, bot.getUpdateInterval())
       }
     }
+  }
+
+  private async getUpdates(bot: BotProvider): Promise<void> {
+    const queryDataList = await bot.getUpdates()
+    if (!queryDataList) return
+    await this.handleUpdatesAndSendResponse(bot, queryDataList)
   }
 
   async handleRequest<T extends BotProvider>(data: RequestDto, botClass: new (...args: any[]) => T) {
@@ -54,11 +58,10 @@ export class BotsService implements OnModuleInit {
 
     const queryDataList = bot.getUpdatesData(data)
 
-    // TODO: его использовать при интервальном обновлении
-    await this.handleUpdatesAndResponse(bot, queryDataList)
+    await this.handleUpdatesAndSendResponse(bot, queryDataList)
   }
 
-  async handleUpdatesAndResponse(bot: BotProvider, queryDataList: IQueryData[]) {
+  async handleUpdatesAndSendResponse(bot: BotProvider, queryDataList: IQueryData[]) {
     for (const queryData of queryDataList) {
       const response = await this.commandHandler.handleQuery(queryData)
       if (!response) continue
