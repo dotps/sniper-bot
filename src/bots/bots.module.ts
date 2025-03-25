@@ -35,10 +35,10 @@ const commandFactory = {
 
 const commandHandler = {
   provide: CommandHandler,
-  useFactory: (commandFactory: CommandFactory) => {
-    return new CommandHandler(commandFactory)
+  useFactory: (commandFactory: CommandFactory, userService: UserService) => {
+    return new CommandHandler(commandFactory, userService)
   },
-  inject: [CommandFactory],
+  inject: [CommandFactory, UserService],
 }
 
 @Module({

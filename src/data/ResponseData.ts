@@ -1,7 +1,7 @@
 export class ResponseData {
   public data: string[] = []
 
-  constructor(data?: string[]) {
-    if (data) this.data = data
+  constructor(data?: string[] | string) {
+    if (data) this.data = Array.isArray(data) ? data : [data]
   }
 }

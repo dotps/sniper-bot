@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
 import { User } from "./user.entity"
 import { UserDto } from "./user.dto"
+import { BotType } from "../providers/bots/IBotProvider"
 
 @Injectable()
 export class UserService {
@@ -11,8 +12,18 @@ export class UserService {
     private readonly repository: Repository<User>,
   ) {}
 
-  async createUser(data: UserDto): Promise<void> {
+  async isUserExist(userId: number, botType: BotType): Promise<boolean> {
+    const user = await this.repository.findOneBy({ userId, botType })
+    return user ? true : false
+  }
+
+  async getUser(userId: number, botType: BotType): Promise<User | null> {
+    return await this.repository.findOneBy({ userId, botType })
+  }
+
+  async createUser(data: UserDto): Promise<User> {
     console.log(data)
+    return new User()
     // const user = this.repository.create(data)
     // const user = this.repository.create([data])
     // return await this.repository.save(user)

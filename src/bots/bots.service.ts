@@ -7,6 +7,7 @@ import { TelegramApiProvider } from "../providers/bots/telegram/TelegramApiProvi
 import { VkApiProvider } from "../providers/bots/vk/VkApiProvider"
 import { RequestVkDto } from "./vk/request-vk.dto"
 import { IQueryData } from "../data/IQueryData"
+import { UserService } from "../users/user.service"
 
 @Injectable()
 export class BotsService implements OnModuleInit {
@@ -16,6 +17,7 @@ export class BotsService implements OnModuleInit {
     private readonly telegramBot: TelegramApiProvider,
     private readonly vkBot: VkApiProvider,
     private readonly commandHandler: CommandHandler,
+    private readonly userService: UserService,
   ) {}
 
   addBot<T extends BotProvider>(botClass: new (...args: any[]) => T, bot: T): void {
@@ -56,18 +58,23 @@ export class BotsService implements OnModuleInit {
     const bot = this.bots.get(botClass)
     if (!bot) throw new NotFoundException("Бот не найден.")
 
+    // console.log(data)
+
     const queryDataList = bot.getUpdatesData(data)
+    console.log(queryDataList)
+
 
     await this.handleUpdatesAndSendResponse(bot, queryDataList)
   }
 
-  async handleUpdatesAndSendResponse(bot: BotProvider, queryDataList: IQueryData[]) {
-    for (const queryData of queryDataList) {
-      const response = await this.commandHandler.handleQuery(queryData)
+  async handleUpdatesAndSendResponse(bot: BotProvider, updateDataList: IQueryData[]) {
+    for (const updateData of updateDataList) {
+      console.log(updateData)
+      const response = await this.commandHandler.handleCommandFromUpdates(updateData, bot.getBotType())
       if (!response) continue
       const responseData = response?.data || []
       for (const text of responseData) {
-        await bot.sendResponse(text, queryData)
+        await bot.sendResponse(text, updateData)
       }
     }
   }

@@ -1,4 +1,4 @@
-import { IBotProvider } from "../IBotProvider"
+import { BotType, IBotProvider } from "../IBotProvider"
 import { IWebRequestService } from "../../IWebRequestService"
 import { Logger } from "../../../utils/Logger"
 import { TelegramCommands } from "./TelegramCommands"
@@ -15,13 +15,18 @@ export class TelegramApiProvider implements IBotProvider {
   private readonly apiUrl: string = "https://api.telegram.org/bot"
   private readonly token: string = TelegramConfig.token
   private readonly baseUrl: string = this.apiUrl + this.token + "/"
-  private readonly canUseWebhook = TelegramConfig.canUseWebhook
-  private readonly canUseUpdate = TelegramConfig.canUseUpdate
+  private readonly canUseWebhook: boolean = TelegramConfig.canUseWebhook
+  private readonly canUseUpdate: boolean = TelegramConfig.canUseUpdate
+  private readonly botType: BotType = BotType.TELEGRAM
   private lastUpdateId: number = 0
   private isBotRunning: boolean = false
   private updateInterval: number = 5000
 
   constructor(private readonly webRequestService: IWebRequestService) {}
+
+  getBotType(): BotType {
+    return this.botType
+  }
 
   async init(): Promise<void> {
     const telegramResponse = await this.webRequestService.tryGet<TelegramBaseDto>(
@@ -56,6 +61,9 @@ export class TelegramApiProvider implements IBotProvider {
     const updatesUrl = `${this.baseUrl}${TelegramCommands.GET_UPDATES}?${offset}`
     const telegramResponse = await this.webRequestService.tryGet<TelegramUpdatesDto>(updatesUrl)
     const telegramResponseDto = plainToClass(TelegramUpdatesDto, telegramResponse)
+
+    // TODO: добавить поле fromUser для создания DTO
+
     return (await this.validateResponse(telegramResponseDto)) ? this.getUpdatesData(telegramResponseDto) : []
   }
 

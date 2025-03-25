@@ -1,8 +1,7 @@
 import { ICommand } from "./ICommand"
-import { CommandData } from "../data/CommandData"
 import { Command } from "./CommandHandler"
+import { User } from "../users/user.entity"
 
 export interface ICommandFactory {
-  // createCommand(commandData: CommandData): ICommand | null
-  createCommand(commandData: Command): ICommand | null
+  createCommand(user: User | null, commandData: Command): ICommand | null
 }

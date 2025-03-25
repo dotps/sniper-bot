@@ -1,8 +1,9 @@
 import { IQueryData } from "../../data/IQueryData"
-import { IBotProvider } from "./IBotProvider"
+import { BotType, IBotProvider } from "./IBotProvider"
 import { RequestDto } from "../../bots/bots.service"
 
 export abstract class BotProvider implements IBotProvider {
+  abstract getBotType(): BotType
   abstract sendResponse(text: string, queryData: IQueryData): Promise<void>
   abstract getUpdates(): Promise<IQueryData[]>
   abstract init(): Promise<void>
