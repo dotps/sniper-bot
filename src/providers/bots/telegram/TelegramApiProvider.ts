@@ -7,7 +7,9 @@ import { TelegramGetUpdatesResponse } from "../../../data/Telegram/TelegramGetUp
 import { IQueryData } from "../../../data/IQueryData"
 import { TelegramConfig } from "./TelegramConfig"
 import { RequestDto } from "../../../bots/bots.service"
-import { TelegramRequestDto } from "../../../bots/telegram/telegram-request.dto"
+import { TelegramUpdatesDto, TelegramBaseDto } from "../../../bots/telegram/telegramUpdatesDto"
+import { plainToClass } from "class-transformer"
+import { validate } from "class-validator"
 
 export class TelegramApiProvider implements IBotProvider {
   private readonly apiUrl: string = "https://api.telegram.org/bot"
@@ -16,15 +18,18 @@ export class TelegramApiProvider implements IBotProvider {
   private readonly canUseWebhook = TelegramConfig.canUseWebhook
   private readonly canUseUpdate = TelegramConfig.canUseUpdate
   private lastUpdateId: number = 0
-  private errorMessage: string = "Telegram не ok: "
   private isBotRunning: boolean = false
   private updateInterval: number = 5000
 
   constructor(private readonly webRequestService: IWebRequestService) {}
 
   async init(): Promise<void> {
-    const response = await this.webRequestService.tryGet<TelegramRequestDto>(this.baseUrl + TelegramCommands.GET_ME)
-    if (response.ok) {
+    const telegramResponse = await this.webRequestService.tryGet<TelegramBaseDto>(
+      this.baseUrl + TelegramCommands.GET_ME,
+    )
+    const telegramResponseDto = plainToClass(TelegramBaseDto, telegramResponse)
+
+    if (await this.validateResponse(telegramResponseDto)) {
       this.isBotRunning = true
       return
     } else {
@@ -41,22 +46,17 @@ export class TelegramApiProvider implements IBotProvider {
     this.lastUpdateId = queryData.updateId
 
     const url = `${this.baseUrl}${TelegramCommands.SEND_MESSAGE}?chat_id=${queryData.chatId}&text=${text}`
-    const response = await this.webRequestService.tryGet<TelegramBaseResponse>(url)
-    if (!response?.ok) Logger.error(this.errorMessage + JSON.stringify(response))
+    const telegramResponse = await this.webRequestService.tryGet<TelegramBaseDto>(url)
+    const telegramResponseDto = plainToClass(TelegramBaseDto, telegramResponse)
+    await this.validateResponse(telegramResponseDto)
   }
 
   async getUpdates(): Promise<IQueryData[]> {
     const offset = this.lastUpdateId ? `offset=${this.lastUpdateId + 1}&` : ``
     const updatesUrl = `${this.baseUrl}${TelegramCommands.GET_UPDATES}?${offset}`
-    // TODO: тут бы проверить на валидность объекта, ValidationPipes ?
-    const response = await this.webRequestService.tryGet<TelegramRequestDto>(updatesUrl)
-
-    if (!response?.ok) {
-      Logger.error(this.errorMessage + JSON.stringify(response))
-      return []
-    }
-
-    return this.getUpdatesData(response)
+    const telegramResponse = await this.webRequestService.tryGet<TelegramUpdatesDto>(updatesUrl)
+    const telegramResponseDto = plainToClass(TelegramUpdatesDto, telegramResponse)
+    return (await this.validateResponse(telegramResponseDto)) ? this.getUpdatesData(telegramResponseDto) : []
   }
 
   isUseWebhook(): boolean {
@@ -74,5 +74,14 @@ export class TelegramApiProvider implements IBotProvider {
 
   getUpdateInterval(): number {
     return this.updateInterval
+  }
+
+  private async validateResponse(telegramResponseDto: TelegramUpdatesDto | TelegramBaseDto) {
+    const errors = await validate(telegramResponseDto)
+    if (errors.length > 0) {
+      Logger.error("Ошибка валидации " + JSON.stringify(errors))
+      return false
+    }
+    return true
   }
 }

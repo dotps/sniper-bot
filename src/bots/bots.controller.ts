@@ -1,5 +1,5 @@
 import { Body, Controller, HttpCode, HttpStatus, Post, UsePipes, ValidationPipe } from "@nestjs/common"
-import { TelegramRequestDto } from "./telegram/telegram-request.dto"
+import { TelegramUpdatesDto } from "./telegram/telegramUpdatesDto"
 import { BotsService } from "./bots.service"
 import { RequestVkDto } from "./vk/request-vk.dto"
 import { TelegramApiProvider } from "../providers/bots/telegram/TelegramApiProvider"
@@ -12,7 +12,7 @@ export class BotsController {
   @Post("telegram")
   @HttpCode(HttpStatus.OK)
   @UsePipes(ValidationPipe)
-  async handleTelegram(@Body() data: TelegramRequestDto): Promise<void> {
+  async handleTelegram(@Body() data: TelegramUpdatesDto): Promise<void> {
     await this.botsService.handleRequest(data, TelegramApiProvider)
   }
 

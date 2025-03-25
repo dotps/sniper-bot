@@ -84,7 +84,7 @@ export class TelegramResultDto {
   message: TelegramMessageDto
 }
 
-export class TelegramRequestDto {
+export class TelegramUpdatesDto {
   @IsNotEmpty()
   @IsBoolean()
   ok: string
@@ -94,4 +94,10 @@ export class TelegramRequestDto {
   @ValidateNested({ each: true })
   @Type(() => TelegramResultDto)
   result: TelegramResultDto[]
+}
+
+export class TelegramBaseDto {
+  @IsNotEmpty()
+  @IsBoolean()
+  ok: string
 }

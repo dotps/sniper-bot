@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException, OnModuleInit } from "@nestjs/common"
-import { TelegramRequestDto } from "./telegram/telegram-request.dto"
+import { TelegramUpdatesDto } from "./telegram/telegramUpdatesDto"
 import { BotProvider } from "../providers/bots/BotProvider"
 import { CommandHandler } from "../Commands/CommandHandler"
 import { Logger } from "../Utils/Logger"
@@ -25,10 +25,10 @@ export class BotsService implements OnModuleInit {
   async onModuleInit() {
     this.addBot(TelegramApiProvider, this.telegramBot)
     // this.addBot(VkApiProvider, this.vkBot)
-    await this.start()
+    await this.initBots()
   }
 
-  async start(): Promise<void> {
+  async initBots(): Promise<void> {
     for (const bot of this.bots.values()) {
       await bot.init()
       if (bot.isUseIntervalUpdate()) {
@@ -73,4 +73,4 @@ export class BotsService implements OnModuleInit {
   }
 }
 
-export type RequestDto = TelegramRequestDto | RequestVkDto
+export type RequestDto = TelegramUpdatesDto | RequestVkDto
