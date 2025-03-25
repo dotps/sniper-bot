@@ -6,8 +6,8 @@ import { WebRequestFetchService } from "../providers/WebRequestFetchService"
 import { UserModule } from "../users/user.module"
 import { VkApiProvider } from "../providers/bots/vk/VkApiProvider"
 import { UserService } from "../users/user.service"
-import { CommandFactory } from "../Commands/CommandFactory"
-import { CommandHandler } from "../Commands/CommandHandler"
+import { CommandFactory } from "../commands/CommandFactory"
+import { CommandHandler } from "../commands/CommandHandler"
 
 const webRequestService = new WebRequestFetchService()
 
