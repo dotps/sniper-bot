@@ -33,8 +33,6 @@ export class BotsService implements OnModuleInit {
     for (const bot of this.bots.values()) {
       await bot.init()
       if (bot.isUseIntervalUpdate()) {
-        // TODO: вынести интервальное обновление из бота в сервис
-        // bot.startIntervalUpdates()
         setInterval(async () => {
           const queryDataList = await bot.getUpdates()
           if (!queryDataList) return
@@ -70,9 +68,6 @@ export class BotsService implements OnModuleInit {
       }
     }
   }
-
 }
-
-
 
 export type RequestDto = TelegramRequestDto | RequestVkDto

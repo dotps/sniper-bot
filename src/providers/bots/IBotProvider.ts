@@ -5,7 +5,7 @@ export interface IBotProvider {
   sendResponse(text: string, queryData: IQueryData): Promise<void>
 
   getUpdates(): Promise<IQueryData[]>
-  startIntervalUpdates(): void
+  // startIntervalUpdates(): void
 
   init(): Promise<void>
 

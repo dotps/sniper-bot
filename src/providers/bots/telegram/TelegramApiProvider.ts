@@ -10,7 +10,6 @@ import { TelegramConfig } from "./TelegramConfig"
 import { RequestDto } from "../../../bots/bots.service"
 import { TelegramRequestDto } from "../../../bots/telegram/telegram-request.dto"
 import { Injectable } from "@nestjs/common"
-import * as console from "node:console"
 
 @Injectable()
 export class TelegramApiProvider implements IBotProvider {
@@ -41,6 +40,8 @@ export class TelegramApiProvider implements IBotProvider {
       Logger.log("Бот не инициализирован.")
       return
     }
+
+    this.lastUpdateId = queryData.updateId
 
     const url = `${this.baseUrl}${TelegramCommands.SEND_MESSAGE}?chat_id=${queryData.chatId}&text=${text}`
     const response = await this.webRequestService.tryGet<TelegramBaseResponse>(url)
@@ -101,13 +102,6 @@ export class TelegramApiProvider implements IBotProvider {
   isUseIntervalUpdate(): boolean {
     return this.canUseUpdate
   }
-
-  // startIntervalUpdates() {
-  //   setInterval(async () => {
-  //     const queryDataList = await this.getUpdates()
-  //     console.log(queryDataList)
-  //   }, this.updateInterval)
-  // }
 
   getUpdatesData(requestData: RequestDto): IQueryData[] {
     const updateData = new TelegramGetUpdatesResponse(requestData.result)
