@@ -6,11 +6,12 @@ import { databaseProvider } from "./providers/database.provider"
 import { BotsModule } from "./bots/bots.module"
 import { ConsoleLogger } from "./utils/ConsoleLogger"
 import { Logger } from "./utils/Logger"
+import { BlockchainModule } from "./blockchain/blockchain.module"
 
 Logger.init(new ConsoleLogger(true))
 
 @Module({
-  imports: [configModule, databaseProvider, BotsModule],
+  imports: [configModule, databaseProvider, BotsModule, BlockchainModule],
   controllers: [AppController],
   providers: [AppService],
 })

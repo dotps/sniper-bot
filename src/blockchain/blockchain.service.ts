@@ -11,5 +11,6 @@ export class BlockchainService {
       chain: mainnet,
       transport: http(),
     })
+    // TODO: реализовать подключение к binance
   }
 }
