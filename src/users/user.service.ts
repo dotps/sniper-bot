@@ -21,12 +21,10 @@ export class UserService {
     return await this.repository.findOneBy({ userId, botType })
   }
 
-  async createUser(data: UserDto): Promise<User> {
-    console.log(data)
-    return new User()
+  async createUser(user: User): Promise<User> {
     // const user = this.repository.create(data)
     // const user = this.repository.create([data])
-    // return await this.repository.save(user)
+    return await this.repository.save(user)
   }
 
   // async getUser(id: number): Promise<User> {

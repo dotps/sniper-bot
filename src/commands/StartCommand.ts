@@ -4,16 +4,16 @@ import { UserService } from "../users/user.service"
 import { Commands } from "./Commands"
 import { Command } from "./CommandHandler"
 import { User } from "../users/user.entity"
-import { UserDto } from "../users/user.dto"
 
 export class StartCommand implements ICommand {
   private readonly userService: UserService
   private readonly commandData: Command
-  private user: User
-  private response: string[] = [
+  private readonly user: User
+  private baseResponse: string[] = [
     `Привет! Я помогу тебе узнать текущие курсы валют.`,
     `Напиши ${Commands.CURRENCY} для получения списка доступных валют.`,
   ]
+    // TODO: переделать уведомление
 
   constructor(userService: UserService, user: User, commandData: Command) {
     this.user = user
@@ -22,14 +22,15 @@ export class StartCommand implements ICommand {
   }
 
   async execute(): Promise<ResponseData | null> {
+    const response: string[] = []
+
     if (!this.user?.id) {
-      // const userDto: UserDto = {
-      //   name: this.user.id.toString(),
-      // }
-      console.log(this.commandData)
-      console.log(this.user)
-      // this.user = await this.userService.createUser(userDto)
+      const user = await this.userService.createUser(this.user)
+      if (user) response.push("Вы зарегистрированы в сервисе. Для дальнейших действий отправьте команду.")
+      else response.push("Ошибка регистрации.")
     }
-    return new ResponseData(this.response)
+
+    response.push(...this.baseResponse)
+    return new ResponseData(response)
   }
 }

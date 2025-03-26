@@ -1,3 +1,4 @@
+import { BotType } from "src/providers/bots/IBotProvider"
 import { IQueryData } from "../IQueryData"
 
 export class QueryData implements IQueryData {
@@ -5,6 +6,10 @@ export class QueryData implements IQueryData {
   updateId: number
   chatId: number
   userId: number
+  firstName: string
+  lastName: string
+  username: string
+  botType: BotType
 
   constructor(data?: any) {
     this.text = data?.text || ""

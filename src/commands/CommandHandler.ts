@@ -5,7 +5,6 @@ import { Logger } from "../utils/Logger"
 import { ICommandFactory } from "./ICommandFactory"
 import { Commands } from "./Commands"
 import { UserService } from "../users/user.service"
-import { BotType } from "../providers/bots/IBotProvider"
 import { User } from "../users/user.entity"
 import { plainToClass } from "class-transformer"
 
@@ -20,17 +19,26 @@ export class CommandHandler {
     private readonly userService: UserService,
   ) {}
 
-  async handleCommandFromUpdates(updateData: IQueryData, botType: BotType): Promise<ResponseData | null> {
+  async handleCommandFromUpdates(updateData: IQueryData): Promise<ResponseData | null> {
     try {
-      let user = await this.userService.getUser(updateData.userId, botType)
+      let user = await this.userService.getUser(updateData.userId, updateData.botType)
       const parsedCommand = this.parseCommand(updateData.text)
 
-      console.log(updateData)
+      console.log(user)
+      // console.log(updateData)
 
       if (!parsedCommand) return new ResponseData(this.enterCommandMessage)
       if (parsedCommand.command !== Commands.START && !user) return new ResponseData(this.needRegisterMessage)
 
-      if (!user) user = plainToClass(User, updateData, { excludeExtraneousValues: true })
+      if (!user) {
+        // создал модель пользователя чтобы потом можно было создать его в БД
+        user = plainToClass(User, updateData, { excludeExtraneousValues: true })
+        console.log(user)
+      }
+
+      console.log(">>>>>>>")
+      console.log(parsedCommand)
+
       const command = this.commandFactory.createCommand(user, parsedCommand)
 
       return command ? await command.execute() : new ResponseData(this.defaultMessage)

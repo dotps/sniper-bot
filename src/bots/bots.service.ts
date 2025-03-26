@@ -58,19 +58,15 @@ export class BotsService implements OnModuleInit {
     const bot = this.bots.get(botClass)
     if (!bot) throw new NotFoundException("Бот не найден.")
 
-    // console.log(data)
-
     const queryDataList = bot.getUpdatesData(data)
-    console.log(queryDataList)
-
 
     await this.handleUpdatesAndSendResponse(bot, queryDataList)
   }
 
   async handleUpdatesAndSendResponse(bot: BotProvider, updateDataList: IQueryData[]) {
     for (const updateData of updateDataList) {
-      console.log(updateData)
-      const response = await this.commandHandler.handleCommandFromUpdates(updateData, bot.getBotType())
+      updateData.botType = bot.getBotType()
+      const response = await this.commandHandler.handleCommandFromUpdates(updateData)
       if (!response) continue
       const responseData = response?.data || []
       for (const text of responseData) {

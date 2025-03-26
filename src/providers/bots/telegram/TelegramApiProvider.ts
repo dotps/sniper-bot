@@ -2,7 +2,6 @@ import { BotType, IBotProvider } from "../IBotProvider"
 import { IWebRequestService } from "../../IWebRequestService"
 import { Logger } from "../../../utils/Logger"
 import { TelegramCommands } from "./TelegramCommands"
-import { TelegramBaseResponse } from "../../../data/Telegram/TelegramBaseResponse"
 import { TelegramGetUpdatesResponse } from "../../../data/Telegram/TelegramGetUpdatesResponse"
 import { IQueryData } from "../../../data/IQueryData"
 import { TelegramConfig } from "./TelegramConfig"
@@ -61,8 +60,10 @@ export class TelegramApiProvider implements IBotProvider {
     const updatesUrl = `${this.baseUrl}${TelegramCommands.GET_UPDATES}?${offset}`
     const telegramResponse = await this.webRequestService.tryGet<TelegramUpdatesDto>(updatesUrl)
     const telegramResponseDto = plainToClass(TelegramUpdatesDto, telegramResponse)
-
+    // console.log(telegramResponse)
+    // console.log(telegramResponseDto)
     // TODO: добавить поле fromUser для создания DTO
+    // updateData.botType = bot.getBotType()
 
     return (await this.validateResponse(telegramResponseDto)) ? this.getUpdatesData(telegramResponseDto) : []
   }

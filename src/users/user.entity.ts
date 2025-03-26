@@ -4,7 +4,6 @@ import { Expose } from "class-transformer"
 
 @Entity()
 export class User {
-  @Expose()
   @PrimaryGeneratedColumn()
   readonly id: number
 
@@ -35,8 +34,4 @@ export class User {
     default: BotType.TELEGRAM,
   })
   readonly botType: BotType
-
-  @Expose()
-  @Column({ default: "ru" })
-  readonly languageCode: string
 }
