@@ -5,6 +5,7 @@ import { generatePrivateKey, privateKeyToAccount } from "viem/accounts"
 @Injectable()
 export class BlockchainService {
   private readonly client: PublicClient
+  private readonly defaultBlockchain = Blockchain.BSC
   private clients: Map<Blockchain, PublicClient> = new Map()
 
   constructor() {
@@ -25,7 +26,7 @@ export class BlockchainService {
     this.clients.set(Blockchain.POLYGON, polygonClient)
   }
 
-  getClient(clientType: Blockchain): PublicClient {
+  getClient(clientType: Blockchain = this.defaultBlockchain): PublicClient {
     const client = this.clients.get(clientType)
     if (!client) throw Error("Клиент не найден.")
     return client
@@ -35,6 +36,10 @@ export class BlockchainService {
     const privateKey = generatePrivateKey()
     const account = privateKeyToAccount(privateKey)
     return account.address
+  }
+
+  getTokenBalance(clientType?: Blockchain) {
+    this.getClient(clientType)
   }
 }
 

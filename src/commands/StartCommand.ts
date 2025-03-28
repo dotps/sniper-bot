@@ -1,7 +1,6 @@
 import { ICommand } from "./ICommand"
 import { ResponseData } from "../data/ResponseData"
 import { UserService } from "../users/user.service"
-import { Commands } from "./Commands"
 import { Command } from "./CommandHandler"
 import { User } from "../users/user.entity"
 

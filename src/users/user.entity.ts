@@ -1,6 +1,7 @@
 import { BotType } from "src/providers/bots/IBotProvider"
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm"
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm"
 import { Expose } from "class-transformer"
+import { Token } from "../blockchain/token.entity"
 
 @Entity()
 export class User {
@@ -21,11 +22,11 @@ export class User {
 
   @Expose()
   @Column()
-  readonly chatId: number
+  readonly chatId: number // TODO: убрать, лишнее
 
   @Expose()
   @Column()
-  readonly userId: number
+  readonly userId: number // TODO: путает, нужно что-то типа botUserId / providerUserId - подумать
 
   @Expose()
   @Column({
@@ -34,4 +35,7 @@ export class User {
     default: BotType.TELEGRAM,
   })
   readonly botType: BotType
+
+  @OneToMany(() => Token, (token) => token.user)
+  tokens: Token[]
 }

@@ -24,19 +24,16 @@ export class CommandHandler {
       let user = await this.userService.getUser(updateData.userId, updateData.botType)
       const parsedCommand = this.parseCommand(updateData.text)
 
-      console.log(user)
-      // console.log(updateData)
-
       if (!parsedCommand) return new ResponseData(this.enterCommandMessage)
       if (parsedCommand.command !== Commands.START && !user) return new ResponseData(this.needRegisterMessage)
 
       if (!user) {
         // создал модель пользователя чтобы потом можно было создать его в БД
         user = plainToClass(User, updateData, { excludeExtraneousValues: true })
-        console.log(user)
+        // console.log(user)
       }
 
-      console.log(">>>>>>>")
+      console.log(user)
       console.log(parsedCommand)
 
       const command = this.commandFactory.createCommand(user, parsedCommand)
@@ -51,12 +48,11 @@ export class CommandHandler {
 
   parseCommand(input: string): Command | null {
     const commands = input.toLowerCase().trim().match(/\/\w+/g)
-    let params: string[] = []
-
     if (!commands || commands.length > 1) return null
 
     const command = commands[0] as Commands
-    params = input.replace(command, "").trim().split(" ")
+    const clearedInput = input.replace(command, "").trim()
+    const params = clearedInput ? clearedInput.split(/\s+/) : undefined
 
     return {
       command: command,

@@ -8,6 +8,10 @@ import { VkApiProvider } from "../providers/bots/vk/VkApiProvider"
 import { UserService } from "../users/user.service"
 import { CommandFactory } from "../commands/CommandFactory"
 import { CommandHandler } from "../commands/CommandHandler"
+import { TokenService } from "../blockchain/token.service"
+import { TypeOrmModule } from "@nestjs/typeorm"
+import { User } from "../users/user.entity"
+import { Token } from "../blockchain/token.entity"
 
 const webRequestService = new WebRequestFetchService()
 
@@ -27,10 +31,10 @@ const vkBot = {
 
 const commandFactory = {
   provide: CommandFactory,
-  useFactory: (userService: UserService) => {
-    return new CommandFactory(userService)
+  useFactory: (userService: UserService, tokenService: TokenService) => {
+    return new CommandFactory(userService, tokenService)
   },
-  inject: [UserService],
+  inject: [UserService, TokenService],
 }
 
 const commandHandler = {
@@ -42,8 +46,8 @@ const commandHandler = {
 }
 
 @Module({
-  imports: [UserModule],
+  imports: [UserModule, TypeOrmModule.forFeature([Token])],
   controllers: [BotsController],
-  providers: [telegramBot, vkBot, BotsService, commandFactory, commandHandler],
+  providers: [telegramBot, vkBot, BotsService, commandFactory, commandHandler, TokenService],
 })
 export class BotsModule {}
