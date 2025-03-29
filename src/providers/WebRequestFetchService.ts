@@ -6,7 +6,7 @@ export class WebRequestFetchService implements IWebRequestService {
     try {
       Logger.log(`Query: ${url}`)
 
-      const response = await fetch(url)
+      const response = await fetch(encodeURI(url))
       const responseData = (await response.json()) as T
 
       if (!response.ok) {

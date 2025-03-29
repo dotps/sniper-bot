@@ -6,6 +6,8 @@ import { Commands } from "./Commands"
 import { TokenService } from "../blockchain/token.service"
 import { TokenDto } from "../blockchain/token.dto"
 import { Hex } from "viem"
+import { ResponseBotError } from "../errors/ResponseBotError"
+import { Logger } from "../utils/Logger"
 
 export class AddTokenCommand implements ICommand {
   private readonly tokenService: TokenService
@@ -31,10 +33,17 @@ export class AddTokenCommand implements ICommand {
       userId: this.user.id,
     }
 
-    const token = await this.tokenService.addToken(tokenDto)
-    console.log(token)
-    // TODO: 5 токенов на пользователя + проверка на дубль
+    try {
+      await this.tokenService.addToken(tokenDto)
+      const tokens = await this.tokenService.getUserTokens(this.user.id)
+      const addresses = tokens.map((token) => token.address).join("\n")
 
+      response.push("Токен успешно добавлен.")
+      response.push("Список токенов:\n" + addresses)
+    } catch (error) {
+      if (error instanceof ResponseBotError) response.push(error.message)
+      else Logger.error(error)
+    }
     return new ResponseData(response)
   }
 }
