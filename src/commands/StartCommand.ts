@@ -8,7 +8,11 @@ export class StartCommand implements ICommand {
   private readonly userService: UserService
   private readonly commandData: Command
   private readonly user: User
-  private baseResponse: string[] = []
+  private readonly messages = {
+    EXIST: "Вы уже зарегистрированы в сервисе.",
+    SUCCESS: "Регистрация в сервисе прошла успешно.",
+    ERROR: "Ошибка регистрации. Попробуйте позже.",
+  } as const
 
   constructor(userService: UserService, user: User, commandData: Command) {
     this.user = user
@@ -20,22 +24,13 @@ export class StartCommand implements ICommand {
     const response: string[] = []
 
     if (this.user.id) {
-      response.push(StartCommandMessages.EXIST)
+      response.push(this.messages.EXIST)
     } else {
       const user = await this.userService.createUser(this.user)
-      if (user) response.push(StartCommandMessages.SUCCESS)
-      else response.push(StartCommandMessages.ERROR)
+      if (user) response.push(this.messages.SUCCESS)
+      else response.push(this.messages.ERROR)
     }
 
-    // TODO: проверить наличие кошелька, если нет то зарегистрировать кошелек
-
-    // response.push(...this.baseResponse)
     return new ResponseData(response)
   }
-}
-
-export enum StartCommandMessages {
-  EXIST = "Вы уже зарегистрированы в сервисе.",
-  SUCCESS = "Регистрация в сервисе прошла успешно.",
-  ERROR = "Ошибка регистрации. Попробуйте позже.",
 }
