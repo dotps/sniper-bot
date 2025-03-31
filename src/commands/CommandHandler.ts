@@ -30,11 +30,10 @@ export class CommandHandler {
       if (!user) {
         // создал модель пользователя чтобы потом можно было создать его в БД
         user = plainToClass(User, updateData, { excludeExtraneousValues: true })
-        // console.log(user)
       }
 
-      console.log(user)
-      console.log(parsedCommand)
+      // console.log(user)
+      // console.log(parsedCommand)
 
       const command = this.commandFactory.createCommand(user, parsedCommand)
 
