@@ -12,6 +12,7 @@ export class TokenService {
   private readonly messages = {
     TOKEN_EXIST: "Такой токен уже добавлен.",
     TOKEN_NOT_FOUND: "Токен не найден.",
+    TOKENS_NOT_FOUND: "Токены не найдены.",
     MAX_AMOUNT_TOKENS: "Максимальное количество токенов ",
     ERROR: "Что-то пошло не так.",
   } as const
@@ -54,7 +55,7 @@ export class TokenService {
   async removeAllTokens(userId: number): Promise<boolean> {
     const result = await this.repository.delete({ userId })
 
-    if (!result || result.affected === 0) throw new ResponseBotError(this.messages.ERROR)
+    if (!result || result.affected === 0) throw new ResponseBotError(this.messages.TOKENS_NOT_FOUND)
     return true
   }
 }

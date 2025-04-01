@@ -27,31 +27,32 @@ export class RemoveTokenCommand implements ICommand {
   }
 
   async execute(): Promise<ResponseData | null> {
-    const response: string[] = []
     const [tokenAddress] = this.commandData.params || []
+    if (!tokenAddress) return new ResponseData(this.messages.NEED_TOKEN)
+    // TODO: валидация формата токена
 
     try {
-      if (!tokenAddress) return new ResponseData(this.messages.NEED_TOKEN)
-      if (tokenAddress === this.removeAllTokensCommand) {
-        if (await this.tokenService.removeAllTokens(this.user.id)) {
-          response.push(this.messages.SUCCESS_ALL)
-          return new ResponseData(response)
+      const canRemoveAllTokens = tokenAddress === this.removeAllTokensCommand
+      const successMessage = canRemoveAllTokens ? this.messages.SUCCESS_ALL : this.messages.SUCCESS
+
+      if (canRemoveAllTokens) {
+        await this.tokenService.removeAllTokens(this.user.id)
+      } else {
+        const tokenDto: TokenDto = {
+          balance: 0,
+          address: tokenAddress as Hex,
+          userId: this.user.id,
         }
+        await this.tokenService.removeToken(tokenDto)
       }
-
-      const tokenDto: TokenDto = {
-        balance: 0,
-        address: tokenAddress as Hex,
-        userId: this.user.id,
-      }
-
-      if (await this.tokenService.removeToken(tokenDto)) {
-        response.push(this.messages.SUCCESS)
-      }
+      return new ResponseData(successMessage)
     } catch (error) {
-      if (error instanceof ResponseBotError) response.push(error.message)
-      else Logger.error(error)
+      if (error instanceof ResponseBotError) {
+        return new ResponseData(error.message)
+      } else {
+        Logger.error(error)
+        return null
+      }
     }
-    return new ResponseData(response)
   }
 }
