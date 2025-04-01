@@ -28,8 +28,8 @@ export class FollowWalletCommand implements ICommand {
     if (!walletAddress || !isAddress(walletAddress)) return new ResponseData(this.messages.NEED_WALLET)
 
     try {
-      await this.walletService.followWallet(walletAddress, this.user.id)
-      // return new ResponseData()
+      await this.walletService.createFollowWallet(walletAddress, this.user.id)
+      return new ResponseData(this.messages.SUCCESS)
     } catch (error) {
       if (error instanceof ResponseBotError) {
         return new ResponseData(error.message)
@@ -38,7 +38,5 @@ export class FollowWalletCommand implements ICommand {
         return null
       }
     }
-
-    return new ResponseData()
   }
 }
