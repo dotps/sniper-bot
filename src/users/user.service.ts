@@ -3,6 +3,8 @@ import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
 import { User } from "./user.entity"
 import { BotType } from "../providers/bots/IBotProvider"
+import { IQueryData } from "../data/IQueryData"
+import { plainToClass } from "class-transformer"
 
 @Injectable()
 export class UserService {
@@ -21,11 +23,12 @@ export class UserService {
   }
 
   async createUser(user: User): Promise<User> {
-    // const user = this.repository.create(data)
-    // const user = this.repository.create([data])
     return await this.repository.save(user)
   }
 
+  createUnregisteredUser(data: IQueryData): User {
+    return plainToClass(User, data, { excludeExtraneousValues: true })
+  }
   // async getUser(id: number): Promise<User> {
   //   const user = await this.repository.findOneBy({ id })
   //   if (!user) throw new NotFoundException(Errors.displayId(id) + ErrorsMessages.USER_NOT_FOUND)

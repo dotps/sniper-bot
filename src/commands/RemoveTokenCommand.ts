@@ -14,10 +14,11 @@ export class RemoveTokenCommand implements ICommand {
   private readonly commandData: Command
   private readonly user: User
   private readonly messages = {
-    TOKEN_LIST: "Список токенов:\n",
-    ADDED: "Токен успешно добавлен.",
-    NEED_TOKEN: "Укажите токен. " + Commands.ADD_TOKEN + " адрес_токена",
+    NEED_TOKEN: `Требуется адрес токена или all для удаления всех токенов из списка.\n${Commands.REMOVE_TOKEN} адрес_токена\n${Commands.REMOVE_TOKEN} all`,
+    SUCCESS: "Токен успешно удален.",
+    SUCCESS_ALL: "Все токены успешно удалены.",
   } as const
+  private readonly removeAllTokensCommand: string = "all"
 
   constructor(tokenService: TokenService, user: User, commandData: Command) {
     this.user = user
@@ -27,29 +28,30 @@ export class RemoveTokenCommand implements ICommand {
 
   async execute(): Promise<ResponseData | null> {
     const response: string[] = []
+    const [tokenAddress] = this.commandData.params || []
 
-    // TODO: сделать команду /removetoken
+    try {
+      if (!tokenAddress) return new ResponseData(this.messages.NEED_TOKEN)
+      if (tokenAddress === this.removeAllTokensCommand) {
+        if (await this.tokenService.removeAllTokens(this.user.id)) {
+          response.push(this.messages.SUCCESS_ALL)
+          return new ResponseData(response)
+        }
+      }
 
-    // if (!this.commandData.params) return new ResponseData(this.messages.NEED_TOKEN)
-    //
-    // const [tokenAddress] = this.commandData.params
-    // const tokenDto: TokenDto = {
-    //   balance: 0,
-    //   address: tokenAddress as Hex,
-    //   userId: this.user.id,
-    // }
+      const tokenDto: TokenDto = {
+        balance: 0,
+        address: tokenAddress as Hex,
+        userId: this.user.id,
+      }
 
-    // try {
-    //   await this.tokenService.addToken(tokenDto)
-    //   const tokens = await this.tokenService.getUserTokens(this.user.id)
-    //   const addresses = tokens.map((token) => token.address).join("\n")
-    //
-    //   response.push(this.messages.ADDED)
-    //   response.push(this.messages.TOKEN_LIST + addresses)
-    // } catch (error) {
-    //   if (error instanceof ResponseBotError) response.push(error.message)
-    //   else Logger.error(error)
-    // }
+      if (await this.tokenService.removeToken(tokenDto)) {
+        response.push(this.messages.SUCCESS)
+      }
+    } catch (error) {
+      if (error instanceof ResponseBotError) response.push(error.message)
+      else Logger.error(error)
+    }
     return new ResponseData(response)
   }
 }

@@ -10,6 +10,7 @@ import { User } from "../users/user.entity"
 import { AddTokenCommand } from "./AddTokenCommand"
 import { TokenService } from "../blockchain/token.service"
 import { GetTokenBalanceCommand } from "./GetTokenBalanceCommand"
+import { RemoveTokenCommand } from "./RemoveTokenCommand"
 
 @Injectable()
 export class CommandFactory implements ICommandFactory {
@@ -26,6 +27,8 @@ export class CommandFactory implements ICommandFactory {
         return new StartCommand(this.userService, user, commandData)
       case Commands.ADD_TOKEN:
         return new AddTokenCommand(this.tokenService, user, commandData)
+      case Commands.REMOVE_TOKEN:
+        return new RemoveTokenCommand(this.tokenService, user, commandData)
       case Commands.BALANCE:
         return new GetTokenBalanceCommand(this.tokenService, user, commandData)
       default:

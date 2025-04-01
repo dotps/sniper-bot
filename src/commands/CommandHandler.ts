@@ -10,6 +10,7 @@ import { plainToClass } from "class-transformer"
 
 @Injectable()
 export class CommandHandler {
+  // TODO: переделать сообщения в одном стиле this.messages.TEST
   private defaultMessage: string = "Неизвестная команда."
   private needRegisterMessage: string = `Для взаимодействия с ботом необходимо зарегистрироваться. Отправьте ${Commands.START} для начала.`
   private enterCommandMessage: string = `Для взаимодействия с ботом необходимо ввести команду. Отправьте ${Commands.START} для начала.`
@@ -21,22 +22,14 @@ export class CommandHandler {
 
   async handleCommandFromUpdates(updateData: IQueryData): Promise<ResponseData | null> {
     try {
-      let user = await this.userService.getUser(updateData.userId, updateData.botType)
       const parsedCommand = this.parseCommand(updateData.text)
-
       if (!parsedCommand) return new ResponseData(this.enterCommandMessage)
+
+      let user = await this.userService.getUser(updateData.userId, updateData.botType)
       if (parsedCommand.command !== Commands.START && !user) return new ResponseData(this.needRegisterMessage)
-
-      if (!user) {
-        // создал модель пользователя чтобы потом можно было создать его в БД
-        user = plainToClass(User, updateData, { excludeExtraneousValues: true })
-      }
-
-      // console.log(user)
-      // console.log(parsedCommand)
+      if (!user) user = this.userService.createUnregisteredUser(updateData)
 
       const command = this.commandFactory.createCommand(user, parsedCommand)
-
       return command ? await command.execute() : new ResponseData(this.defaultMessage)
     } catch (error) {
       Logger.error(error)
