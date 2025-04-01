@@ -2,6 +2,7 @@ import { BotType } from "src/providers/bots/IBotProvider"
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm"
 import { Expose } from "class-transformer"
 import { Token } from "../blockchain/token.entity"
+import { FollowWallet } from "../blockchain/follow-wallet.entity"
 
 @Entity()
 export class User {
@@ -38,4 +39,7 @@ export class User {
 
   @OneToMany(() => Token, (token) => token.user)
   tokens: Token[]
+
+  @OneToMany(() => FollowWallet, (followWallet) => followWallet.user)
+  followWallet: FollowWallet[]
 }

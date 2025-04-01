@@ -11,12 +11,15 @@ import { AddTokenCommand } from "./AddTokenCommand"
 import { TokenService } from "../blockchain/token.service"
 import { GetTokenBalanceCommand } from "./GetTokenBalanceCommand"
 import { RemoveTokenCommand } from "./RemoveTokenCommand"
+import { FollowWalletCommand } from "./FollowWalletCommand"
+import { WalletService } from "../blockchain/wallet.service"
 
 @Injectable()
 export class CommandFactory implements ICommandFactory {
   constructor(
     private readonly userService: UserService,
     private readonly tokenService: TokenService,
+    private readonly walletService: WalletService,
   ) {}
 
   createCommand(user: User, commandData: Command): ICommand | null {
@@ -31,6 +34,8 @@ export class CommandFactory implements ICommandFactory {
         return new RemoveTokenCommand(this.tokenService, user, commandData)
       case Commands.BALANCE:
         return new GetTokenBalanceCommand(this.tokenService, user, commandData)
+      case Commands.FOLLOW:
+        return new FollowWalletCommand(this.walletService, user, commandData)
       default:
         return null
     }

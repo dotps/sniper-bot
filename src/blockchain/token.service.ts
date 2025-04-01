@@ -4,7 +4,6 @@ import { Repository } from "typeorm"
 import { Token } from "./token.entity"
 import { TokenDto } from "./token.dto"
 import { ResponseBotError } from "../errors/ResponseBotError"
-import { Commands } from "../commands/Commands"
 
 @Injectable()
 export class TokenService {

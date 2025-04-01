@@ -4,4 +4,5 @@ export enum Commands {
   ADD_TOKEN = "/addtoken",
   REMOVE_TOKEN = "/removetoken",
   BALANCE = "/balance",
+  FOLLOW = "/follow",
 }

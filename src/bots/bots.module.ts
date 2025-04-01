@@ -10,8 +10,9 @@ import { CommandFactory } from "../commands/CommandFactory"
 import { CommandHandler } from "../commands/CommandHandler"
 import { TokenService } from "../blockchain/token.service"
 import { TypeOrmModule } from "@nestjs/typeorm"
-import { User } from "../users/user.entity"
 import { Token } from "../blockchain/token.entity"
+import { WalletService } from "../blockchain/wallet.service"
+import { FollowWallet } from "../blockchain/follow-wallet.entity"
 
 const webRequestService = new WebRequestFetchService()
 
@@ -31,10 +32,10 @@ const vkBot = {
 
 const commandFactory = {
   provide: CommandFactory,
-  useFactory: (userService: UserService, tokenService: TokenService) => {
-    return new CommandFactory(userService, tokenService)
+  useFactory: (userService: UserService, tokenService: TokenService, walletService: WalletService) => {
+    return new CommandFactory(userService, tokenService, walletService)
   },
-  inject: [UserService, TokenService],
+  inject: [UserService, TokenService, WalletService],
 }
 
 const commandHandler = {
@@ -46,8 +47,8 @@ const commandHandler = {
 }
 
 @Module({
-  imports: [UserModule, TypeOrmModule.forFeature([Token])],
+  imports: [UserModule, TypeOrmModule.forFeature([Token, FollowWallet])],
   controllers: [BotsController],
-  providers: [telegramBot, vkBot, BotsService, commandFactory, commandHandler, TokenService],
+  providers: [telegramBot, vkBot, BotsService, commandFactory, commandHandler, TokenService, WalletService],
 })
 export class BotsModule {}
