@@ -1,6 +1,5 @@
 import { ICommand } from "./infrastructure/ICommand"
 import { ResponseData } from "../data/ResponseData"
-import { Command } from "./infrastructure/CommandHandler"
 import { User } from "../users/user.entity"
 import { TokenService } from "../blockchain/token.service"
 import { ResponseBotError } from "../errors/ResponseBotError"
@@ -8,17 +7,15 @@ import { Logger } from "../utils/Logger"
 
 export class GetTokenBalanceCommand implements ICommand {
   private readonly tokenService: TokenService
-  private readonly commandData: Command
   private readonly user: User
   private readonly messages = {
     NOT_FOUND: "Токены не найдены.",
     CURRENT_BALANCE: "Текущий баланс:\n",
   } as const
 
-  constructor(tokenService: TokenService, user: User, commandData: Command) {
+  constructor(tokenService: TokenService, user: User) {
     this.user = user
     this.tokenService = tokenService
-    this.commandData = commandData
   }
 
   async execute(): Promise<ResponseData | null> {

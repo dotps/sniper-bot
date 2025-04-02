@@ -7,12 +7,13 @@ import { ResponseBotError } from "../errors/ResponseBotError"
 import { ReplicateDealCommand } from "../commands/ReplicateCommand"
 import { Replicate } from "./replicate.entity"
 import { DBError } from "../errors/DBError"
-import { Token } from "./token.entity"
 
 @Injectable()
 export class WalletService {
   private readonly messages = {
     FOLLOW_WALLET_EXIST: "Такой кошелек уже отслеживается.",
+    FOLLOW_WALLET_NOT_FOUND: "Такой кошелек уже отслеживается.",
+    REPEATED_DEALS: "Повторные сделки: ",
   } as const
 
   constructor(
@@ -46,11 +47,20 @@ export class WalletService {
       const replicate = this.replicateRepository.create(replicateDto)
       return await this.replicateRepository.save(replicate)
     } catch (error) {
-      DBError.handle(error, "Повторные сделки: ")
+      DBError.handle(error, this.messages.REPEATED_DEALS)
     }
   }
 
   async getFollowWallets(userId: number): Promise<FollowWallet[]> {
     return await this.followRepository.findBy({ userId })
+  }
+
+  async unfollow(walletAddress: Hex, userId: number) {
+    const result = await this.followRepository.delete({
+      userId: userId,
+      wallet: walletAddress,
+    })
+
+    if (!result || result.affected === 0) throw new ResponseBotError(this.messages.FOLLOW_WALLET_NOT_FOUND)
   }
 }

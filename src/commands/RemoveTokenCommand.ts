@@ -17,7 +17,7 @@ export class RemoveTokenCommand implements ICommand {
     SUCCESS: "Токен успешно удален.",
     SUCCESS_ALL: "Все токены успешно удалены.",
   } as const
-  private readonly removeAllTokensCommand: string = "all"
+  private readonly removeAllTokensCommand: string = "all" // TODO: переделать как у ReplicateCommand
 
   constructor(tokenService: TokenService, user: User, commandData: Command) {
     this.user = user
