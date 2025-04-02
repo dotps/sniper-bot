@@ -5,8 +5,6 @@ import { Logger } from "../../utils/Logger"
 import { ICommandFactory } from "./ICommandFactory"
 import { Commands } from "../Commands"
 import { UserService } from "../../users/user.service"
-import { User } from "../../users/user.entity"
-import { plainToClass } from "class-transformer"
 
 @Injectable()
 export class CommandHandler {
@@ -26,10 +24,8 @@ export class CommandHandler {
       if (!parsedCommand) return new ResponseData(this.enterCommandMessage)
 
       let user = await this.userService.getUser(updateData.userId, updateData.botType)
-      console.log("+++++++++++++", user)
       if (parsedCommand.command !== Commands.START && !user) return new ResponseData(this.needRegisterMessage)
       if (!user) user = this.userService.createUnregisteredUser(updateData)
-      console.log("+++++++++++++", user)
 
       const command = this.commandFactory.createCommand(user, parsedCommand)
       return command ? await command.execute() : new ResponseData(this.defaultMessage)

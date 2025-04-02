@@ -13,11 +13,6 @@ export class UserService {
     private readonly repository: Repository<User>,
   ) {}
 
-  async isUserExist(userId: number, botType: BotType): Promise<boolean> {
-    const user = await this.repository.findOneBy({ botUserId: userId, botType })
-    return user ? true : false
-  }
-
   async getUser(userId: number, botType: BotType): Promise<User | null> {
     return await this.repository.findOneBy({ botUserId: userId, botType })
   }
