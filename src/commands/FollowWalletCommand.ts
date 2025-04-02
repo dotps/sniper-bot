@@ -7,6 +7,7 @@ import { Logger } from "../utils/Logger"
 import { Commands } from "./Commands"
 import { WalletService } from "../blockchain/wallet.service"
 import { isAddress } from "viem"
+import { ErrorHandler } from "../errors/ErrorHandler"
 
 export class FollowWalletCommand implements ICommand {
   private readonly walletService: WalletService
@@ -31,12 +32,7 @@ export class FollowWalletCommand implements ICommand {
       await this.walletService.createFollowWallet(walletAddress, this.user.id)
       return new ResponseData(this.messages.SUCCESS)
     } catch (error) {
-      if (error instanceof ResponseBotError) {
-        return new ResponseData(error.message)
-      } else {
-        Logger.error(error)
-        return null
-      }
+      return ErrorHandler.handleAndResponse(error)
     }
   }
 }

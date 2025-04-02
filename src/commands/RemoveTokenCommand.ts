@@ -8,6 +8,7 @@ import { Hex } from "viem"
 import { ResponseBotError } from "../errors/ResponseBotError"
 import { Logger } from "../utils/Logger"
 import { Commands } from "./Commands"
+import { ErrorHandler } from "../errors/ErrorHandler"
 
 export class RemoveTokenCommand implements ICommand {
   private readonly tokenService: TokenService
@@ -47,12 +48,7 @@ export class RemoveTokenCommand implements ICommand {
       }
       return new ResponseData(successMessage)
     } catch (error) {
-      if (error instanceof ResponseBotError) {
-        return new ResponseData(error.message)
-      } else {
-        Logger.error(error)
-        return null
-      }
+      return ErrorHandler.handleAndResponse(error)
     }
   }
 }

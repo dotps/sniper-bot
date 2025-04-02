@@ -6,6 +6,7 @@ import { ResponseBotError } from "../errors/ResponseBotError"
 import { Logger } from "../utils/Logger"
 import { Commands } from "./Commands"
 import { WalletService } from "../blockchain/wallet.service"
+import { ErrorHandler } from "../errors/ErrorHandler"
 
 export class ReplicateCommand implements ICommand {
   private readonly walletService: WalletService
@@ -31,13 +32,7 @@ export class ReplicateCommand implements ICommand {
       await this.walletService.createReplicate(command, this.user.id, limit)
       return new ResponseData(this.messages.SUCCESS)
     } catch (error) {
-      // TODO: вынести в отдельно часто повторяется
-      if (error instanceof ResponseBotError) {
-        return new ResponseData(error.message)
-      } else {
-        Logger.error(error)
-        return null
-      }
+      return ErrorHandler.handleAndResponse(error)
     }
   }
 
