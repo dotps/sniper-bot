@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
 import { FollowWallet } from "./follow-wallet.entity"
-import { Hex } from "viem"
+import { createWalletClient, Hex, WalletClient } from "viem"
 import { ResponseBotError } from "../errors/ResponseBotError"
 import { ReplicateDealCommand } from "../commands/ReplicateCommand"
 import { Replicate } from "./replicate.entity"
@@ -40,6 +40,20 @@ export class WalletService {
 
     const createdWallet = await this.walletRepository.save(wallet)
     return createdWallet.address
+  }
+
+  async getWalletClient(userId: number): Promise<WalletClient> {
+    const wallet = await this.walletRepository.findOneBy({ userId: userId })
+    // TODO: продолжить ошибку
+    if (!wallet) throw Error()
+    const privateKey = this.decrypt(wallet.encryptedKey)
+    const account = privateKeyToAccount(privateKey)
+
+    return createWalletClient({
+      account,
+      chain: bsc,
+      transport: http(),
+    })
   }
 
   async createFollowWallet(walletAddress: Hex, userId: number): Promise<FollowWallet> {
@@ -91,7 +105,7 @@ export class WalletService {
     return data
   }
 
-  private decrypt(data: Hex) {
-    return data
+  private decrypt(data: string): Hex {
+    return data as Hex
   }
 }
