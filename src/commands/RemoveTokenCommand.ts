@@ -5,8 +5,6 @@ import { User } from "../users/user.entity"
 import { TokenService } from "../blockchain/token.service"
 import { TokenDto } from "../blockchain/token.dto"
 import { Hex } from "viem"
-import { ResponseBotError } from "../errors/ResponseBotError"
-import { Logger } from "../utils/Logger"
 import { Commands } from "./Commands"
 import { ErrorHandler } from "../errors/ErrorHandler"
 
