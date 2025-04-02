@@ -8,4 +8,5 @@ export enum Commands {
   UNFOLLOW = "/unfollow",
   REPLICATE = "/replicate",
   SUBSCRIPTIONS = "/subscriptions",
+  SEND = "/send",
 }
