@@ -31,7 +31,7 @@ export class CommandFactory implements ICommandFactory {
       case Commands.EXIT:
         return new ExitCommand()
       case Commands.START:
-        return new StartCommand(this.userService, user, commandData)
+        return new StartCommand(this.userService, this.walletService, user)
       case Commands.ADD_TOKEN:
         return new AddTokenCommand(this.tokenService, user, commandData)
       case Commands.REMOVE_TOKEN:
