@@ -60,6 +60,8 @@ export class WalletService {
     })
   }
 
+  // TODO: продолжить подключение к блокчейну
+
   async createFollowWallet(walletAddress: Hex, userId: number): Promise<FollowWallet> {
     const followWalletDto: Partial<FollowWallet> = {
       wallet: walletAddress,
