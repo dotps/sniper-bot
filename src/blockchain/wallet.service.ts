@@ -2,20 +2,22 @@ import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
 import { FollowWallet } from "./follow-wallet.entity"
-import { createWalletClient, Hex, WalletClient } from "viem"
+import { createWalletClient, Hex, http, Transport, TransportConfig, WalletClient } from "viem"
 import { ResponseBotError } from "../errors/ResponseBotError"
 import { ReplicateDealCommand } from "../commands/ReplicateCommand"
 import { Replicate } from "./replicate.entity"
 import { DBError } from "../errors/DBError"
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts"
 import { Wallet } from "./wallet.entity"
+import { BlockchainService } from "./blockchain.service"
 
 @Injectable()
 export class WalletService {
   private readonly messages = {
     FOLLOW_WALLET_EXIST: "Такой кошелек уже отслеживается.",
-    FOLLOW_WALLET_NOT_FOUND: "Такой кошелек уже отслеживается.",
+    FOLLOW_WALLET_NOT_FOUND: "Подписка не найдена.",
     REPEATED_DEALS: "Повторные сделки: ",
+    WALLET_NOT_FOUND: "Кошелек не найден.",
   } as const
 
   constructor(
@@ -25,6 +27,7 @@ export class WalletService {
     private readonly followRepository: Repository<FollowWallet>,
     @InjectRepository(Replicate)
     private readonly replicateRepository: Repository<Replicate>,
+    private readonly blockchainService: BlockchainService,
   ) {}
 
   async createWallet(userId: number): Promise<Hex> {
@@ -44,14 +47,15 @@ export class WalletService {
 
   async getWalletClient(userId: number): Promise<WalletClient> {
     const wallet = await this.walletRepository.findOneBy({ userId: userId })
-    // TODO: продолжить ошибку
-    if (!wallet) throw Error()
+    if (!wallet) throw new ResponseBotError(this.messages.WALLET_NOT_FOUND)
+
     const privateKey = this.decrypt(wallet.encryptedKey)
     const account = privateKeyToAccount(privateKey)
+    const client = this.blockchainService.getPublicClient()
 
     return createWalletClient({
       account,
-      chain: bsc,
+      chain: client.chain,
       transport: http(),
     })
   }

@@ -50,7 +50,7 @@ const commandHandler = {
 }
 
 @Module({
-  imports: [UserModule, TypeOrmModule.forFeature([Token, FollowWallet, Replicate, Wallet])],
+  imports: [UserModule, BlockchainModule, TypeOrmModule.forFeature([Token, FollowWallet, Replicate, Wallet])],
   controllers: [BotsController],
   providers: [telegramBot, vkBot, BotsService, commandFactory, commandHandler, TokenService, WalletService],
 })
