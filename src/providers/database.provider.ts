@@ -4,12 +4,13 @@ import { Config } from "../config/config"
 import { User } from "../users/user.entity"
 import { Token } from "../blockchain/token.entity"
 import { FollowWallet } from "../blockchain/follow-wallet.entity"
+import { Replicate } from "../blockchain/replicate.entity"
 
 export const databaseProvider = TypeOrmModule.forRootAsync({
   useFactory: (configService: ConfigService) => ({
     type: "postgres",
     url: configService.get<string>(Config.DATABASE_URL),
-    entities: [User, Token, FollowWallet],
+    entities: [User, Token, FollowWallet, Replicate],
     synchronize: true,
     logging: false,
   }),

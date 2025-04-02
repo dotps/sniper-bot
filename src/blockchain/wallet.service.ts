@@ -4,6 +4,9 @@ import { Repository } from "typeorm"
 import { FollowWallet } from "./follow-wallet.entity"
 import { Hex } from "viem"
 import { ResponseBotError } from "../errors/ResponseBotError"
+import { ReplicateDealCommand } from "../commands/ReplicateCommand"
+import { Replicate } from "./replicate.entity"
+import { DBError } from "../errors/DBError"
 
 @Injectable()
 export class WalletService {
@@ -14,6 +17,8 @@ export class WalletService {
   constructor(
     @InjectRepository(FollowWallet)
     private readonly followRepository: Repository<FollowWallet>,
+    @InjectRepository(Replicate)
+    private readonly replicateRepository: Repository<Replicate>,
   ) {}
 
   async createFollowWallet(walletAddress: Hex, userId: number): Promise<FollowWallet> {
@@ -28,5 +33,19 @@ export class WalletService {
     const followWallet = this.followRepository.create(followWalletDto)
 
     return await this.followRepository.save(followWallet)
+  }
+
+  async createReplicate(command: ReplicateDealCommand, userId: number, limit: number): Promise<Replicate | undefined> {
+    const replicateDto: Partial<Replicate> = {
+      command: command,
+      limit: limit,
+      userId: userId,
+    }
+    try {
+      const replicate = this.replicateRepository.create(replicateDto)
+      return await this.replicateRepository.save(replicate)
+    } catch (error) {
+      DBError.handle(error, "Повторные сделки: ")
+    }
   }
 }

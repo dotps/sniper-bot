@@ -6,15 +6,14 @@ import { ResponseBotError } from "../errors/ResponseBotError"
 import { Logger } from "../utils/Logger"
 import { Commands } from "./Commands"
 import { WalletService } from "../blockchain/wallet.service"
-import { isAddress } from "viem"
 
 export class ReplicateCommand implements ICommand {
   private readonly walletService: WalletService
   private readonly commandData: Command
   private readonly user: User
   private readonly messages = {
-    NEED_WALLET: `Требуется адрес кошелька.\n${Commands.FOLLOW} адрес_кошелька`,
-    SUCCESS: "Подписка на кошелек успешно оформлена.",
+    WRONG_COMMAND: `Неверные параметры команды.\nПример: ${Commands.REPLICATE} buy/sell лимит_суммы`,
+    SUCCESS: "Повторные сделки подключены.",
   } as const
 
   constructor(walletService: WalletService, user: User, commandData: Command) {
@@ -23,16 +22,16 @@ export class ReplicateCommand implements ICommand {
     this.commandData = commandData
   }
 
-  // TODO: продолжить делать ReplicateCommand
-
   async execute(): Promise<ResponseData | null> {
-    const [walletAddress] = this.commandData.params || []
-    if (!walletAddress || !isAddress(walletAddress)) return new ResponseData(this.messages.NEED_WALLET)
+    const command = this.commandData?.params?.[0]?.toLowerCase() || undefined
+    const limit = Number(this.commandData.params?.[1]) || undefined
+    if (!command || !this.isValidCommand(command) || !limit) return new ResponseData(this.messages.WRONG_COMMAND)
 
     try {
-      await this.walletService.createFollowWallet(walletAddress, this.user.id)
+      await this.walletService.createReplicate(command, this.user.id, limit)
       return new ResponseData(this.messages.SUCCESS)
     } catch (error) {
+      // TODO: вынести в отдельно часто повторяется
       if (error instanceof ResponseBotError) {
         return new ResponseData(error.message)
       } else {
@@ -41,4 +40,13 @@ export class ReplicateCommand implements ICommand {
       }
     }
   }
+
+  isValidCommand(command: string): command is ReplicateDealCommand {
+    return Object.values(ReplicateDealCommand).includes(command as ReplicateDealCommand)
+  }
+}
+
+export enum ReplicateDealCommand {
+  BUY = "buy",
+  SELL = "sell",
 }

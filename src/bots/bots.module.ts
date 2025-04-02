@@ -13,6 +13,7 @@ import { TypeOrmModule } from "@nestjs/typeorm"
 import { Token } from "../blockchain/token.entity"
 import { WalletService } from "../blockchain/wallet.service"
 import { FollowWallet } from "../blockchain/follow-wallet.entity"
+import { Replicate } from "../blockchain/replicate.entity"
 
 const webRequestService = new WebRequestFetchService()
 
@@ -47,7 +48,7 @@ const commandHandler = {
 }
 
 @Module({
-  imports: [UserModule, TypeOrmModule.forFeature([Token, FollowWallet])],
+  imports: [UserModule, TypeOrmModule.forFeature([Token, FollowWallet, Replicate])],
   controllers: [BotsController],
   providers: [telegramBot, vkBot, BotsService, commandFactory, commandHandler, TokenService, WalletService],
 })
