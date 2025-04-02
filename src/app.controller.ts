@@ -15,9 +15,14 @@ export class AppController {
   }
 
   @Get("test")
-  test(): string {
-    const address = this.blockchainService.createWallet()
-    console.log(address)
-    return address
+  async test(): Promise<bigint> {
+    const balance = await this.blockchainService.getPublicClient().getBalance({
+      address: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+    })
+    console.log(balance)
+    return balance
+    // const address = this.blockchainService.createWallet()
+    // console.log(address)
+    // return address
   }
 }

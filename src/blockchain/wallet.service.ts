@@ -7,6 +7,8 @@ import { ResponseBotError } from "../errors/ResponseBotError"
 import { ReplicateDealCommand } from "../commands/ReplicateCommand"
 import { Replicate } from "./replicate.entity"
 import { DBError } from "../errors/DBError"
+import { generatePrivateKey, privateKeyToAccount } from "viem/accounts"
+import { Wallet } from "./wallet.entity"
 
 @Injectable()
 export class WalletService {
@@ -17,11 +19,28 @@ export class WalletService {
   } as const
 
   constructor(
+    @InjectRepository(Wallet)
+    private readonly walletRepository: Repository<Wallet>,
     @InjectRepository(FollowWallet)
     private readonly followRepository: Repository<FollowWallet>,
     @InjectRepository(Replicate)
     private readonly replicateRepository: Repository<Replicate>,
   ) {}
+
+  async createWallet(userId: number): Promise<Hex> {
+    const privateKey = generatePrivateKey()
+    const account = privateKeyToAccount(privateKey)
+
+    const encryptedKey = this.encrypt(privateKey)
+    const wallet = this.walletRepository.create({
+      userId,
+      encryptedKey,
+      address: account.address,
+    })
+
+    const createdWallet = await this.walletRepository.save(wallet)
+    return createdWallet.address
+  }
 
   async createFollowWallet(walletAddress: Hex, userId: number): Promise<FollowWallet> {
     const followWalletDto: Partial<FollowWallet> = {
@@ -66,5 +85,13 @@ export class WalletService {
 
   async send(fromAddress: Hex, toAddress: Hex, transferAmount: number, userId: number) {
     console.log(fromAddress, toAddress, transferAmount, userId)
+  }
+
+  private encrypt(data: Hex) {
+    return data
+  }
+
+  private decrypt(data: Hex) {
+    return data
   }
 }

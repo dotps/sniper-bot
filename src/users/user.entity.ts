@@ -3,6 +3,7 @@ import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm"
 import { Expose } from "class-transformer"
 import { Token } from "../blockchain/token.entity"
 import { FollowWallet } from "../blockchain/follow-wallet.entity"
+import { Wallet } from "../blockchain/wallet.entity"
 
 @Entity()
 export class User {
@@ -42,4 +43,7 @@ export class User {
 
   @OneToMany(() => FollowWallet, (followWallet) => followWallet.user)
   followWallet: FollowWallet[]
+
+  @OneToMany(() => Wallet, (wallet) => wallet.user)
+  wallets: Wallet[]
 }

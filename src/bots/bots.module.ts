@@ -14,6 +14,8 @@ import { Token } from "../blockchain/token.entity"
 import { WalletService } from "../blockchain/wallet.service"
 import { FollowWallet } from "../blockchain/follow-wallet.entity"
 import { Replicate } from "../blockchain/replicate.entity"
+import { Wallet } from "../blockchain/wallet.entity"
+import { BlockchainModule } from "../blockchain/blockchain.module"
 
 const webRequestService = new WebRequestFetchService()
 
@@ -48,7 +50,7 @@ const commandHandler = {
 }
 
 @Module({
-  imports: [UserModule, TypeOrmModule.forFeature([Token, FollowWallet, Replicate])],
+  imports: [UserModule, TypeOrmModule.forFeature([Token, FollowWallet, Replicate, Wallet])],
   controllers: [BotsController],
   providers: [telegramBot, vkBot, BotsService, commandFactory, commandHandler, TokenService, WalletService],
 })

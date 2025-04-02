@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common"
-import { createPublicClient, defineChain, Hex, http, PublicClient } from "viem"
+import { createPublicClient, Hex, http, PublicClient } from "viem"
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts"
+import { bsc, polygon } from "viem/chains"
 
 @Injectable()
 export class BlockchainService {
@@ -13,6 +14,18 @@ export class BlockchainService {
   }
 
   private initBlockchainClients() {
+    // const client = {
+    //   public: createPublicClient({
+    //     chain: bsc,
+    //     transport: http(),
+    //   }),
+    //   wallet: createWalletClient({
+    //     account,
+    //     chain: bsc,
+    //     transport: http(),
+    //   }),
+    // }
+
     const bscClient = createPublicClient({
       chain: bsc,
       transport: http(),
@@ -26,7 +39,7 @@ export class BlockchainService {
     this.clients.set(Blockchain.POLYGON, polygonClient)
   }
 
-  getClient(clientType: Blockchain = this.defaultBlockchain): PublicClient {
+  getPublicClient(clientType: Blockchain = this.defaultBlockchain): PublicClient {
     const client = this.clients.get(clientType)
     if (!client) throw Error("Клиент не найден.")
     return client
@@ -39,7 +52,7 @@ export class BlockchainService {
   }
 
   getTokenBalance(clientType?: Blockchain) {
-    this.getClient(clientType)
+    this.getPublicClient(clientType)
   }
 }
 
@@ -47,39 +60,3 @@ enum Blockchain {
   BSC = "bsc",
   POLYGON = "polygon",
 }
-
-const bsc = defineChain({
-  id: 56,
-  name: "Binance Smart Chain",
-  network: "bsc",
-  nativeCurrency: {
-    decimals: 18,
-    name: "Binance Chain Native Token",
-    symbol: "BNB",
-  },
-  rpcUrls: {
-    default: { http: ["https://bsc-dataseed1.binance.org"] },
-    public: { http: ["https://bsc-dataseed1.binance.org"] },
-  },
-  blockExplorers: {
-    default: { name: "BscScan", url: "https://bscscan.com" },
-  },
-})
-
-const polygon = defineChain({
-  id: 137,
-  name: "Polygon",
-  network: "polygon",
-  nativeCurrency: {
-    decimals: 18,
-    name: "MATIC",
-    symbol: "MATIC",
-  },
-  rpcUrls: {
-    default: { http: ["https://polygon-rpc.com"] },
-    public: { http: ["https://polygon-rpc.com"] },
-  },
-  blockExplorers: {
-    default: { name: "PolygonScan", url: "https://polygonscan.com" },
-  },
-})
