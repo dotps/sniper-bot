@@ -14,6 +14,7 @@ import { RemoveTokenCommand } from "../RemoveTokenCommand"
 import { FollowWalletCommand } from "../FollowWalletCommand"
 import { WalletService } from "../../blockchain/wallet.service"
 import { ReplicateCommand } from "../ReplicateCommand"
+import { SubscriptionsCommand } from "../SubscriptionsCommand"
 
 @Injectable()
 export class CommandFactory implements ICommandFactory {
@@ -39,6 +40,8 @@ export class CommandFactory implements ICommandFactory {
         return new FollowWalletCommand(this.walletService, user, commandData)
       case Commands.REPLICATE:
         return new ReplicateCommand(this.walletService, user, commandData)
+      case Commands.SUBSCRIPTIONS:
+        return new SubscriptionsCommand(this.walletService, user)
       default:
         return null
     }

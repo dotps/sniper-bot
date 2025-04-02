@@ -7,6 +7,7 @@ import { ResponseBotError } from "../errors/ResponseBotError"
 import { ReplicateDealCommand } from "../commands/ReplicateCommand"
 import { Replicate } from "./replicate.entity"
 import { DBError } from "../errors/DBError"
+import { Token } from "./token.entity"
 
 @Injectable()
 export class WalletService {
@@ -47,5 +48,9 @@ export class WalletService {
     } catch (error) {
       DBError.handle(error, "Повторные сделки: ")
     }
+  }
+
+  async getFollowWallets(userId: number): Promise<FollowWallet[]> {
+    return await this.followRepository.findBy({ userId })
   }
 }

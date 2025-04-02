@@ -6,4 +6,5 @@ export enum Commands {
   BALANCE = "/balance",
   FOLLOW = "/follow",
   REPLICATE = "/replicate",
+  SUBSCRIPTIONS = "/subscriptions",
 }
