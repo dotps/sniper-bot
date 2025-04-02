@@ -1,6 +1,6 @@
-import { ICommand } from "./ICommand"
+import { ICommand } from "./infrastructure/ICommand"
 import { ResponseData } from "../data/ResponseData"
-import { Command } from "./CommandHandler"
+import { Command } from "./infrastructure/CommandHandler"
 import { User } from "../users/user.entity"
 import { Commands } from "./Commands"
 import { WalletService } from "../blockchain/wallet.service"

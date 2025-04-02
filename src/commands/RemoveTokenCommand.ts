@@ -1,6 +1,6 @@
-import { ICommand } from "./ICommand"
+import { ICommand } from "./infrastructure/ICommand"
 import { ResponseData } from "../data/ResponseData"
-import { Command } from "./CommandHandler"
+import { Command } from "./infrastructure/CommandHandler"
 import { User } from "../users/user.entity"
 import { TokenService } from "../blockchain/token.service"
 import { TokenDto } from "../blockchain/token.dto"

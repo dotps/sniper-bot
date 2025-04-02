@@ -1,5 +1,5 @@
 import { ResponseData } from "../data/ResponseData"
-import { ICommand } from "./ICommand"
+import { ICommand } from "./infrastructure/ICommand"
 
 export class ExitCommand implements ICommand {
   private response: string[] = ["Выход."]

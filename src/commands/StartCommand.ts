@@ -1,7 +1,7 @@
-import { ICommand } from "./ICommand"
+import { ICommand } from "./infrastructure/ICommand"
 import { ResponseData } from "../data/ResponseData"
 import { UserService } from "../users/user.service"
-import { Command } from "./CommandHandler"
+import { Command } from "./infrastructure/CommandHandler"
 import { User } from "../users/user.entity"
 
 export class StartCommand implements ICommand {

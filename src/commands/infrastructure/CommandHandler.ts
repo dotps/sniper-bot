@@ -1,11 +1,11 @@
-import { ResponseData } from "../data/ResponseData"
-import { IQueryData } from "../data/IQueryData"
+import { ResponseData } from "../../data/ResponseData"
+import { IQueryData } from "../../data/IQueryData"
 import { Injectable } from "@nestjs/common"
-import { Logger } from "../utils/Logger"
+import { Logger } from "../../utils/Logger"
 import { ICommandFactory } from "./ICommandFactory"
-import { Commands } from "./Commands"
-import { UserService } from "../users/user.service"
-import { User } from "../users/user.entity"
+import { Commands } from "../Commands"
+import { UserService } from "../../users/user.service"
+import { User } from "../../users/user.entity"
 import { plainToClass } from "class-transformer"
 
 @Injectable()
