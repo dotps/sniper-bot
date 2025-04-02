@@ -1,6 +1,5 @@
 import { Injectable } from "@nestjs/common"
-import { createPublicClient, Hex, http, PublicClient } from "viem"
-import { generatePrivateKey, privateKeyToAccount } from "viem/accounts"
+import { createPublicClient, http, PublicClient } from "viem"
 import { bsc, polygon } from "viem/chains"
 
 @Injectable()
