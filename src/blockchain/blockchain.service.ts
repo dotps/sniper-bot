@@ -14,18 +14,6 @@ export class BlockchainService {
   }
 
   private initBlockchainClients() {
-    // const client = {
-    //   public: createPublicClient({
-    //     chain: bsc,
-    //     transport: http(),
-    //   }),
-    //   wallet: createWalletClient({
-    //     account,
-    //     chain: bsc,
-    //     transport: http(),
-    //   }),
-    // }
-
     const bscClient = createPublicClient({
       chain: bsc,
       transport: http(),
@@ -43,16 +31,6 @@ export class BlockchainService {
     const client = this.clients.get(clientType)
     if (!client) throw Error("Клиент не найден.")
     return client
-  }
-
-  createWallet(): Hex {
-    const privateKey = generatePrivateKey()
-    const account = privateKeyToAccount(privateKey)
-    return account.address
-  }
-
-  getTokenBalance(clientType?: Blockchain) {
-    this.getPublicClient(clientType)
   }
 }
 
