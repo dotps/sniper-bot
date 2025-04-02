@@ -14,12 +14,12 @@ export class UserService {
   ) {}
 
   async isUserExist(userId: number, botType: BotType): Promise<boolean> {
-    const user = await this.repository.findOneBy({ userId, botType })
+    const user = await this.repository.findOneBy({ botUserId: userId, botType })
     return user ? true : false
   }
 
   async getUser(userId: number, botType: BotType): Promise<User | null> {
-    return await this.repository.findOneBy({ userId, botType })
+    return await this.repository.findOneBy({ botUserId: userId, botType })
   }
 
   async createUser(user: User): Promise<User> {
@@ -29,30 +29,4 @@ export class UserService {
   createUnregisteredUser(data: IQueryData): User {
     return plainToClass(User, data, { excludeExtraneousValues: true })
   }
-  // async getUser(id: number): Promise<User> {
-  //   const user = await this.repository.findOneBy({ id })
-  //   if (!user) throw new NotFoundException(Errors.displayId(id) + ErrorsMessages.USER_NOT_FOUND)
-  //   return user
-  // }
-  //
-  // async getUserByName(name: string): Promise<User> {
-  //   const user = await this.repository.findOneBy({ name: name.trim() })
-  //   if (!user) throw new NotFoundException(ErrorsMessages.USER_NOT_FOUND)
-  //   return user
-  // }
-  //
-  // async updateUser(id: number, data: UserDto): Promise<User> {
-  //   const result = await this.repository.update(id, data)
-  //   if (!result.affected) throw new NotFoundException(Errors.displayId(id) + ErrorsMessages.NOT_FOUND)
-  //   return await this.getUser(id)
-  // }
-  //
-  // async getAll(): Promise<User[]> {
-  //   return this.repository.find()
-  // }
-  //
-  // async deleteUser(id: number): Promise<void> {
-  //   const result = await this.repository.delete(id)
-  //   if (!result.affected) throw new NotFoundException(Errors.displayId(id) + ErrorsMessages.NOT_FOUND)
-  // }
 }

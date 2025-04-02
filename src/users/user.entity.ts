@@ -24,11 +24,11 @@ export class User {
 
   @Expose()
   @Column()
-  readonly chatId: number // TODO: убрать, лишнее
+  readonly chatId: number
 
-  @Expose()
+  @Expose({ name: "userId" })
   @Column()
-  readonly userId: number // TODO: путает, нужно что-то типа botUserId / providerUserId - подумать
+  readonly botUserId: number
 
   @Expose()
   @Column({
@@ -42,7 +42,7 @@ export class User {
   tokens: Token[]
 
   @OneToMany(() => FollowWallet, (followWallet) => followWallet.user)
-  followWallet: FollowWallet[]
+  followWallets: FollowWallet[]
 
   @OneToMany(() => Wallet, (wallet) => wallet.user)
   wallets: Wallet[]

@@ -26,8 +26,10 @@ export class CommandHandler {
       if (!parsedCommand) return new ResponseData(this.enterCommandMessage)
 
       let user = await this.userService.getUser(updateData.userId, updateData.botType)
+      console.log("+++++++++++++", user)
       if (parsedCommand.command !== Commands.START && !user) return new ResponseData(this.needRegisterMessage)
       if (!user) user = this.userService.createUnregisteredUser(updateData)
+      console.log("+++++++++++++", user)
 
       const command = this.commandFactory.createCommand(user, parsedCommand)
       return command ? await command.execute() : new ResponseData(this.defaultMessage)

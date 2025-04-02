@@ -14,6 +14,6 @@ export class FollowWallet {
   @Column({ nullable: false })
   userId: number
 
-  @ManyToOne(() => User, (user) => user.tokens)
+  @ManyToOne(() => User, (user) => user.followWallets)
   user: User
 }
