@@ -39,7 +39,7 @@ export class CommandFactory implements ICommandFactory {
       case Commands.REMOVE_TOKEN:
         return new RemoveTokenCommand(this.tokenService, user, commandData)
       case Commands.BALANCE:
-        return new GetTokenBalanceCommand(this.tokenService, this.blockchainService, user)
+        return new GetTokenBalanceCommand(this.tokenService, this.blockchainService, this.walletService, user)
       case Commands.FOLLOW:
         return new FollowWalletCommand(this.walletService, user, commandData)
       case Commands.UNFOLLOW:

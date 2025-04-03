@@ -60,6 +60,13 @@ export class WalletService {
     })
   }
 
+  async getWalletAddress(userId: number): Promise<Hex> {
+    const wallet = await this.walletRepository.findOneBy({ userId: userId })
+    if (!wallet) throw new ResponseBotError(this.messages.WALLET_NOT_FOUND)
+
+    return wallet.address
+  }
+
   // TODO: продолжить подключение к блокчейну
 
   async createFollowWallet(walletAddress: Hex, userId: number): Promise<FollowWallet> {

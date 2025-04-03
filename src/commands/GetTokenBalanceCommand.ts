@@ -5,16 +5,18 @@ import { TokenService } from "../blockchain/token.service"
 import { ResponseBotError } from "../errors/ResponseBotError"
 import { Logger } from "../utils/Logger"
 import { BlockchainService } from "../blockchain/blockchain.service"
+import { WalletService } from "../blockchain/wallet.service"
 
 export class GetTokenBalanceCommand implements ICommand {
   private readonly messages = {
-    NOT_FOUND: "Токены не найдены.",
+    TOKEN_NOT_FOUND: "Токены не найдены.",
     CURRENT_BALANCE: "Текущий баланс:\n",
   } as const
 
   constructor(
     private readonly tokenService: TokenService,
     private readonly blockchainService: BlockchainService,
+    private readonly walletService: WalletService,
     private readonly user: User,
   ) {}
 
@@ -23,17 +25,16 @@ export class GetTokenBalanceCommand implements ICommand {
 
     try {
       const tokens = await this.tokenService.getUserTokens(this.user.id)
-      if (tokens.length === 0) return new ResponseData(this.messages.NOT_FOUND)
+      if (tokens.length === 0) return new ResponseData(this.messages.TOKEN_NOT_FOUND)
 
-      // TODO: пока не удалять, нужно выяснить показывать баланс токена на кошельке (и можно ли смотреть баланс токена на кошельке)
-      // или баланс самого токена в блокчейне?
+      const walletAddress = await this.walletService.getWalletAddress(this.user.id)
+
       let balanceMessage = ""
       for (const token of tokens) {
-        const balance = await this.blockchainService.getBalance(token.address)
+        const balance = await this.blockchainService.getTokenBalance(walletAddress, token.address)
         balanceMessage += `${token.symbol} ${token.address}: ${balance}\n`
       }
 
-      // const balanceMessage = tokens.map((token) => `${token.address}: ${token.balance}`).join("\n")
       response.push(this.messages.CURRENT_BALANCE + balanceMessage)
     } catch (error) {
       if (error instanceof ResponseBotError) response.push(error.message)
