@@ -4,12 +4,11 @@ import { Command } from "./infrastructure/CommandHandler"
 import { User } from "../users/user.entity"
 import { TokenService } from "../blockchain/token.service"
 import { TokenDto } from "../blockchain/token.dto"
-import { Hex, isAddress } from "viem"
+import { isAddress } from "viem"
 import { ResponseBotError } from "../errors/ResponseBotError"
 import { Logger } from "../utils/Logger"
 import { Commands } from "./Commands"
 import { BlockchainService } from "../blockchain/blockchain.service"
-import { Token } from "../blockchain/token.entity"
 
 export class AddTokenCommand implements ICommand {
   private readonly messages = {

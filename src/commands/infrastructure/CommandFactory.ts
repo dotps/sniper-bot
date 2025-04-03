@@ -9,7 +9,7 @@ import { StartCommand } from "../StartCommand"
 import { User } from "../../users/user.entity"
 import { AddTokenCommand } from "../AddTokenCommand"
 import { TokenService } from "../../blockchain/token.service"
-import { GetTokenBalanceCommand } from "../GetTokenBalanceCommand"
+import { TokenBalanceCommand } from "../TokenBalanceCommand"
 import { RemoveTokenCommand } from "../RemoveTokenCommand"
 import { FollowWalletCommand } from "../FollowWalletCommand"
 import { WalletService } from "../../blockchain/wallet.service"
@@ -39,7 +39,7 @@ export class CommandFactory implements ICommandFactory {
       case Commands.REMOVE_TOKEN:
         return new RemoveTokenCommand(this.tokenService, user, commandData)
       case Commands.BALANCE:
-        return new GetTokenBalanceCommand(this.tokenService, this.blockchainService, this.walletService, user)
+        return new TokenBalanceCommand(this.tokenService, this.blockchainService, this.walletService, user)
       case Commands.FOLLOW:
         return new FollowWalletCommand(this.walletService, user, commandData)
       case Commands.UNFOLLOW:

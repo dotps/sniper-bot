@@ -7,7 +7,7 @@ import { Logger } from "../utils/Logger"
 import { BlockchainService } from "../blockchain/blockchain.service"
 import { WalletService } from "../blockchain/wallet.service"
 
-export class GetTokenBalanceCommand implements ICommand {
+export class TokenBalanceCommand implements ICommand {
   private readonly messages = {
     TOKEN_NOT_FOUND: "Токены не найдены.",
     CURRENT_BALANCE: "Текущий баланс:\n",
