@@ -1,13 +1,14 @@
 import { Injectable } from "@nestjs/common"
 import { createPublicClient, erc20Abi, Hex, http, isAddress, PublicClient } from "viem"
-import { bsc, bscTestnet, polygon } from "viem/chains"
+import { bscTestnet, polygon } from "viem/chains"
 import { Logger } from "../utils/Logger"
 import { ResponseBotError } from "../errors/ResponseBotError"
 import { Token } from "./token.entity"
+import { pancakeRouterV2Abi } from "../providers/nets/pancakeRouterAbi"
+import { watchPendingTransactions } from "viem/actions"
 
 @Injectable()
 export class BlockchainService {
-  private readonly client: PublicClient
   private readonly defaultBlockchain = Blockchain.BSC
   private clients: Map<Blockchain, PublicClient> = new Map()
   private readonly messages = {
@@ -17,6 +18,7 @@ export class BlockchainService {
 
   constructor() {
     this.initBlockchainClients()
+    this.watchDeals("0x7c810d8bb90634b040f9ee913f5639f3d3914d93f4a361ab89c747eb8fa546ec")
   }
 
   private initBlockchainClients() {
@@ -73,6 +75,27 @@ export class BlockchainService {
       return null
     }
   }
+
+  private watchDeals(walletAddress: Hex) {
+    this.getClient().watchPendingTransactions({ onTransactions: (hashes) => this.handleHashes(hashes, walletAddress) })
+  }
+
+  private async handleHashes(hashes: Hex[], walletAddress: Hex) {
+    for (const hash of hashes) {
+      console.log(hash)
+      try {
+        const transaction = await this.getClient().getTransaction({ hash })
+        if (transaction.from.toLowerCase() === walletAddress.toLowerCase()) {
+          console.log("++++++++")
+        }
+      } catch (error) {
+        // TODO: продолжить отслеживание транзакций
+      }
+
+      //
+      //
+    }
+  }
 }
 
 enum Blockchain {
@@ -98,3 +121,9 @@ TODO:
  Оповещение при недостатке баланса
  Перевод токенов (подключить блокчейн)
  */
+
+const pancakeSwapRouterAddress = "0xD99D1c33F9fC3444f8101754aBC46c52416550D1" // для BSC Testnet
+const pancakeSwapRouter = {
+  address: pancakeSwapRouterAddress,
+  abi: pancakeRouterV2Abi,
+}
