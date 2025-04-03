@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common"
 import { createPublicClient, Hex, http, PublicClient } from "viem"
-import { bsc, polygon } from "viem/chains"
+import { bsc, bscTestnet, polygon } from "viem/chains"
 
 @Injectable()
 export class BlockchainService {
@@ -14,7 +14,7 @@ export class BlockchainService {
 
   private initBlockchainClients() {
     const bscClient = createPublicClient({
-      chain: bsc,
+      chain: bscTestnet, // bsc
       transport: http(),
     })
     const polygonClient = createPublicClient({
@@ -22,7 +22,7 @@ export class BlockchainService {
       transport: http(),
     })
 
-    this.clients.set(Blockchain.BSC, bscClient)
+    this.clients.set(Blockchain.BSC, bscClient) // TODO: можно перейти на строки bscClient.chain.name, чтобы не создавать enum
     this.clients.set(Blockchain.POLYGON, polygonClient)
   }
 
