@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common"
-import { createPublicClient, http, PublicClient } from "viem"
+import { createPublicClient, Hex, http, PublicClient } from "viem"
 import { bsc, polygon } from "viem/chains"
 
 @Injectable()
@@ -30,6 +30,10 @@ export class BlockchainService {
     const client = this.clients.get(clientType)
     if (!client) throw Error("Клиент не найден.")
     return client
+  }
+
+  async getBalance(address: Hex) {
+    return await this.getPublicClient().getBalance({ address: address })
   }
 }
 
