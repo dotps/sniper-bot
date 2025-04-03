@@ -17,6 +17,7 @@ import { ReplicateCommand } from "../ReplicateCommand"
 import { SubscriptionsCommand } from "../SubscriptionsCommand"
 import { UnfollowCommand } from "../UnfollowCommand"
 import { SendCommand } from "../SendCommand"
+import { BlockchainService } from "../../blockchain/blockchain.service"
 
 @Injectable()
 export class CommandFactory implements ICommandFactory {
@@ -24,6 +25,7 @@ export class CommandFactory implements ICommandFactory {
     private readonly userService: UserService,
     private readonly tokenService: TokenService,
     private readonly walletService: WalletService,
+    private readonly blockchainService: BlockchainService,
   ) {}
 
   createCommand(user: User, commandData: Command): ICommand | null {
@@ -33,11 +35,11 @@ export class CommandFactory implements ICommandFactory {
       case Commands.START:
         return new StartCommand(this.userService, this.walletService, user)
       case Commands.ADD_TOKEN:
-        return new AddTokenCommand(this.tokenService, user, commandData)
+        return new AddTokenCommand(this.tokenService, this.blockchainService, user, commandData)
       case Commands.REMOVE_TOKEN:
         return new RemoveTokenCommand(this.tokenService, user, commandData)
       case Commands.BALANCE:
-        return new GetTokenBalanceCommand(this.tokenService, user)
+        return new GetTokenBalanceCommand(this.tokenService, this.blockchainService, user)
       case Commands.FOLLOW:
         return new FollowWalletCommand(this.walletService, user, commandData)
       case Commands.UNFOLLOW:

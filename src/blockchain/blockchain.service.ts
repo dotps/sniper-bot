@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common"
-import { createPublicClient, Hex, http, PublicClient } from "viem"
+import { createPublicClient, erc20Abi, Hex, http, PublicClient } from "viem"
 import { bsc, bscTestnet, polygon } from "viem/chains"
+import { Logger } from "../utils/Logger"
 
 @Injectable()
 export class BlockchainService {
@@ -14,7 +15,8 @@ export class BlockchainService {
 
   private initBlockchainClients() {
     const bscClient = createPublicClient({
-      chain: bscTestnet, // bsc
+      // chain: bscTestnet,
+      chain: bsc,
       transport: http(),
     })
     const polygonClient = createPublicClient({
@@ -26,14 +28,42 @@ export class BlockchainService {
     this.clients.set(Blockchain.POLYGON, polygonClient)
   }
 
-  getPublicClient(clientType: Blockchain = this.defaultBlockchain): PublicClient {
+  getClient(clientType: Blockchain = this.defaultBlockchain): PublicClient {
     const client = this.clients.get(clientType)
     if (!client) throw Error("Клиент не найден.")
     return client
   }
 
   async getBalance(address: Hex) {
-    return await this.getPublicClient().getBalance({ address: address })
+    return await this.getClient().getBalance({ address: address })
+  }
+
+  async getTokenBalance(address: Hex): Promise<void> {
+    // const tokenBalance = await this.getPublicClient().readContract({
+    //   address: address,
+    //   abi: [{
+    //     constant: true,
+    //     inputs: [{ name: "_owner", type: "address" }],
+    //     name: "balanceOf",
+    //     outputs: [{ name: "balance", type: "uint256" }],
+    //     type: "function"
+    //   }],
+    //   functionName: 'balanceOf',
+    //   args: [userAddress]
+    // })
+  }
+
+  async getTokenSymbol(address: Hex): Promise<string | null> {
+    try {
+      return await this.getClient().readContract({
+        address: address,
+        abi: erc20Abi,
+        functionName: "symbol",
+      })
+    } catch (error) {
+      Logger.error(error)
+      return null
+    }
   }
 }
 
@@ -41,3 +71,10 @@ enum Blockchain {
   BSC = "bsc",
   POLYGON = "polygon",
 }
+
+/*
+Токены BSC:
+Токен USDT: 0x55d398326f99059fF775485246999027B3197955
+Токен BUSD: 0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56
+Токен CAKE: 0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82
+ */

@@ -4,7 +4,7 @@ import { Command } from "./infrastructure/CommandHandler"
 import { User } from "../users/user.entity"
 import { TokenService } from "../blockchain/token.service"
 import { TokenDto } from "../blockchain/token.dto"
-import { Hex } from "viem"
+import { Hex, isAddress } from "viem"
 import { Commands } from "./Commands"
 import { ErrorHandler } from "../errors/ErrorHandler"
 
@@ -27,8 +27,7 @@ export class RemoveTokenCommand implements ICommand {
 
   async execute(): Promise<ResponseData | null> {
     const [tokenAddress] = this.commandData.params || []
-    if (!tokenAddress) return new ResponseData(this.messages.NEED_TOKEN)
-    // TODO: валидация формата токена
+    if (!tokenAddress || !isAddress(tokenAddress)) return new ResponseData(this.messages.NEED_TOKEN)
 
     try {
       const canRemoveAllTokens = tokenAddress === this.removeAllTokensCommand
@@ -39,8 +38,9 @@ export class RemoveTokenCommand implements ICommand {
       } else {
         const tokenDto: TokenDto = {
           balance: 0,
-          address: tokenAddress as Hex,
+          address: tokenAddress,
           userId: this.user.id,
+          symbol: "",
         }
         await this.tokenService.removeToken(tokenDto)
       }

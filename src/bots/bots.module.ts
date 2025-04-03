@@ -15,6 +15,7 @@ import { WalletService } from "../blockchain/wallet.service"
 import { FollowWallet } from "../blockchain/follow-wallet.entity"
 import { Replicate } from "../blockchain/replicate.entity"
 import { Wallet } from "../blockchain/wallet.entity"
+import { BlockchainService } from "../blockchain/blockchain.service"
 import { BlockchainModule } from "../blockchain/blockchain.module"
 
 const webRequestService = new WebRequestFetchService()
@@ -35,10 +36,15 @@ const vkBot = {
 
 const commandFactory = {
   provide: CommandFactory,
-  useFactory: (userService: UserService, tokenService: TokenService, walletService: WalletService) => {
-    return new CommandFactory(userService, tokenService, walletService)
+  useFactory: (
+    userService: UserService,
+    tokenService: TokenService,
+    walletService: WalletService,
+    blockchainService: BlockchainService,
+  ) => {
+    return new CommandFactory(userService, tokenService, walletService, blockchainService)
   },
-  inject: [UserService, TokenService, WalletService],
+  inject: [UserService, TokenService, WalletService, BlockchainService],
 }
 
 const commandHandler = {

@@ -11,6 +11,9 @@ export class Token {
   @Column()
   readonly address: Hex
 
+  @Column()
+  readonly symbol: string
+
   @Column("decimal", { precision: 78, scale: 18 })
   readonly balance: number
 

@@ -51,7 +51,7 @@ export class WalletService {
 
     const privateKey = this.decrypt(wallet.encryptedKey)
     const account = privateKeyToAccount(privateKey)
-    const client = this.blockchainService.getPublicClient()
+    const client = this.blockchainService.getClient()
 
     return createWalletClient({
       account,
