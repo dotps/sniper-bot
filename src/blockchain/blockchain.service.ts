@@ -1,8 +1,9 @@
 import { Injectable } from "@nestjs/common"
 import { createPublicClient, erc20Abi, Hex, http, isAddress, PublicClient } from "viem"
-import { bsc, polygon } from "viem/chains"
+import { bsc, bscTestnet, polygon } from "viem/chains"
 import { Logger } from "../utils/Logger"
 import { ResponseBotError } from "../errors/ResponseBotError"
+import { Token } from "./token.entity"
 
 @Injectable()
 export class BlockchainService {
@@ -11,6 +12,7 @@ export class BlockchainService {
   private clients: Map<Blockchain, PublicClient> = new Map()
   private readonly messages = {
     WRONG_WALLET_OR_TOKEN: "Неверный адрес кошелька или токена.",
+    TOKEN_ERROR: "Ошибка с адресом токена. Возможно токен не принадлежит текущей сети.",
   } as const
 
   constructor() {
@@ -19,8 +21,8 @@ export class BlockchainService {
 
   private initBlockchainClients() {
     const bscClient = createPublicClient({
-      // chain: bscTestnet,
-      chain: bsc,
+      chain: bscTestnet,
+      // chain: bsc,
       transport: http(),
     })
     const polygonClient = createPublicClient({
@@ -42,20 +44,20 @@ export class BlockchainService {
     return await this.getClient().getBalance({ address: address })
   }
 
-  async getTokenBalance(walletAddress: Hex, tokenAddress: Hex): Promise<bigint> {
-    if (!isAddress(walletAddress) || !isAddress(tokenAddress))
+  async getTokenBalance(walletAddress: Hex, token: Token): Promise<bigint> {
+    if (!isAddress(walletAddress) || !isAddress(token.address))
       throw new ResponseBotError(this.messages.WRONG_WALLET_OR_TOKEN)
 
     try {
       return await this.getClient().readContract({
-        address: tokenAddress,
-        abi: erc20Abi,
+        address: token.address,
+        abi: erc20Abi, // TODO: в настройки, еще где-то встречается
         functionName: "balanceOf",
         args: [walletAddress],
       })
     } catch (error) {
       Logger.error(error)
-      return 0n
+      throw new ResponseBotError(`${this.messages.TOKEN_ERROR}\n${token.symbol} ${token.address}`)
     }
   }
 
@@ -79,6 +81,11 @@ enum Blockchain {
 }
 
 /*
+Токены BSC TestNet:
+Токен USDT: 0x337610d27c682E347C9cD60BD4b3b107C9d34dDd
+Токен BUSD: 0x8301F2213c0eeD49a7E28Ae4c3e91722919B8B47
+Токен CAKE: 0x8d008B313C1d6C7fE2982F62d32Da7507cF43551
+
 Токены BSC:
 Токен USDT: 0x55d398326f99059fF775485246999027B3197955
 Токен BUSD: 0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56

@@ -31,7 +31,7 @@ export class GetTokenBalanceCommand implements ICommand {
 
       let balanceMessage = ""
       for (const token of tokens) {
-        const balance = await this.blockchainService.getTokenBalance(walletAddress, token.address)
+        const balance = await this.blockchainService.getTokenBalance(walletAddress, token)
         balanceMessage += `${token.symbol} ${token.address}: ${balance}\n`
       }
 
