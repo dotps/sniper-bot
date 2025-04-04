@@ -4,6 +4,7 @@ import { Repository } from "typeorm"
 import { Token } from "./token.entity"
 import { TokenDto } from "./token.dto"
 import { ResponseBotError } from "../errors/ResponseBotError"
+import { Hex } from "viem"
 
 @Injectable()
 export class TokenService {
@@ -41,10 +42,10 @@ export class TokenService {
     return await this.repository.findBy({ userId })
   }
 
-  async removeToken(tokenDto: TokenDto): Promise<boolean> {
+  async removeToken(address: Hex, userId: number): Promise<boolean> {
     const result = await this.repository.delete({
-      userId: tokenDto.userId,
-      address: tokenDto.address,
+      userId: userId,
+      address: address,
     })
 
     if (!result || result.affected === 0) throw new ResponseBotError(this.messages.TOKEN_NOT_FOUND)

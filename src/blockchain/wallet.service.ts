@@ -11,6 +11,7 @@ import { generatePrivateKey, privateKeyToAccount } from "viem/accounts"
 import { Wallet } from "./wallet.entity"
 import { BlockchainService } from "./blockchain.service"
 import { TransactionObserverService } from "./transaction-observer.service"
+import { Commands } from "../commands/Commands"
 
 @Injectable()
 export class WalletService {
@@ -18,7 +19,7 @@ export class WalletService {
     FOLLOW_WALLET_EXIST: "Такой кошелек уже отслеживается.",
     FOLLOW_WALLET_NOT_FOUND: "Подписка не найдена.",
     REPEATED_DEALS: "Повторные сделки: ",
-    WALLET_NOT_FOUND: "Кошелек не найден.",
+    WALLET_NOT_FOUND: `Кошелек не найден. ${Commands.WALLET} для создания кошелька.`,
   } as const
 
   constructor(
@@ -62,6 +63,13 @@ export class WalletService {
       chain: client.chain,
       transport: http(),
     })
+  }
+
+  async getWalletAddressOrCreate(userId: number): Promise<Hex> {
+    const existedWallet = await this.walletRepository.findOneBy({ userId })
+    if (existedWallet) return existedWallet.address
+
+    return this.createWallet(userId)
   }
 
   async getWalletAddress(userId: number): Promise<Hex> {

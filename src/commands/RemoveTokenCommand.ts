@@ -27,7 +27,7 @@ export class RemoveTokenCommand implements ICommand {
 
   async execute(): Promise<ResponseData | null> {
     const [tokenAddress] = this.commandData.params || []
-    if (!tokenAddress || !isAddress(tokenAddress)) return new ResponseData(this.messages.NEED_TOKEN)
+    if (!tokenAddress) return new ResponseData(this.messages.NEED_TOKEN)
 
     try {
       const canRemoveAllTokens = tokenAddress === this.removeAllTokensCommand
@@ -36,13 +36,8 @@ export class RemoveTokenCommand implements ICommand {
       if (canRemoveAllTokens) {
         await this.tokenService.removeAllTokens(this.user.id)
       } else {
-        const tokenDto: TokenDto = {
-          balance: 0,
-          address: tokenAddress,
-          userId: this.user.id,
-          symbol: "",
-        }
-        await this.tokenService.removeToken(tokenDto)
+        if (!isAddress(tokenAddress)) return new ResponseData(this.messages.NEED_TOKEN)
+        await this.tokenService.removeToken(tokenAddress, this.user.id)
       }
       return new ResponseData(successMessage)
     } catch (error) {

@@ -18,6 +18,7 @@ import { SubscriptionsCommand } from "../SubscriptionsCommand"
 import { UnfollowCommand } from "../UnfollowCommand"
 import { SendCommand } from "../SendCommand"
 import { BlockchainService } from "../../blockchain/blockchain.service"
+import { WalletCommand } from "../WalletCommand"
 
 @Injectable()
 export class CommandFactory implements ICommandFactory {
@@ -50,6 +51,8 @@ export class CommandFactory implements ICommandFactory {
         return new SubscriptionsCommand(this.walletService, user)
       case Commands.SEND:
         return new SendCommand(this.walletService, user, commandData)
+      case Commands.WALLET:
+        return new WalletCommand(this.walletService, user)
       default:
         return null
     }

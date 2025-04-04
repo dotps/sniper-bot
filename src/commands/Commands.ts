@@ -9,4 +9,5 @@ export enum Commands {
   REPLICATE = "/replicate",
   SUBSCRIPTIONS = "/subscriptions",
   SEND = "/send",
+  WALLET = "/wallet",
 }
