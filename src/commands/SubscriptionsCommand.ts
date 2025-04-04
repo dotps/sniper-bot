@@ -19,7 +19,7 @@ export class SubscriptionsCommand implements ICommand {
 
   async execute(): Promise<ResponseData | null> {
     try {
-      const followWallets = await this.walletService.getFollowWallets(this.user.id)
+      const followWallets = await this.walletService.getFollowWalletsForUser(this.user.id)
       if (followWallets.length === 0) return new ResponseData(this.messages.NOT_FOUND)
 
       const subscriptionMessage = followWallets.map((followWallet) => followWallet.wallet).join("\n")

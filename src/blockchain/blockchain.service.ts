@@ -18,7 +18,7 @@ export class BlockchainService {
 
   constructor() {
     this.initBlockchainClients()
-    this.watchDeals("0x7c810d8bb90634b040f9ee913f5639f3d3914d93f4a361ab89c747eb8fa546ec")
+    // this.watchDeals("0x7c810d8bb90634b040f9ee913f5639f3d3914d93f4a361ab89c747eb8fa546ec")
   }
 
   private initBlockchainClients() {
@@ -76,26 +76,31 @@ export class BlockchainService {
     }
   }
 
-  private watchDeals(walletAddress: Hex) {
-    this.getClient().watchPendingTransactions({ onTransactions: (hashes) => this.handleHashes(hashes, walletAddress) })
-  }
-
-  private async handleHashes(hashes: Hex[], walletAddress: Hex) {
-    for (const hash of hashes) {
-      console.log(hash)
-      try {
-        const transaction = await this.getClient().getTransaction({ hash })
-        if (transaction.from.toLowerCase() === walletAddress.toLowerCase()) {
-          console.log("++++++++")
-        }
-      } catch (error) {
-        // TODO: продолжить отслеживание транзакций
-      }
-
-      //
-      //
-    }
-  }
+  // private watchDeals(walletAddress: Hex) {
+  //   this.getClient().watchPendingTransactions({
+  //     onTransactions: (hashes) => void this.handleHashes(hashes, walletAddress),
+  //   })
+  // }
+  //
+  // // TODO: walletAddress.toLowerCase происходит ввод где возможно (адрес не чуствителен к регистру и могут быть ошибки)
+  //
+  // // TODO: сделать сервис для отслеживания сделок, при старте он загружает в себя список отслеживаемых токенов,
+  // // при добавлении/удалении подписок список изменяется, переодически сам обновляется
+  //
+  // private async handleHashes(hashes: Hex[], walletAddress: Hex) {
+  //   for (const hash of hashes) {
+  //     console.log(hash)
+  //     try {
+  //       const transaction = await this.getClient().getTransaction({ hash })
+  //       if (transaction.from.toLowerCase() === walletAddress.toLowerCase()) {
+  //         console.log(transaction.from.toLowerCase())
+  //         // TODO: запустить команду Повтора сделки
+  //       }
+  //     } catch (error) {
+  //       Logger.error(error)
+  //     }
+  //   }
+  // }
 }
 
 enum Blockchain {
@@ -108,6 +113,8 @@ enum Blockchain {
 Токен USDT: 0x337610d27c682E347C9cD60BD4b3b107C9d34dDd
 Токен BUSD: 0x8301F2213c0eeD49a7E28Ae4c3e91722919B8B47
 Токен CAKE: 0x8d008B313C1d6C7fE2982F62d32Da7507cF43551
+
+0xd0567bb38fa5bad45150026281c43fa6031577b9 - часто идут транзакции
 
 Токены BSC:
 Токен USDT: 0x55d398326f99059fF775485246999027B3197955

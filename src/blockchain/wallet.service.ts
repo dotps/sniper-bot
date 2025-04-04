@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common"
+import { forwardRef, Inject, Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
 import { FollowWallet } from "./follow-wallet.entity"
@@ -10,6 +10,7 @@ import { DBError } from "../errors/DBError"
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts"
 import { Wallet } from "./wallet.entity"
 import { BlockchainService } from "./blockchain.service"
+import { TransactionObserverService } from "./transaction-observer.service"
 
 @Injectable()
 export class WalletService {
@@ -28,6 +29,8 @@ export class WalletService {
     @InjectRepository(Replicate)
     private readonly replicateRepository: Repository<Replicate>,
     private readonly blockchainService: BlockchainService,
+    @Inject(forwardRef(() => TransactionObserverService)) // TODO: посмотреть как можно выйти из циклической зависимости
+    private readonly transactionObserverService: TransactionObserverService,
   ) {}
 
   async createWallet(userId: number): Promise<Hex> {
@@ -45,6 +48,7 @@ export class WalletService {
     return createdWallet.address
   }
 
+  // TODO: вынести в blockchainService
   async getWalletClient(userId: number): Promise<WalletClient> {
     const wallet = await this.walletRepository.findOneBy({ userId: userId })
     if (!wallet) throw new ResponseBotError(this.messages.WALLET_NOT_FOUND)
@@ -67,8 +71,6 @@ export class WalletService {
     return wallet.address
   }
 
-  // TODO: продолжить подключение к блокчейну
-
   async createFollowWallet(walletAddress: Hex, userId: number): Promise<FollowWallet> {
     const followWalletDto: Partial<FollowWallet> = {
       wallet: walletAddress,
@@ -79,8 +81,10 @@ export class WalletService {
     if (currentFollow) throw new ResponseBotError(this.messages.FOLLOW_WALLET_EXIST)
 
     const followWallet = this.followRepository.create(followWalletDto)
+    const wallet = await this.followRepository.save(followWallet)
 
-    return await this.followRepository.save(followWallet)
+    this.transactionObserverService.addFollowWalletIntoObserver(wallet) // TODO: через события отправить, чтобы не инжектить сервис
+    return wallet
   }
 
   async createReplicate(command: ReplicateDealCommand, userId: number, limit: number): Promise<Replicate | undefined> {
@@ -97,8 +101,24 @@ export class WalletService {
     }
   }
 
-  async getFollowWallets(userId: number): Promise<FollowWallet[]> {
+  async getFollowWalletsForUser(userId: number): Promise<FollowWallet[]> {
     return await this.followRepository.findBy({ userId })
+  }
+
+  async getFollowWallets(): Promise<Record<Hex, number[]>> {
+    const result: Record<Hex, number[]> = {}
+    const walletsWithGroupedUsers: Array<{ wallet: Hex; userIdList: number[] }> = await this.followRepository
+      .createQueryBuilder("follow_wallet")
+      .select("follow_wallet.wallet", "wallet")
+      .addSelect("ARRAY_AGG(follow_wallet.userId)", "userIdList")
+      .groupBy("follow_wallet.wallet")
+      .getRawMany()
+
+    for (const item of walletsWithGroupedUsers) {
+      result[item.wallet] = item.userIdList
+    }
+
+    return result
   }
 
   async unfollow(walletAddress: Hex, userId: number) {
