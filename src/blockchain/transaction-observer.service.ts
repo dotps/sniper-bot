@@ -4,19 +4,20 @@ import { Logger } from "../utils/Logger"
 import { BlockchainService } from "./blockchain.service"
 import { WalletService } from "./wallet.service"
 import { FollowWallet } from "./follow-wallet.entity"
+import { ReplicateTransactionCommand } from "../commands/ReplicateTransactionCommand"
 
 @Injectable()
 export class TransactionObserverService implements OnModuleInit {
   private readonly client: PublicClient
+  private readonly updateObservedWalletsInterval: number = 60000
   private observedWallets: Record<Hex, number[]> = {}
-  private updateObservedWalletsInterval: number = 60000
 
   constructor(
     private readonly blockchainService: BlockchainService,
     @Inject(forwardRef(() => WalletService)) // TODO: посмотреть как можно выйти из циклической зависимости
     private readonly walletService: WalletService,
   ) {
-    this.client = blockchainService.getClient()
+    this.client = this.blockchainService.getClient()
   }
 
   async onModuleInit() {
@@ -49,8 +50,8 @@ export class TransactionObserverService implements OnModuleInit {
 
         const walletUsers = this.observedWallets[fromAddress]
         if (walletUsers) {
-          console.log("TODO: запустить команду Повтора сделки")
-          // TODO: запустить команду Повтора сделки
+          const command = new ReplicateTransactionCommand(this.blockchainService, fromAddress, walletUsers, transaction)
+          await command.execute()
         }
       } catch (error) {
         Logger.error(error)
