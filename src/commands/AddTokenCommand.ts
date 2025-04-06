@@ -29,6 +29,7 @@ export class AddTokenCommand implements ICommand {
     const response: string[] = []
 
     const [tokenAddress] = this.commandData.params || []
+    console.log(tokenAddress)
     if (!tokenAddress || !isAddress(tokenAddress)) return new ResponseData(this.messages.NEED_TOKEN)
 
     try {

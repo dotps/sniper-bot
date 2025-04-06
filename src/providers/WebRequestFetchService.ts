@@ -11,7 +11,8 @@ export class WebRequestFetchService implements IWebRequestService {
 
       if (!response.ok) {
         Logger.error(`${response.status} ${response.statusText} ${JSON.stringify(responseData)}`)
-        throw new Error("WebRequest Error")
+        return null as T
+        // throw new Error("WebRequest Error")
       }
 
       Logger.log(`Response: ${JSON.stringify(responseData)}`)
@@ -20,6 +21,7 @@ export class WebRequestFetchService implements IWebRequestService {
     } catch (e) {
       Logger.error(`${e}`)
       throw new Error("WebRequest Error")
+      // TODO: останавливает приложение, если нет интернета
     }
   }
 }

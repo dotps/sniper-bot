@@ -35,6 +35,9 @@ export class TokenBalanceCommand implements ICommand {
         balanceMessage += `${token.symbol} ${token.address}: ${balance}\n`
       }
 
+      const balance = await this.blockchainService.getBalance(walletAddress)
+      balanceMessage += `BASE COIN: ${balance}\n`
+
       response.push(this.messages.CURRENT_BALANCE + balanceMessage)
     } catch (error) {
       if (error instanceof ResponseBotError) response.push(error.message)

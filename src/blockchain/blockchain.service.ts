@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common"
 import { createPublicClient, erc20Abi, Hex, http, isAddress, PublicClient } from "viem"
-import { bscTestnet, polygon } from "viem/chains"
+import { bsc, bscTestnet, polygon } from "viem/chains"
 import { Logger } from "../utils/Logger"
 import { ResponseBotError } from "../errors/ResponseBotError"
 import { Token } from "./token.entity"
@@ -71,7 +71,7 @@ export class BlockchainService {
         functionName: "symbol",
       })
     } catch (error) {
-      Logger.error(error)
+      // Logger.error(error)
       return null
     }
   }
@@ -116,6 +116,10 @@ enum Blockchain {
 
 0xd0567bb38fa5bad45150026281c43fa6031577b9 - часто идут транзакции
 
+0xF6dD294C065DDE53CcA856249FB34ae67BE5C54C - мой кошелек
+
+0x22579CA45eE22E2E16dDF72D955D6cf4c767B0eF - кошелек (кран) с celo
+
 Токены BSC:
 Токен USDT: 0x55d398326f99059fF775485246999027B3197955
 Токен BUSD: 0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56
@@ -129,8 +133,8 @@ TODO:
  Перевод токенов (подключить блокчейн)
  */
 
-const pancakeSwapRouterAddress = "0xD99D1c33F9fC3444f8101754aBC46c52416550D1" // для BSC Testnet
-const pancakeSwapRouter = {
+const pancakeSwapRouterAddress: Hex = "0xD99D1c33F9fC3444f8101754aBC46c52416550D1" // для BSC Testnet
+export const pancakeSwapRouter = {
   address: pancakeSwapRouterAddress,
   abi: pancakeRouterV2Abi,
 }
