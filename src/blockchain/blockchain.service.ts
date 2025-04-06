@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common"
-import { createPublicClient, erc20Abi, Hex, http, isAddress, PublicClient } from "viem"
-import { bsc, bscTestnet, polygon } from "viem/chains"
+import { createPublicClient, erc20Abi, Hex, http, isAddress, PublicClient, webSocket } from "viem"
+import { bsc, bscTestnet, polygon, polygonMumbai } from "viem/chains"
 import { Logger } from "../utils/Logger"
 import { ResponseBotError } from "../errors/ResponseBotError"
 import { Token } from "./token.entity"
@@ -9,7 +9,8 @@ import { watchPendingTransactions } from "viem/actions"
 
 @Injectable()
 export class BlockchainService {
-  private readonly defaultBlockchain = Blockchain.BSC
+  // private readonly defaultBlockchain = Blockchain.BSC
+  private readonly defaultBlockchain = Blockchain.POLYGON
   private clients: Map<Blockchain, PublicClient> = new Map()
   private readonly messages = {
     WRONG_WALLET_OR_TOKEN: "Неверный адрес кошелька или токена.",
@@ -29,6 +30,7 @@ export class BlockchainService {
     })
     const polygonClient = createPublicClient({
       chain: polygon,
+      // chain: polygonMumbai,
       transport: http(),
     })
 
@@ -38,6 +40,7 @@ export class BlockchainService {
 
   getClient(clientType: Blockchain = this.defaultBlockchain): PublicClient {
     const client = this.clients.get(clientType)
+    console.log(clientType)
     if (!client) throw Error("Клиент не найден.")
     return client
   }
