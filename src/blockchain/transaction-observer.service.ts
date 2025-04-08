@@ -18,6 +18,7 @@ import { WalletService } from "./wallet.service"
 import { FollowWallet } from "./follow-wallet.entity"
 import { ReplicateTransactionCommand } from "../commands/ReplicateTransactionCommand"
 import { bscTestnet } from "viem/chains"
+import { Uniswap } from "./uniswap"
 
 @Injectable()
 export class TransactionObserverService implements OnModuleInit {
@@ -53,7 +54,10 @@ export class TransactionObserverService implements OnModuleInit {
       // address: "0xe92Ea8F400CB9bD368BD1185C9fC5e2664770341",
     })
     console.log(`Баланс: ${balance} wei`)
-    await this.polygonWatch()
+    // await this.polygonWatch()
+    await this.polygonWatchPool()
+
+
     // const unwatch = await this.trackSwaps(targetWallet)
     // const swaps = await this.getRecentSwaps(targetWallet)
     // console.log("Последние свапы:", swaps)
@@ -116,12 +120,17 @@ export class TransactionObserverService implements OnModuleInit {
     }
   }
 
+  /*
   async polygonWatch() {
     console.log("polygonWatch")
 
     const swapEventAbi = parseAbiItem(
       "event Swap(address indexed sender, address indexed recipient, int256 amount0, int256 amount1, uint160 sqrtPriceX96, uint128 liquidity, int24 tick)",
     )
+
+    const uniswap = new Uniswap(this.client)
+    const uniswapPools = await uniswap.getAllPools2()
+    console.log(uniswapPools)
 
     // const walletAddress = "0xe92Ea8F400CB9bD368BD1185C9fC5e2664770341"
     // const walletAddress = "0x7f20a7A526D1BAB092e3Be0733D96287E93cEf59" // тут есть
@@ -142,29 +151,31 @@ export class TransactionObserverService implements OnModuleInit {
       },
     })
   }
-
+*/
   // TODO: с использованием пула работает, мне нужно отслеживать все
   async polygonWatchPool() {
     const swapEventAbi = parseAbiItem(
       "event Swap(address indexed sender, address indexed recipient, int256 amount0, int256 amount1, uint160 sqrtPriceX96, uint128 liquidity, int24 tick)",
     )
 
-    // Адрес пула USDC/WETH на Polygon
-    const poolAddress = "0x45dDa9cb7c25131DF268515131f647d726f50608"
+    const uniswap = new Uniswap(this.client)
+    const poolAddresses = uniswap.getPools()
 
     const unwatch = this.client.watchEvent({
-      address: poolAddress,
+      address: poolAddresses,
       event: swapEventAbi,
       onLogs: (logs) => {
-        logs.forEach((log) => {
-          const { args } = log
-          console.log("Новая сделка:")
-          console.log("Sender:", args.sender)
-          console.log("Recipient:", args.recipient)
-          console.log("Amount0 (delta):", args?.amount0?.toString())
-          console.log("Amount1 (delta):", args?.amount1?.toString())
-          console.log("------------------")
-        })
+        console.log(logs.length)
+        // TODO: продолжить поиск кошелька
+        // logs.forEach((log) => {
+        //   const { args } = log
+        //   console.log("Новая сделка:")
+        //   console.log("Sender:", args.sender)
+        //   console.log("Recipient:", args.recipient)
+        //   console.log("Amount0 (delta):", args?.amount0?.toString())
+        //   console.log("Amount1 (delta):", args?.amount1?.toString())
+        //   console.log("------------------")
+        // })
       },
     })
   }
