@@ -4,6 +4,7 @@ import { User } from "../users/user.entity"
 
 @Entity()
 @Unique(["wallet", "userId"])
+// TODO: переименовать в Subscribes
 export class FollowWallet {
   @PrimaryGeneratedColumn()
   readonly id: number
