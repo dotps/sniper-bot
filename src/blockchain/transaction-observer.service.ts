@@ -49,8 +49,8 @@ export class TransactionObserverService implements OnModuleInit {
     */
     const targetWallet = "0xd0567bb38fa5bad45150026281c43fa6031577b9"
     const balance = await this.client.getBalance({
-      // address: "0xF6dD294C065DDE53CcA856249FB34ae67BE5C54C",
-      address: "0xe92Ea8F400CB9bD368BD1185C9fC5e2664770341",
+      address: "0xF6dD294C065DDE53CcA856249FB34ae67BE5C54C",
+      // address: "0xe92Ea8F400CB9bD368BD1185C9fC5e2664770341",
     })
     console.log(`Баланс: ${balance} wei`)
     await this.polygonWatch()
@@ -123,17 +123,22 @@ export class TransactionObserverService implements OnModuleInit {
       "event Swap(address indexed sender, address indexed recipient, int256 amount0, int256 amount1, uint160 sqrtPriceX96, uint128 liquidity, int24 tick)",
     )
 
-    const walletAddress = "0xe92Ea8F400CB9bD368BD1185C9fC5e2664770341" // Замените на нужный адрес
+    // const walletAddress = "0xe92Ea8F400CB9bD368BD1185C9fC5e2664770341"
+    // const walletAddress = "0x7f20a7A526D1BAB092e3Be0733D96287E93cEf59" // тут есть
+    const walletAddress = "0x06959153B974D0D5fDfd87D561db6d8d4FA0bb0B"
+    // TODO: продолжить
     const unwatch = this.client.watchEvent({
       event: swapEventAbi,
       onLogs: (logs) => {
-        console.log("++++")
-        // console.log(logs)
-        // logs
-        //   .filter((log) => log.args.sender === walletAddress || log.args.recipient === walletAddress)
-        //   .forEach((log) => {
-        //     console.log("Найдена сделка:", log)
-        //   })
+        console.log("++++", logs.length)
+        // for (const log of logs) {
+        //   console.log(log.args.sender)
+        // }
+        logs
+          .filter((log) => log.args.sender === walletAddress || log.args.recipient === walletAddress)
+          .forEach((log) => {
+            console.log("Найдена сделка:", log)
+          })
       },
     })
   }
@@ -164,7 +169,7 @@ export class TransactionObserverService implements OnModuleInit {
     })
   }
 
-  async getTokenInfo(tokenAddress: `0x${string}`) {
+  async getTokenInfo(tokenAddress: Hex) {
     const [symbol, decimals] = await Promise.all([
       this.client.readContract({
         address: tokenAddress,
