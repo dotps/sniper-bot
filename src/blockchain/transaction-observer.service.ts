@@ -57,7 +57,6 @@ export class TransactionObserverService implements OnModuleInit {
     // await this.polygonWatch()
     await this.polygonWatchPool()
 
-
     // const unwatch = await this.trackSwaps(targetWallet)
     // const swaps = await this.getRecentSwaps(targetWallet)
     // console.log("Последние свапы:", swaps)
@@ -73,6 +72,7 @@ export class TransactionObserverService implements OnModuleInit {
 
   // TODO: walletAddress.toLowerCase происходит ввод? добавить где возможно (адрес не чуствителен к регистру и могут быть ошибки)
 
+  // TODO: сохранить отслеживание через транзакции для образца
   private async handleHashes(hashes: Hex[]) {
     for (const hash of hashes) {
       try {
@@ -152,7 +152,8 @@ export class TransactionObserverService implements OnModuleInit {
     })
   }
 */
-  // TODO: с использованием пула работает, мне нужно отслеживать все
+
+  // TODO: с использованием пула работает
   async polygonWatchPool() {
     const swapEventAbi = parseAbiItem(
       "event Swap(address indexed sender, address indexed recipient, int256 amount0, int256 amount1, uint160 sqrtPriceX96, uint128 liquidity, int24 tick)",
@@ -165,8 +166,17 @@ export class TransactionObserverService implements OnModuleInit {
       address: poolAddresses,
       event: swapEventAbi,
       onLogs: (logs) => {
+        await Promise.all(
+          logs.map(async (log) => {
+            const sender = log?.args?.sender?.toLowerCase()
+            if (!sender || !isAddress(sender)) return
+            // TODO: продолжить
+            if (this.observedWallets[sender] || this.observedWallets[log.args.recipient]) {
+            }
+          }),
+        )
+
         console.log(logs.length)
-        // TODO: продолжить поиск кошелька
         // logs.forEach((log) => {
         //   const { args } = log
         //   console.log("Новая сделка:")
