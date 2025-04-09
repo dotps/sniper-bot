@@ -122,75 +122,28 @@ export class TransactionObserverService implements OnModuleInit {
     }
   }
 
-  /*
-  async polygonWatch() {
-    console.log("polygonWatch")
+  ////////////
 
-    const swapEventAbi = parseAbiItem(
-      "event Swap(address indexed sender, address indexed recipient, int256 amount0, int256 amount1, uint160 sqrtPriceX96, uint128 liquidity, int24 tick)",
-    )
-
-    const uniswap = new Uniswap(this.client)
-    const uniswapPools = await uniswap.getAllPools2()
-    console.log(uniswapPools)
-
-    // const walletAddress = "0xe92Ea8F400CB9bD368BD1185C9fC5e2664770341"
-    // const walletAddress = "0x7f20a7A526D1BAB092e3Be0733D96287E93cEf59" // тут есть
-    const walletAddress = "0x06959153B974D0D5fDfd87D561db6d8d4FA0bb0B"
-    // TODO: продолжить
-    const unwatch = this.client.watchEvent({
-      event: swapEventAbi,
-      onLogs: (logs) => {
-        console.log("++++", logs.length)
-        // for (const log of logs) {
-        //   console.log(log.args.sender)
-        // }
-        logs
-          .filter((log) => log.args.sender === walletAddress || log.args.recipient === walletAddress)
-          .forEach((log) => {
-            console.log("Найдена сделка:", log)
-          })
-      },
-    })
-  }
-*/
-
-  // TODO: с использованием пула работает
   async polygonWatchPool() {
-    const uniswap = new Uniswap(this.client)
-    const poolAddresses = uniswap.getPools()
+    const uniswap = await Uniswap.create(this.client)
+    const pools = uniswap.getPools()
+    const poolsAddresses = [...pools.keys()]
+    console.log(poolsAddresses)
+    console.log(pools)
 
     const unwatch = this.client.watchEvent({
-      address: poolAddresses,
+      address: poolsAddresses,
       event: swapEventAbi,
       onLogs: (logs) => {
-        // const relevantLogs: Log[] = []
-        const relevantLogs = this.filterRelevantLogs(logs)
-        // for (const log of logs) {
-        //   const { sender, recipient } = log.args
-        //   if (!sender || !isAddress(sender)) continue
-        //   if (!recipient || !isAddress(recipient)) continue
-        //   if (this.observedWallets[sender] || this.observedWallets[recipient]) {
-        //     relevantLogs.push(log)
-        //   }
-        // }
-
-        console.log(relevantLogs)
-
-        // await Promise.all(
-        //   logs.map(async (log) => {
-        //     const sender = log?.args?.sender?.toLowerCase()
-        //     const recipient = log?.args?.recipient?.toLowerCase()
-        //     if (!sender || !isAddress(sender)) return
-        //     if (!recipient || !isAddress(recipient)) return
-        //     // TODO: продолжить
-        //     if (this.observedWallets[sender] || this.observedWallets[recipient]) {
-        //
-        //     }
-        //   }),
-        // )
-
+        const filteredLogs = this.getLogsForObservableWallets(logs)
         console.log(logs.length)
+        console.log(filteredLogs)
+
+        const top5 = this.getTop5Addresses()
+        top5.forEach((entry, index) => {
+          console.log(`#${index + 1}: ${entry.address} (${entry.value})`)
+        })
+
         // logs.forEach((log) => {
         //   const { args } = log
         //   console.log("Новая сделка:")
@@ -204,37 +157,35 @@ export class TransactionObserverService implements OnModuleInit {
     })
   }
 
-  // private filterRelevantLogs(logs: Log<bigint, number, true, typeof swapEventAbi>[]): Log[] {
-  private filterRelevantLogs(logs: WatchEventOnLogsParameter<typeof swapEventAbi>): Log[] {
-    const relevantLogs: Log[] = []
+  getTop5Addresses(): { address: Hex; value: number }[] {
+    const entries = Array.from(this.tempWalletAddresses.entries())
+    entries.sort((a, b) => b[1] - a[1])
+    const top5 = entries.slice(0, 5).map(([address, value]) => ({
+      address,
+      value,
+    }))
+
+    return top5
+  }
+
+  private getLogsForObservableWallets(logs: WatchEventOnLogsParameter<typeof swapEventAbi>): Log[] {
+    const filteredLogs: Log[] = []
 
     for (const log of logs) {
       const { sender, recipient } = log.args
       if (!sender || !isAddress(sender)) continue
       if (!recipient || !isAddress(recipient)) continue
-      if (this.observedWallets[sender] || this.observedWallets[recipient]) {
-        relevantLogs.push(log)
+      console.log(log)
+      if (this.observedWallets[sender.toLowerCase()] || this.observedWallets[recipient.toLowerCase()]) {
+        filteredLogs.push(log)
       }
+
+      const currentValue = this.tempWalletAddresses.get(sender) || 0
+      this.tempWalletAddresses.set(sender, currentValue + 1)
     }
 
-    return relevantLogs
+    return filteredLogs
   }
-
-  // private filterRelevantLogs(logs: Log[]): Log[] {
-  //   const relevantLogs: Log[] = []
-  //
-  //   for (const log of logs) {
-  //     if (!Object.hasOwn(log, "args")) continue
-  //     const { sender, recipient } = log.args
-  //     if (!sender || !isAddress(sender)) continue
-  //     if (!recipient || !isAddress(recipient)) continue
-  //     if (this.observedWallets[sender] || this.observedWallets[recipient]) {
-  //       relevantLogs.push(log)
-  //     }
-  //   }
-  //
-  //   return relevantLogs
-  // }
 
   async getTokenInfo(tokenAddress: Hex) {
     const [symbol, decimals] = await Promise.all([
@@ -263,3 +214,17 @@ const tokenAbi = parseAbi(["function symbol() view returns (string)", "function 
 const swapEventAbi = parseAbiItem(
   "event Swap(address indexed sender, address indexed recipient, int256 amount0, int256 amount1, uint160 sqrtPriceX96, uint128 liquidity, int24 tick)",
 )
+
+/*
+address - адрес контракта пула, где произошел обмен
+sender - адрес, инициировавший обмен
+recipient - адрес получателя
+  * может быть равен sender - тогда это покупка/продажа
+  * != sender, то это перевод?
+amount0 - изменение количества первого токена, если положительный, то был продан
+amount1 - изменение количества второго токена, если отризацельный, то был куплен
+
+Логика обмена токенов:
+Пользователь sender продал токены token0 и получил токены token1 в пуле address
+
+ */
