@@ -1,5 +1,6 @@
 import { forwardRef, Inject, Injectable, OnModuleInit } from "@nestjs/common"
 import {
+  Address,
   Block,
   createPublicClient,
   GetContractEventsReturnType,
@@ -10,6 +11,7 @@ import {
   parseAbi,
   parseAbiItem,
   PublicClient,
+  WatchEventOnLogsParameter,
   webSocket,
 } from "viem"
 import { Logger } from "../utils/Logger"
@@ -155,10 +157,6 @@ export class TransactionObserverService implements OnModuleInit {
 
   // TODO: с использованием пула работает
   async polygonWatchPool() {
-    const swapEventAbi = parseAbiItem(
-      "event Swap(address indexed sender, address indexed recipient, int256 amount0, int256 amount1, uint160 sqrtPriceX96, uint128 liquidity, int24 tick)",
-    )
-
     const uniswap = new Uniswap(this.client)
     const poolAddresses = uniswap.getPools()
 
@@ -166,15 +164,31 @@ export class TransactionObserverService implements OnModuleInit {
       address: poolAddresses,
       event: swapEventAbi,
       onLogs: (logs) => {
-        await Promise.all(
-          logs.map(async (log) => {
-            const sender = log?.args?.sender?.toLowerCase()
-            if (!sender || !isAddress(sender)) return
-            // TODO: продолжить
-            if (this.observedWallets[sender] || this.observedWallets[log.args.recipient]) {
-            }
-          }),
-        )
+        // const relevantLogs: Log[] = []
+        const relevantLogs = this.filterRelevantLogs(logs)
+        // for (const log of logs) {
+        //   const { sender, recipient } = log.args
+        //   if (!sender || !isAddress(sender)) continue
+        //   if (!recipient || !isAddress(recipient)) continue
+        //   if (this.observedWallets[sender] || this.observedWallets[recipient]) {
+        //     relevantLogs.push(log)
+        //   }
+        // }
+
+        console.log(relevantLogs)
+
+        // await Promise.all(
+        //   logs.map(async (log) => {
+        //     const sender = log?.args?.sender?.toLowerCase()
+        //     const recipient = log?.args?.recipient?.toLowerCase()
+        //     if (!sender || !isAddress(sender)) return
+        //     if (!recipient || !isAddress(recipient)) return
+        //     // TODO: продолжить
+        //     if (this.observedWallets[sender] || this.observedWallets[recipient]) {
+        //
+        //     }
+        //   }),
+        // )
 
         console.log(logs.length)
         // logs.forEach((log) => {
@@ -189,6 +203,38 @@ export class TransactionObserverService implements OnModuleInit {
       },
     })
   }
+
+  // private filterRelevantLogs(logs: Log<bigint, number, true, typeof swapEventAbi>[]): Log[] {
+  private filterRelevantLogs(logs: WatchEventOnLogsParameter<typeof swapEventAbi>): Log[] {
+    const relevantLogs: Log[] = []
+
+    for (const log of logs) {
+      const { sender, recipient } = log.args
+      if (!sender || !isAddress(sender)) continue
+      if (!recipient || !isAddress(recipient)) continue
+      if (this.observedWallets[sender] || this.observedWallets[recipient]) {
+        relevantLogs.push(log)
+      }
+    }
+
+    return relevantLogs
+  }
+
+  // private filterRelevantLogs(logs: Log[]): Log[] {
+  //   const relevantLogs: Log[] = []
+  //
+  //   for (const log of logs) {
+  //     if (!Object.hasOwn(log, "args")) continue
+  //     const { sender, recipient } = log.args
+  //     if (!sender || !isAddress(sender)) continue
+  //     if (!recipient || !isAddress(recipient)) continue
+  //     if (this.observedWallets[sender] || this.observedWallets[recipient]) {
+  //       relevantLogs.push(log)
+  //     }
+  //   }
+  //
+  //   return relevantLogs
+  // }
 
   async getTokenInfo(tokenAddress: Hex) {
     const [symbol, decimals] = await Promise.all([
@@ -214,3 +260,6 @@ transaction.to -
  */
 
 const tokenAbi = parseAbi(["function symbol() view returns (string)", "function decimals() view returns (uint8)"])
+const swapEventAbi = parseAbiItem(
+  "event Swap(address indexed sender, address indexed recipient, int256 amount0, int256 amount1, uint160 sqrtPriceX96, uint128 liquidity, int24 tick)",
+)
