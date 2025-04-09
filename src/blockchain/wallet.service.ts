@@ -81,7 +81,7 @@ export class WalletService {
 
   async createFollowWallet(walletAddress: Hex, userId: number): Promise<FollowWallet> {
     const followWalletDto: Partial<FollowWallet> = {
-      wallet: walletAddress,
+      wallet: walletAddress.toLowerCase() as Hex,
       userId: userId,
     }
 

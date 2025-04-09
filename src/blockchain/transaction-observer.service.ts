@@ -128,8 +128,6 @@ export class TransactionObserverService implements OnModuleInit {
     const uniswap = await Uniswap.create(this.client)
     const pools = uniswap.getPools()
     const poolsAddresses = [...pools.keys()]
-    console.log(poolsAddresses)
-    console.log(pools)
 
     const unwatch = this.client.watchEvent({
       address: poolsAddresses,
@@ -137,7 +135,12 @@ export class TransactionObserverService implements OnModuleInit {
       onLogs: (logs) => {
         const filteredLogs = this.getLogsForObservableWallets(logs)
         console.log(logs.length)
-        console.log(filteredLogs)
+        // console.log(filteredLogs)
+
+        for (const log of filteredLogs) {
+          console.log(log)
+
+        }
 
         const top5 = this.getTop5Addresses()
         top5.forEach((entry, index) => {
@@ -175,9 +178,11 @@ export class TransactionObserverService implements OnModuleInit {
       const { sender, recipient } = log.args
       if (!sender || !isAddress(sender)) continue
       if (!recipient || !isAddress(recipient)) continue
-      console.log(log)
+      // console.log(log)
       if (this.observedWallets[sender.toLowerCase()] || this.observedWallets[recipient.toLowerCase()]) {
-        filteredLogs.push(log)
+        // filteredLogs.push(log)
+        console.log(">>>>>>>>>>>>>>>>>>>>>")
+        // TODO: запустить команду повтора транзакции
       }
 
       const currentValue = this.tempWalletAddresses.get(sender) || 0
