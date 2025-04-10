@@ -5,12 +5,14 @@ import { WalletService } from "./wallet.service"
 import { FollowWallet } from "./follow-wallet.entity"
 import { Uniswap } from "./uniswap"
 import { ISwapProvider } from "./ISwapProvider"
+import { IPoolTokenPair } from "./IPoolTokenPair"
 
 @Injectable()
 export class SwapObserverService implements OnModuleInit {
   private readonly client: PublicClient
-  private observedWallets: Record<Hex, number[]> = {}
+  private observedWallets: Map<Hex, number[]> = new Map<Hex, number[]>()
   private swapProvider: ISwapProvider
+  private pools: Map<Hex, IPoolTokenPair> = new Map<Hex, IPoolTokenPair>()
 
   constructor(
     private readonly blockchainService: BlockchainService,
@@ -35,19 +37,18 @@ export class SwapObserverService implements OnModuleInit {
   // TODO: walletAddress.toLowerCase происходит ввод? добавить где возможно (адрес не чуствителен к регистру и могут быть ошибки)
 
   async watchSwaps() {
-    const pools = this.swapProvider.getPools()
-    const poolsAddresses = [...pools.keys()]
+    this.pools = this.swapProvider.getPools()
+    const poolsAddresses = [...this.pools.keys()]
 
     const unwatch = this.client.watchEvent({
       address: poolsAddresses,
       event: swapEventAbi,
       onLogs: (logs) => {
-        const filteredLogs = this.getLogsForObservableWallets(logs)
+        const swaps = this.getSwapsOfObservableWallets(logs)
         console.log(logs.length)
-        // console.log(filteredLogs)
 
-        for (const log of filteredLogs) {
-          console.log(log)
+        for (const swap of swaps) {
+          console.log(swap)
           // TODO: запустить команду повтора транзакции
         }
 
@@ -64,33 +65,59 @@ export class SwapObserverService implements OnModuleInit {
     })
   }
 
-  private getLogsForObservableWallets(logs: WatchEventOnLogsParameter<typeof swapEventAbi>): Log[] {
-    const filteredLogs: Log[] = []
+  private getSwapsOfObservableWallets(logs: WatchEventOnLogsParameter<typeof swapEventAbi>): Swap[] {
+    const swaps: Swap[] = []
 
     for (const log of logs) {
       if (!log.args) continue
       if (!log.args.sender || !isAddress(log.args.sender)) continue
       if (!log.args.recipient || !isAddress(log.args.recipient)) continue
 
-      log.args.sender = log.args.sender.toLowerCase() as Hex
-      log.args.recipient = log.args.recipient.toLowerCase() as Hex
-      log.address = log.address.toLowerCase() as Hex
+      const poolAddress = log.address.toLowerCase() as Hex
+      const tokens = this.pools.get(poolAddress)
+      if (!tokens) continue
 
-      if (this.observedWallets[log.args.sender] || this.observedWallets[log.args.recipient]) {
-        filteredLogs.push(log)
+      const swap: Swap = {
+        sender: log.args.sender.toLowerCase() as Hex,
+        recipient: log.args.recipient.toLowerCase() as Hex,
+        poolAddress: poolAddress,
+        amount0: log.args.amount0 ?? 0n,
+        amount1: log.args.amount1 ?? 0n,
+        sqrtPriceX96: log.args.sqrtPriceX96 ?? 0n,
+        liquidity: log.args.liquidity ?? 0n,
+        tick: log.args.tick ?? 0,
+        tokens: tokens,
+      }
+
+      if (this.observedWallets[swap.sender] || this.observedWallets[swap.recipient]) {
+        swaps.push(swap)
       }
     }
 
-    return filteredLogs
+    return swaps
   }
 
   addFollowWalletIntoObserver(followWallet: FollowWallet) {
-    if (!this.observedWallets[followWallet.wallet]) {
-      this.observedWallets[followWallet.wallet] = [followWallet.userId]
-    } else if (!this.observedWallets[followWallet.wallet].includes(followWallet.userId)) {
-      this.observedWallets[followWallet.wallet].push(followWallet.userId)
+    const users = this.observedWallets.get(followWallet.wallet)
+
+    if (!users) {
+      this.observedWallets.set(followWallet.wallet, [followWallet.userId])
+    } else if (!users.includes(followWallet.userId)) {
+      users.push(followWallet.userId)
     }
   }
+}
+
+type Swap = {
+  sender: Hex
+  recipient: Hex
+  poolAddress: Hex
+  tokens: IPoolTokenPair
+  amount0: bigint
+  amount1: bigint
+  sqrtPriceX96: bigint
+  liquidity: bigint
+  tick: number,
 }
 
 /*
@@ -98,8 +125,6 @@ NOTE:
 transaction.from - всегда кошелек
 transaction.to -
  */
-
-
 
 /*
 address - адрес контракта пула, где произошел обмен
@@ -112,5 +137,5 @@ amount1 - изменение количества второго токена, �
 
 Логика обмена токенов:
 Пользователь sender продал токены token0 и получил токены token1 в пуле address
-
+В логе токены не отображаются, нужно делать запрос или получить из пула
  */

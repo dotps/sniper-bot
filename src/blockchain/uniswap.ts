@@ -20,7 +20,8 @@ export class Uniswap implements ISwapProvider {
   private async getPoolsInfo(): Promise<Map<Hex, IPoolTokenPair>> {
     const pools = new Map<Hex, IPoolTokenPair>()
     try {
-      for (const poolAddress of poolAddresses) {
+      for (let poolAddress of poolAddresses) {
+        poolAddress = poolAddress.toLowerCase() as Hex
         const { token0, token1 } = await this.blockchainService.getTokensForPool(poolAddress)
         const { symbol: symbol0 } = await this.blockchainService.getTokenInfo(token0)
         const { symbol: symbol1 } = await this.blockchainService.getTokenInfo(token1)

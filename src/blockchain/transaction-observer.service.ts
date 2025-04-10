@@ -10,7 +10,7 @@ import { ReplicateTransactionCommand } from "../commands/ReplicateTransactionCom
 export class TransactionObserverService implements OnModuleInit {
   private readonly client: PublicClient
   private readonly updateObservedWalletsInterval: number = 60000
-  private observedWallets: Record<Hex, number[]> = {}
+  private observedWallets: Map<Hex, number[]> = new Map<Hex, number[]>()
 
   constructor(
     private readonly blockchainService: BlockchainService,

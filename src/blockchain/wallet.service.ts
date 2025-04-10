@@ -114,8 +114,8 @@ export class WalletService {
     return await this.followRepository.findBy({ userId })
   }
 
-  async getFollowWallets(): Promise<Record<Hex, number[]>> {
-    const result: Record<Hex, number[]> = {}
+  async getFollowWallets(): Promise<Map<Hex, number[]>> {
+    const result = new Map<Hex, number[]>()
     const walletsWithGroupedUsers: Array<{ wallet: Hex; userIdList: number[] }> = await this.followRepository
       .createQueryBuilder("follow_wallet")
       .select("follow_wallet.wallet", "wallet")
@@ -124,7 +124,7 @@ export class WalletService {
       .getRawMany()
 
     for (const item of walletsWithGroupedUsers) {
-      result[item.wallet] = item.userIdList
+      result.set(item.wallet, item.userIdList)
     }
 
     return result

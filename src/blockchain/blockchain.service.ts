@@ -94,7 +94,7 @@ export class BlockchainService {
   }
 
   async getTokensForPool(poolAddress: Hex) {
-    const [token0, token1] = await Promise.all([
+    let [token0, token1] = await Promise.all([
       this.getClient().readContract({
         address: poolAddress,
         abi: poolAbi,
@@ -106,6 +106,9 @@ export class BlockchainService {
         functionName: "token1",
       }),
     ])
+
+    token0 = token0.toLowerCase() as Hex
+    token1 = token1.toLowerCase() as Hex
 
     return { token0, token1 }
   }
@@ -135,7 +138,6 @@ export const swapEventAbi = parseAbiItem(
 
 Популярные адреса polygon uniswap
 0xe592427a0aece92de3edee1f18e0157c05861564
-0x802b65b5d9016621e66003aed0b16615093f328b
 0x802b65b5d9016621e66003aed0b16615093f328b
 0x7f20a7a526d1bab092e3be0733d96287e93cef59
 0x85cd07ea01423b1e937929b44e4ad8c40bbb5e71
