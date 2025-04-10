@@ -1,33 +1,16 @@
 import { forwardRef, Inject, Injectable, OnModuleInit } from "@nestjs/common"
-import {
-  Address,
-  Block,
-  createPublicClient,
-  GetContractEventsReturnType,
-  Hex,
-  http,
-  isAddress,
-  Log,
-  parseAbi,
-  parseAbiItem,
-  PublicClient,
-  WatchEventOnLogsParameter,
-  webSocket,
-} from "viem"
+import { Hex, isAddress, Log, parseAbi, parseAbiItem, PublicClient, WatchEventOnLogsParameter } from "viem"
 import { Logger } from "../utils/Logger"
-import { BlockchainService, pancakeSwapRouter } from "./blockchain.service"
+import { BlockchainService } from "./blockchain.service"
 import { WalletService } from "./wallet.service"
 import { FollowWallet } from "./follow-wallet.entity"
 import { ReplicateTransactionCommand } from "../commands/ReplicateTransactionCommand"
-import { bscTestnet } from "viem/chains"
-import { Uniswap } from "./uniswap"
 
 @Injectable()
 export class TransactionObserverService implements OnModuleInit {
   private readonly client: PublicClient
   private readonly updateObservedWalletsInterval: number = 60000
   private observedWallets: Record<Hex, number[]> = {}
-  private tempWalletAddresses: Map<Hex, number> = new Map<Hex, number>()
 
   constructor(
     private readonly blockchainService: BlockchainService,
@@ -39,32 +22,22 @@ export class TransactionObserverService implements OnModuleInit {
 
   async onModuleInit() {
     await this.updateObservedWallets()
-    /*
-        this.client.watchPendingTransactions({
-          onTransactions: (hashes) => void this.handleHashes(hashes),
-        })
-    
-        setInterval(() => {
-          this.updateObservedWallets().catch((error) => {
-            Logger.error(error)
-          })
-        }, this.updateObservedWalletsInterval)
-    */
+    this.client.watchPendingTransactions({
+      onTransactions: (hashes) => void this.handleHashes(hashes),
+    })
+
+    setInterval(() => {
+      this.updateObservedWallets().catch((error) => {
+        Logger.error(error)
+      })
+    }, this.updateObservedWalletsInterval)
+
     const targetWallet = "0xd0567bb38fa5bad45150026281c43fa6031577b9"
     const balance = await this.client.getBalance({
       address: "0xF6dD294C065DDE53CcA856249FB34ae67BE5C54C",
       // address: "0xe92Ea8F400CB9bD368BD1185C9fC5e2664770341",
     })
     console.log(`Баланс: ${balance} wei`)
-    // await this.polygonWatch()
-    await this.polygonWatchPool()
-
-    // const unwatch = await this.trackSwaps(targetWallet)
-    // const swaps = await this.getRecentSwaps(targetWallet)
-    // console.log("Последние свапы:", swaps)
-
-    // const unwatch = await this.watchSwaps(targetWallet)
-    // const unwatch = await this.watchSwaps()
   }
 
   private async updateObservedWallets() {
@@ -74,7 +47,6 @@ export class TransactionObserverService implements OnModuleInit {
 
   // TODO: walletAddress.toLowerCase происходит ввод? добавить где возможно (адрес не чуствителен к регистру и могут быть ошибки)
 
-  // TODO: сохранить отслеживание через транзакции для образца
   private async handleHashes(hashes: Hex[]) {
     for (const hash of hashes) {
       try {
@@ -122,78 +94,6 @@ export class TransactionObserverService implements OnModuleInit {
     }
   }
 
-  ////////////
-
-  async polygonWatchPool() {
-    const uniswap = await Uniswap.create(this.client)
-    const pools = uniswap.getPools()
-    const poolsAddresses = [...pools.keys()]
-
-    const unwatch = this.client.watchEvent({
-      address: poolsAddresses,
-      event: swapEventAbi,
-      onLogs: (logs) => {
-        const filteredLogs = this.getLogsForObservableWallets(logs)
-        console.log(logs.length)
-        // console.log(filteredLogs)
-
-        for (const log of filteredLogs) {
-          console.log(log)
-          // TODO: запустить команду повтора транзакции
-        }
-
-        const top5 = this.getTop5Addresses()
-        top5.forEach((entry, index) => {
-          console.log(`#${index + 1}: ${entry.address} (${entry.value})`)
-        })
-
-        // logs.forEach((log) => {
-        //   const { args } = log
-        //   console.log("Новая сделка:")
-        //   console.log("Sender:", args.sender)
-        //   console.log("Recipient:", args.recipient)
-        //   console.log("Amount0 (delta):", args?.amount0?.toString())
-        //   console.log("Amount1 (delta):", args?.amount1?.toString())
-        //   console.log("------------------")
-        // })
-      },
-    })
-  }
-
-  getTop5Addresses(): { address: Hex; value: number }[] {
-    const entries = Array.from(this.tempWalletAddresses.entries())
-    entries.sort((a, b) => b[1] - a[1])
-    const top5 = entries.slice(0, 5).map(([address, value]) => ({
-      address,
-      value,
-    }))
-
-    return top5
-  }
-
-  private getLogsForObservableWallets(logs: WatchEventOnLogsParameter<typeof swapEventAbi>): Log[] {
-    const filteredLogs: Log[] = []
-
-    for (const log of logs) {
-      if (!log.args) continue
-      if (!log.args.sender || !isAddress(log.args.sender)) continue
-      if (!log.args.recipient || !isAddress(log.args.recipient)) continue
-
-      log.args.sender = log.args.sender.toLowerCase() as Hex
-      log.args.recipient = log.args.recipient.toLowerCase() as Hex
-      log.address = log.address.toLowerCase() as Hex
-
-      if (this.observedWallets[log.args.sender] || this.observedWallets[log.args.recipient]) {
-        filteredLogs.push(log)
-      }
-
-      const currentValue = this.tempWalletAddresses.get(log.args.sender) || 0
-      this.tempWalletAddresses.set(log.args.sender, currentValue + 1)
-    }
-
-    return filteredLogs
-  }
-
   async getTokenInfo(tokenAddress: Hex) {
     const [symbol, decimals] = await Promise.all([
       this.client.readContract({
@@ -218,20 +118,3 @@ transaction.to -
  */
 
 const tokenAbi = parseAbi(["function symbol() view returns (string)", "function decimals() view returns (uint8)"])
-const swapEventAbi = parseAbiItem(
-  "event Swap(address indexed sender, address indexed recipient, int256 amount0, int256 amount1, uint160 sqrtPriceX96, uint128 liquidity, int24 tick)",
-)
-
-/*
-address - адрес контракта пула, где произошел обмен
-sender - адрес, инициировавший обмен
-recipient - адрес получателя
-  * может быть равен sender - тогда это покупка/продажа
-  * != sender, то это перевод?
-amount0 - изменение количества первого токена, если положительный, то был продан
-amount1 - изменение количества второго токена, если отризацельный, то был куплен
-
-Логика обмена токенов:
-Пользователь sender продал токены token0 и получил токены token1 в пуле address
-
- */

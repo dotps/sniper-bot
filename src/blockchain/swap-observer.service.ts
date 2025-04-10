@@ -25,13 +25,6 @@ export class SwapObserverService implements OnModuleInit {
     })
     console.log(`Баланс: ${balance} wei`)
     await this.polygonWatchPool()
-
-    // const unwatch = await this.trackSwaps(targetWallet)
-    // const swaps = await this.getRecentSwaps(targetWallet)
-    // console.log("Последние свапы:", swaps)
-
-    // const unwatch = await this.watchSwaps(targetWallet)
-    // const unwatch = await this.watchSwaps()
   }
 
   private async updateObservedWallets() {

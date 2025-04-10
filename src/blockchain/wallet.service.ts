@@ -12,6 +12,7 @@ import { Wallet } from "./wallet.entity"
 import { BlockchainService } from "./blockchain.service"
 import { TransactionObserverService } from "./transaction-observer.service"
 import { Commands } from "../commands/Commands"
+import { SwapObserverService } from "./swap-observer.service"
 
 @Injectable()
 export class WalletService {
@@ -30,8 +31,8 @@ export class WalletService {
     @InjectRepository(Replicate)
     private readonly replicateRepository: Repository<Replicate>,
     private readonly blockchainService: BlockchainService,
-    @Inject(forwardRef(() => TransactionObserverService)) // TODO: посмотреть как можно выйти из циклической зависимости
-    private readonly transactionObserverService: TransactionObserverService,
+    @Inject(forwardRef(() => SwapObserverService)) // TODO: посмотреть как можно выйти из циклической зависимости
+    private readonly swapObserverService: SwapObserverService,
   ) {}
 
   async createWallet(userId: number): Promise<Hex> {
@@ -91,7 +92,7 @@ export class WalletService {
     const followWallet = this.followRepository.create(followWalletDto)
     const wallet = await this.followRepository.save(followWallet)
 
-    this.transactionObserverService.addFollowWalletIntoObserver(wallet) // TODO: через события отправить, чтобы не инжектить сервис
+    // this.transactionObserverService.addFollowWalletIntoObserver(wallet) // TODO: через события отправить, чтобы не инжектить сервис
     return wallet
   }
 

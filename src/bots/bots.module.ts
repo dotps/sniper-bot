@@ -17,7 +17,7 @@ import { Replicate } from "../blockchain/replicate.entity"
 import { Wallet } from "../blockchain/wallet.entity"
 import { BlockchainService } from "../blockchain/blockchain.service"
 import { BlockchainModule } from "../blockchain/blockchain.module"
-import { TransactionObserverService } from "../blockchain/transaction-observer.service"
+import { SwapObserverService } from "../blockchain/swap-observer.service"
 
 const webRequestService = new WebRequestFetchService()
 
@@ -73,7 +73,8 @@ const commandHandler = {
     commandHandler,
     TokenService,
     WalletService,
-    TransactionObserverService,
+    // TransactionObserverService,
+    SwapObserverService,
   ],
 })
 export class BotsModule {}
