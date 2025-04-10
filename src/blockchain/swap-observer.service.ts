@@ -1,6 +1,6 @@
 import { forwardRef, Inject, Injectable, OnModuleInit } from "@nestjs/common"
 import { Hex, isAddress, Log, parseAbi, parseAbiItem, PublicClient, WatchEventOnLogsParameter } from "viem"
-import { BlockchainService } from "./blockchain.service"
+import { BlockchainService, swapEventAbi } from "./blockchain.service"
 import { WalletService } from "./wallet.service"
 import { FollowWallet } from "./follow-wallet.entity"
 import { Uniswap } from "./uniswap"
@@ -23,12 +23,7 @@ export class SwapObserverService implements OnModuleInit {
   async onModuleInit() {
     this.swapProvider = new Uniswap(this.blockchainService)
     await this.swapProvider.init()
-
     await this.updateObservedWallets()
-    const balance = await this.client.getBalance({
-      address: "0xF6dD294C065DDE53CcA856249FB34ae67BE5C54C",
-    })
-    console.log(`Баланс: ${balance} wei`)
     await this.watchSwaps()
   }
 
@@ -38,14 +33,6 @@ export class SwapObserverService implements OnModuleInit {
   }
 
   // TODO: walletAddress.toLowerCase происходит ввод? добавить где возможно (адрес не чуствителен к регистру и могут быть ошибки)
-
-  addFollowWalletIntoObserver(followWallet: FollowWallet) {
-    if (!this.observedWallets[followWallet.wallet]) {
-      this.observedWallets[followWallet.wallet] = [followWallet.userId]
-    } else if (!this.observedWallets[followWallet.wallet].includes(followWallet.userId)) {
-      this.observedWallets[followWallet.wallet].push(followWallet.userId)
-    }
-  }
 
   async watchSwaps() {
     const pools = this.swapProvider.getPools()
@@ -97,21 +84,12 @@ export class SwapObserverService implements OnModuleInit {
     return filteredLogs
   }
 
-  // перенести в blockchain может в разных местах использоваться
-  async getTokenInfo(tokenAddress: Hex) {
-    const [symbol, decimals] = await Promise.all([
-      this.client.readContract({
-        address: tokenAddress,
-        abi: tokenAbi,
-        functionName: "symbol",
-      }),
-      this.client.readContract({
-        address: tokenAddress,
-        abi: tokenAbi,
-        functionName: "decimals",
-      }),
-    ])
-    return { symbol, decimals }
+  addFollowWalletIntoObserver(followWallet: FollowWallet) {
+    if (!this.observedWallets[followWallet.wallet]) {
+      this.observedWallets[followWallet.wallet] = [followWallet.userId]
+    } else if (!this.observedWallets[followWallet.wallet].includes(followWallet.userId)) {
+      this.observedWallets[followWallet.wallet].push(followWallet.userId)
+    }
   }
 }
 
@@ -121,10 +99,7 @@ transaction.from - всегда кошелек
 transaction.to -
  */
 
-const tokenAbi = parseAbi(["function symbol() view returns (string)", "function decimals() view returns (uint8)"])
-const swapEventAbi = parseAbiItem(
-  "event Swap(address indexed sender, address indexed recipient, int256 amount0, int256 amount1, uint160 sqrtPriceX96, uint128 liquidity, int24 tick)",
-)
+
 
 /*
 address - адрес контракта пула, где произошел обмен

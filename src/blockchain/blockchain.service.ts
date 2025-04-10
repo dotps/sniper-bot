@@ -1,10 +1,9 @@
 import { Injectable } from "@nestjs/common"
-import { createPublicClient, erc20Abi, Hex, http, isAddress, parseAbi, PublicClient } from "viem"
+import { createPublicClient, erc20Abi, Hex, http, isAddress, parseAbi, parseAbiItem, PublicClient } from "viem"
 import { bscTestnet, polygon, polygonMumbai } from "viem/chains"
 import { Logger } from "../utils/Logger"
 import { ResponseBotError } from "../errors/ResponseBotError"
 import { Token } from "./token.entity"
-import { pancakeRouterV2Abi } from "../providers/nets/pancakeRouterAbi"
 
 @Injectable()
 export class BlockchainService {
@@ -110,32 +109,6 @@ export class BlockchainService {
 
     return { token0, token1 }
   }
-
-  // private watchDeals(walletAddress: Hex) {
-  //   this.getClient().watchPendingTransactions({
-  //     onTransactions: (hashes) => void this.handleHashes(hashes, walletAddress),
-  //   })
-  // }
-  //
-  // // TODO: walletAddress.toLowerCase происходит ввод где возможно (адрес не чуствителен к регистру и могут быть ошибки)
-  //
-  // // TODO: сделать сервис для отслеживания сделок, при старте он загружает в себя список отслеживаемых токенов,
-  // // при добавлении/удалении подписок список изменяется, переодически сам обновляется
-  //
-  // private async handleHashes(hashes: Hex[], walletAddress: Hex) {
-  //   for (const hash of hashes) {
-  //     console.log(hash)
-  //     try {
-  //       const transaction = await this.getClient().getTransaction({ hash })
-  //       if (transaction.from.toLowerCase() === walletAddress.toLowerCase()) {
-  //         console.log(transaction.from.toLowerCase())
-  //         // TODO: запустить команду Повтора сделки
-  //       }
-  //     } catch (error) {
-  //       Logger.error(error)
-  //     }
-  //   }
-  // }
 }
 
 enum Blockchain {
@@ -144,6 +117,9 @@ enum Blockchain {
 }
 
 const poolAbi = parseAbi(["function token0() view returns (address)", "function token1() view returns (address)"])
+export const swapEventAbi = parseAbiItem(
+  "event Swap(address indexed sender, address indexed recipient, int256 amount0, int256 amount1, uint160 sqrtPriceX96, uint128 liquidity, int24 tick)",
+)
 
 /*
 Токены BSC TestNet:
@@ -178,8 +154,9 @@ TODO:
  Перевод токенов (подключить блокчейн)
  */
 
-const pancakeSwapRouterAddress: Hex = "0xD99D1c33F9fC3444f8101754aBC46c52416550D1" // для BSC Testnet
-export const pancakeSwapRouter = {
-  address: pancakeSwapRouterAddress,
-  abi: pancakeRouterV2Abi,
-}
+// TODO: попробовать через pancake
+// const pancakeSwapRouterAddress: Hex = "0xD99D1c33F9fC3444f8101754aBC46c52416550D1" // для BSC Testnet
+// export const pancakeSwapRouter = {
+//   address: pancakeSwapRouterAddress,
+//   abi: pancakeRouterV2Abi,
+// }
