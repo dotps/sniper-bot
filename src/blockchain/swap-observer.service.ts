@@ -62,15 +62,18 @@ export class SwapObserverService implements OnModuleInit {
 
     for (const log of logs) {
       if (!log.args) continue
-      if (!log.args.sender || !isAddress(log.args.sender)) continue
-      if (!log.args.recipient || !isAddress(log.args.recipient)) continue
+      let sender = log.args.sender
+      let recipient = log.args.recipient
+
+      if (!sender || !isAddress(sender)) continue
+      if (!recipient || !isAddress(recipient)) continue
+
+      sender = sender.toLowerCase() as Hex
+      recipient = recipient.toLowerCase() as Hex
 
       const poolAddress = log.address.toLowerCase() as Hex
       const tokens = this.pools.get(poolAddress)
       if (!tokens) continue
-
-      const sender = log.args.sender.toLowerCase() as Hex
-      const recipient = log.args.recipient.toLowerCase() as Hex
 
       const subscribedUsersOnWallet = this.observedWallets.get(sender) ?? this.observedWallets.get(recipient)
       if (subscribedUsersOnWallet) {
