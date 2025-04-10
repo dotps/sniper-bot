@@ -1,11 +1,10 @@
 import { Injectable } from "@nestjs/common"
-import { createPublicClient, erc20Abi, Hex, http, isAddress, PublicClient, webSocket } from "viem"
-import { bsc, bscTestnet, polygon, polygonMumbai } from "viem/chains"
+import { createPublicClient, erc20Abi, Hex, http, isAddress, parseAbi, PublicClient } from "viem"
+import { bscTestnet, polygon, polygonMumbai } from "viem/chains"
 import { Logger } from "../utils/Logger"
 import { ResponseBotError } from "../errors/ResponseBotError"
 import { Token } from "./token.entity"
 import { pancakeRouterV2Abi } from "../providers/nets/pancakeRouterAbi"
-import { watchPendingTransactions } from "viem/actions"
 
 @Injectable()
 export class BlockchainService {
@@ -19,7 +18,6 @@ export class BlockchainService {
 
   constructor() {
     this.initBlockchainClients()
-    // this.watchDeals("0x7c810d8bb90634b040f9ee913f5639f3d3914d93f4a361ab89c747eb8fa546ec")
   }
 
   private initBlockchainClients() {
@@ -36,11 +34,11 @@ export class BlockchainService {
 
     this.clients.set(Blockchain.BSC, bscClient) // TODO: можно перейти на строки bscClient.chain.name, чтобы не создавать enum
     this.clients.set(Blockchain.POLYGON, polygonClient)
+    console.log(this.defaultBlockchain)
   }
 
   getClient(clientType: Blockchain = this.defaultBlockchain): PublicClient {
     const client = this.clients.get(clientType)
-    console.log(clientType)
     if (!client) throw Error("Клиент не найден.")
     return client
   }
@@ -74,9 +72,43 @@ export class BlockchainService {
         functionName: "symbol",
       })
     } catch (error) {
-      // Logger.error(error)
+      Logger.error(error)
       return null
     }
+  }
+
+  async getTokenInfo(tokenAddress: Hex) {
+    const [symbol, decimals] = await Promise.all([
+      this.getClient().readContract({
+        address: tokenAddress,
+        abi: erc20Abi,
+        functionName: "symbol",
+      }),
+      this.getClient().readContract({
+        address: tokenAddress,
+        abi: erc20Abi,
+        functionName: "decimals",
+      }),
+    ])
+
+    return { symbol, decimals }
+  }
+
+  async getTokensForPool(poolAddress: Hex) {
+    const [token0, token1] = await Promise.all([
+      this.getClient().readContract({
+        address: poolAddress,
+        abi: poolAbi,
+        functionName: "token0",
+      }),
+      this.getClient().readContract({
+        address: poolAddress,
+        abi: poolAbi,
+        functionName: "token1",
+      }),
+    ])
+
+    return { token0, token1 }
   }
 
   // private watchDeals(walletAddress: Hex) {
@@ -110,6 +142,8 @@ enum Blockchain {
   BSC = "bsc",
   POLYGON = "polygon",
 }
+
+const poolAbi = parseAbi(["function token0() view returns (address)", "function token1() view returns (address)"])
 
 /*
 Токены BSC TestNet:

@@ -1,11 +1,13 @@
-import { Hex, parseAbi, PublicClient } from "viem"
+import { Hex } from "viem"
 import { ISwapProvider } from "./ISwapProvider"
 import { IPoolTokenPair } from "./IPoolTokenPair"
+import { BlockchainService } from "./blockchain.service"
+import { Logger } from "../utils/Logger"
 
 export class Uniswap implements ISwapProvider {
   private pools: Map<Hex, IPoolTokenPair> = new Map<Hex, IPoolTokenPair>()
 
-  constructor(private readonly client: PublicClient) {}
+  constructor(private readonly blockchainService: BlockchainService) {}
 
   async init(): Promise<void> {
     this.pools = await this.getPoolsInfo()
@@ -17,54 +19,23 @@ export class Uniswap implements ISwapProvider {
 
   private async getPoolsInfo(): Promise<Map<Hex, IPoolTokenPair>> {
     const pools = new Map<Hex, IPoolTokenPair>()
-    for (const poolAddress of poolAddresses) {
-      const { token0, token1 } = await this.getTokensForPool(poolAddress)
-      const { symbol: symbol0 } = await this.getTokenInfo(token0)
-      const { symbol: symbol1 } = await this.getTokenInfo(token1)
-      pools.set(poolAddress, {
-        token0: { symbol: symbol0, address: token0 },
-        token1: { symbol: symbol1, address: token1 },
-      })
+    try {
+      for (const poolAddress of poolAddresses) {
+        const { token0, token1 } = await this.blockchainService.getTokensForPool(poolAddress)
+        const { symbol: symbol0 } = await this.blockchainService.getTokenInfo(token0)
+        const { symbol: symbol1 } = await this.blockchainService.getTokenInfo(token1)
+        pools.set(poolAddress, {
+          token0: { symbol: symbol0, address: token0 },
+          token1: { symbol: symbol1, address: token1 },
+        })
+      }
+    } catch (error) {
+      Logger.error(error)
     }
+
     return pools
   }
-
-  private async getTokensForPool(poolAddress: Hex) {
-    const [token0, token1] = await Promise.all([
-      this.client.readContract({
-        address: poolAddress,
-        abi: poolAbi,
-        functionName: "token0",
-      }),
-      this.client.readContract({
-        address: poolAddress,
-        abi: poolAbi,
-        functionName: "token1",
-      }),
-    ])
-
-    return { token0, token1 }
-  }
-
-  private async getTokenInfo(tokenAddress: Hex) {
-    const [symbol, decimals] = await Promise.all([
-      this.client.readContract({
-        address: tokenAddress,
-        abi: tokenAbi,
-        functionName: "symbol",
-      }),
-      this.client.readContract({
-        address: tokenAddress,
-        abi: tokenAbi,
-        functionName: "decimals",
-      }),
-    ])
-    return { symbol, decimals }
-  }
 }
-
-const tokenAbi = parseAbi(["function symbol() view returns (string)", "function decimals() view returns (uint8)"])
-const poolAbi = parseAbi(["function token0() view returns (address)", "function token1() view returns (address)"])
 
 const poolAddresses: Hex[] = [
   "0xD36ec33c8bed5a9F7B6630855f1533455b98a418", // USDC.e/USDC
