@@ -139,7 +139,7 @@ export class TransactionObserverService implements OnModuleInit {
 
         for (const log of filteredLogs) {
           console.log(log)
-
+          // TODO: запустить команду повтора транзакции
         }
 
         const top5 = this.getTop5Addresses()
@@ -175,18 +175,20 @@ export class TransactionObserverService implements OnModuleInit {
     const filteredLogs: Log[] = []
 
     for (const log of logs) {
-      const { sender, recipient } = log.args
-      if (!sender || !isAddress(sender)) continue
-      if (!recipient || !isAddress(recipient)) continue
-      // console.log(log)
-      if (this.observedWallets[sender.toLowerCase()] || this.observedWallets[recipient.toLowerCase()]) {
-        // filteredLogs.push(log)
-        console.log(">>>>>>>>>>>>>>>>>>>>>")
-        // TODO: запустить команду повтора транзакции
+      if (!log.args) continue
+      if (!log.args.sender || !isAddress(log.args.sender)) continue
+      if (!log.args.recipient || !isAddress(log.args.recipient)) continue
+
+      log.args.sender = log.args.sender.toLowerCase() as Hex
+      log.args.recipient = log.args.recipient.toLowerCase() as Hex
+      log.address = log.address.toLowerCase() as Hex
+
+      if (this.observedWallets[log.args.sender] || this.observedWallets[log.args.recipient]) {
+        filteredLogs.push(log)
       }
 
-      const currentValue = this.tempWalletAddresses.get(sender) || 0
-      this.tempWalletAddresses.set(sender, currentValue + 1)
+      const currentValue = this.tempWalletAddresses.get(log.args.sender) || 0
+      this.tempWalletAddresses.set(log.args.sender, currentValue + 1)
     }
 
     return filteredLogs
