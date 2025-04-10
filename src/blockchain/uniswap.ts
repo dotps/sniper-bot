@@ -1,26 +1,22 @@
 import { Hex, parseAbi, PublicClient } from "viem"
+import { ISwapProvider } from "./ISwapProvider"
+import { IPoolTokenPair } from "./IPoolTokenPair"
 
-export class Uniswap {
-  private pools: Map<Hex, PoolTokenPair> = new Map<Hex, PoolTokenPair>()
+export class Uniswap implements ISwapProvider {
+  private pools: Map<Hex, IPoolTokenPair> = new Map<Hex, IPoolTokenPair>()
 
   constructor(private readonly client: PublicClient) {}
 
-  static async create(client: PublicClient): Promise<Uniswap> {
-    const instance = new Uniswap(client)
-    await instance.init()
-    return instance
-  }
-
-  async init() {
+  async init(): Promise<void> {
     this.pools = await this.getPoolsInfo()
   }
 
-  getPools(): Map<Hex, PoolTokenPair> {
+  getPools(): Map<Hex, IPoolTokenPair> {
     return this.pools
   }
 
-  async getPoolsInfo(): Promise<Map<Hex, PoolTokenPair>> {
-    const pools = new Map<Hex, PoolTokenPair>()
+  private async getPoolsInfo(): Promise<Map<Hex, IPoolTokenPair>> {
+    const pools = new Map<Hex, IPoolTokenPair>()
     for (const poolAddress of poolAddresses) {
       const { token0, token1 } = await this.getTokensForPool(poolAddress)
       const { symbol: symbol0 } = await this.getTokenInfo(token0)
@@ -33,7 +29,7 @@ export class Uniswap {
     return pools
   }
 
-  async getTokensForPool(poolAddress: Hex) {
+  private async getTokensForPool(poolAddress: Hex) {
     const [token0, token1] = await Promise.all([
       this.client.readContract({
         address: poolAddress,
@@ -50,7 +46,7 @@ export class Uniswap {
     return { token0, token1 }
   }
 
-  async getTokenInfo(tokenAddress: Hex) {
+  private async getTokenInfo(tokenAddress: Hex) {
     const [symbol, decimals] = await Promise.all([
       this.client.readContract({
         address: tokenAddress,
@@ -64,17 +60,6 @@ export class Uniswap {
       }),
     ])
     return { symbol, decimals }
-  }
-}
-
-interface PoolTokenPair {
-  token0: {
-    address: string
-    symbol: string
-  }
-  token1: {
-    address: string
-    symbol: string
   }
 }
 

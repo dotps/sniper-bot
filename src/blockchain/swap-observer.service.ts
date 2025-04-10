@@ -4,11 +4,13 @@ import { BlockchainService } from "./blockchain.service"
 import { WalletService } from "./wallet.service"
 import { FollowWallet } from "./follow-wallet.entity"
 import { Uniswap } from "./uniswap"
+import { ISwapProvider } from "./ISwapProvider"
 
 @Injectable()
 export class SwapObserverService implements OnModuleInit {
   private readonly client: PublicClient
   private observedWallets: Record<Hex, number[]> = {}
+  private swapProvider: ISwapProvider
 
   constructor(
     private readonly blockchainService: BlockchainService,
@@ -19,12 +21,15 @@ export class SwapObserverService implements OnModuleInit {
   }
 
   async onModuleInit() {
+    this.swapProvider = new Uniswap(this.client)
+    await this.swapProvider.init()
+
     await this.updateObservedWallets()
     const balance = await this.client.getBalance({
       address: "0xF6dD294C065DDE53CcA856249FB34ae67BE5C54C",
     })
     console.log(`Баланс: ${balance} wei`)
-    await this.polygonWatchPool()
+    await this.watchSwaps()
   }
 
   private async updateObservedWallets() {
@@ -34,8 +39,6 @@ export class SwapObserverService implements OnModuleInit {
 
   // TODO: walletAddress.toLowerCase происходит ввод? добавить где возможно (адрес не чуствителен к регистру и могут быть ошибки)
 
-  // TODO: вынести отсюда
-  // observedWallets - тоже?
   addFollowWalletIntoObserver(followWallet: FollowWallet) {
     if (!this.observedWallets[followWallet.wallet]) {
       this.observedWallets[followWallet.wallet] = [followWallet.userId]
@@ -44,9 +47,8 @@ export class SwapObserverService implements OnModuleInit {
     }
   }
 
-  async polygonWatchPool() {
-    const uniswap = await Uniswap.create(this.client)
-    const pools = uniswap.getPools()
+  async watchSwaps() {
+    const pools = this.swapProvider.getPools()
     const poolsAddresses = [...pools.keys()]
 
     const unwatch = this.client.watchEvent({

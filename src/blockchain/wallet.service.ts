@@ -92,7 +92,7 @@ export class WalletService {
     const followWallet = this.followRepository.create(followWalletDto)
     const wallet = await this.followRepository.save(followWallet)
 
-    // this.transactionObserverService.addFollowWalletIntoObserver(wallet) // TODO: через события отправить, чтобы не инжектить сервис
+    this.swapObserverService.addFollowWalletIntoObserver(wallet) // TODO: через события отправить, чтобы не инжектить сервис
     return wallet
   }
 
