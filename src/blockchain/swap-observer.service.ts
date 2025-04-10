@@ -89,7 +89,7 @@ export class SwapObserverService implements OnModuleInit {
         tokens: tokens,
       }
 
-      if (this.observedWallets[swap.sender] || this.observedWallets[swap.recipient]) {
+      if (this.observedWallets.has(swap.sender) || this.observedWallets.has(swap.recipient)) {
         swaps.push(swap)
       }
     }
@@ -117,7 +117,7 @@ type Swap = {
   amount1: bigint
   sqrtPriceX96: bigint
   liquidity: bigint
-  tick: number,
+  tick: number
 }
 
 /*
