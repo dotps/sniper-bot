@@ -75,11 +75,11 @@ export class TransactionObserverService implements OnModuleInit {
           console.log("------")
         }
 
-        const walletUsers = this.observedWallets[fromAddress]
-        if (walletUsers) {
-          const command = new ReplicateTransactionCommand(this.blockchainService, fromAddress, walletUsers, transaction)
-          await command.execute()
-        }
+        // const walletUsers = this.observedWallets[fromAddress]
+        // if (walletUsers) {
+        //   const command = new ReplicateTransactionCommand(this.blockchainService, fromAddress, walletUsers, transaction)
+        //   await command.execute()
+        // }
       } catch (error) {
         Logger.error(error)
       }

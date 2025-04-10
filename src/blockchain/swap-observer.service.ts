@@ -6,6 +6,7 @@ import { FollowWallet } from "./follow-wallet.entity"
 import { Uniswap } from "./uniswap"
 import { ISwapProvider } from "./ISwapProvider"
 import { IPoolTokenPair } from "./IPoolTokenPair"
+import { ReplicateTransactionCommand } from "../commands/ReplicateTransactionCommand"
 
 @Injectable()
 export class SwapObserverService implements OnModuleInit {
@@ -34,8 +35,6 @@ export class SwapObserverService implements OnModuleInit {
     console.log(this.observedWallets)
   }
 
-  // TODO: walletAddress.toLowerCase происходит ввод? добавить где возможно (адрес не чуствителен к регистру и могут быть ошибки)
-
   async watchSwaps() {
     this.pools = this.swapProvider.getPools()
     const poolsAddresses = [...this.pools.keys()]
@@ -49,18 +48,11 @@ export class SwapObserverService implements OnModuleInit {
 
         for (const swap of swaps) {
           console.log(swap)
+          console.log("запустить команду повтора транзакции")
           // TODO: запустить команду повтора транзакции
+          const command = new ReplicateTransactionCommand(this.blockchainService, swap)
+          command.execute()
         }
-
-        // logs.forEach((log) => {
-        //   const { args } = log
-        //   console.log("Новая сделка:")
-        //   console.log("Sender:", args.sender)
-        //   console.log("Recipient:", args.recipient)
-        //   console.log("Amount0 (delta):", args?.amount0?.toString())
-        //   console.log("Amount1 (delta):", args?.amount1?.toString())
-        //   console.log("------------------")
-        // })
       },
     })
   }
@@ -77,19 +69,23 @@ export class SwapObserverService implements OnModuleInit {
       const tokens = this.pools.get(poolAddress)
       if (!tokens) continue
 
-      const swap: Swap = {
-        sender: log.args.sender.toLowerCase() as Hex,
-        recipient: log.args.recipient.toLowerCase() as Hex,
-        poolAddress: poolAddress,
-        amount0: log.args.amount0 ?? 0n,
-        amount1: log.args.amount1 ?? 0n,
-        sqrtPriceX96: log.args.sqrtPriceX96 ?? 0n,
-        liquidity: log.args.liquidity ?? 0n,
-        tick: log.args.tick ?? 0,
-        tokens: tokens,
-      }
+      const sender = log.args.sender.toLowerCase() as Hex
+      const recipient = log.args.recipient.toLowerCase() as Hex
 
-      if (this.observedWallets.has(swap.sender) || this.observedWallets.has(swap.recipient)) {
+      const subscribedUsersOnWallet = this.observedWallets.get(sender) ?? this.observedWallets.get(recipient)
+      if (subscribedUsersOnWallet) {
+        const swap: Swap = {
+          sender: sender,
+          recipient: recipient,
+          poolAddress: poolAddress,
+          amount0: log.args.amount0 ?? 0n,
+          amount1: log.args.amount1 ?? 0n,
+          sqrtPriceX96: log.args.sqrtPriceX96 ?? 0n,
+          liquidity: log.args.liquidity ?? 0n,
+          tick: log.args.tick ?? 0,
+          tokens: tokens,
+          users: subscribedUsersOnWallet,
+        }
         swaps.push(swap)
       }
     }
@@ -108,7 +104,7 @@ export class SwapObserverService implements OnModuleInit {
   }
 }
 
-type Swap = {
+export type Swap = {
   sender: Hex
   recipient: Hex
   poolAddress: Hex
@@ -118,6 +114,7 @@ type Swap = {
   sqrtPriceX96: bigint
   liquidity: bigint
   tick: number
+  users: number[]
 }
 
 /*
