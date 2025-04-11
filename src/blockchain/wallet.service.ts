@@ -1,6 +1,6 @@
 import { forwardRef, Inject, Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Repository } from "typeorm"
+import { In, Repository } from "typeorm"
 import { FollowWallet } from "./follow-wallet.entity"
 import { createWalletClient, Hex, http, Transport, TransportConfig, WalletClient } from "viem"
 import { ResponseBotError } from "../errors/ResponseBotError"
@@ -149,5 +149,14 @@ export class WalletService {
 
   private decrypt(data: string): Hex {
     return data as Hex
+  }
+
+  async getReplicatesWithWallets(users: number[]): Promise<Replicate[]> {
+    const commands = await this.replicateRepository.find({
+      where: { userId: In(users) },
+      relations: ["user.wallets"],
+    })
+
+    return commands
   }
 }

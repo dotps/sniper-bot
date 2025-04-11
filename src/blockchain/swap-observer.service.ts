@@ -3,10 +3,11 @@ import { Hex, isAddress, Log, parseAbi, parseAbiItem, PublicClient, WatchEventOn
 import { BlockchainService, swapEventAbi } from "./blockchain.service"
 import { WalletService } from "./wallet.service"
 import { FollowWallet } from "./follow-wallet.entity"
-import { Uniswap } from "./uniswap"
+import { Uniswap } from "../providers/nets/uniswap"
 import { ISwapProvider } from "./ISwapProvider"
 import { IPoolTokenPair } from "./IPoolTokenPair"
-import { ReplicateTransactionCommand } from "../commands/ReplicateTransactionCommand"
+import { ReplicateSwapCommand } from "../commands/ReplicateSwapCommand"
+import { UserService } from "../users/user.service"
 
 @Injectable()
 export class SwapObserverService implements OnModuleInit {
@@ -19,6 +20,7 @@ export class SwapObserverService implements OnModuleInit {
     private readonly blockchainService: BlockchainService,
     @Inject(forwardRef(() => WalletService)) // TODO: посмотреть как можно выйти из циклической зависимости
     private readonly walletService: WalletService,
+    private readonly userService: UserService,
   ) {
     this.client = this.blockchainService.getClient()
   }
@@ -36,6 +38,15 @@ export class SwapObserverService implements OnModuleInit {
   }
 
   async watchSwaps() {
+    // TODO: для сделок нужен fee его надо загружать из пула, доработать getPoolsInfo
+    // сейчас fee просто число в ReplicateSwapCommand
+    /*
+  const fee = await client.readContract({
+  address: poolAddress,
+  abi: poolAbi,
+  functionName: 'fee'
+})
+     */
     this.pools = this.swapProvider.getPools()
     const poolsAddresses = [...this.pools.keys()]
 
@@ -46,11 +57,9 @@ export class SwapObserverService implements OnModuleInit {
         const swaps = this.getSwapsOfObservableWallets(logs)
         console.log(logs.length)
 
+        // TODO: сделать паралельное выполнение
         for (const swap of swaps) {
-          console.log(swap)
-          console.log("запустить команду повтора транзакции")
-          // TODO: запустить команду повтора транзакции
-          const command = new ReplicateTransactionCommand(this.blockchainService, swap)
+          const command = new ReplicateSwapCommand(this.blockchainService, this.userService, this.walletService, swap)
           command.execute()
         }
       },
