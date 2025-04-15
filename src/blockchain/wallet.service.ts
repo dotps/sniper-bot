@@ -151,7 +151,7 @@ export class WalletService {
     return data as Hex
   }
 
-  async getReplicatesWithWallets(users: number[]): Promise<Replicate[]> {
+  async getReplicatesWithUserWallet(users: number[]): Promise<Replicate[]> {
     const commands = await this.replicateRepository.find({
       where: { userId: In(users) },
       relations: ["user.wallets"],
