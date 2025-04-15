@@ -132,11 +132,11 @@ export class BlockchainService {
       abi: poolAbi,
     }
 
-    // const currentSqrtPriceX96 = await this.getClient().readContract({
-    //   ...poolContract,
-    //   functionName: "slot0",
-    // })
-    const currentSqrtPriceX96 = await poolContract.read.slot0().then((slot) => slot.sqrtPriceX96)
+    const currentSqrtPriceX96 = await this.getClient().readContract({
+      ...poolContract,
+      functionName: "slot0",
+    })
+    // const currentSqrtPriceX96 = await poolContract.read.slot0().then((slot) => slot.sqrtPriceX96)
 
     // TODO: тут ошибки
     const sqrtPriceLimitX96 = swapParams.zeroForOne
