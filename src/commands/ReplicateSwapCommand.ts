@@ -25,10 +25,16 @@ export class ReplicateSwapCommand implements ICommand {
 
     for (const replicateCommand of usersReplicates) {
       const userWallet = replicateCommand.user.wallets[0]
+      console.log(userWallet)
       if (!userWallet || !isAddress(userWallet.address)) continue
 
-      if (isToken0BoughtInPool) console.log("isBuyToken0 " + isToken0BoughtInPool)
-      else console.log("isSellToken0 " + isToken0SoldInPool)
+      if (isToken0BoughtInPool) {
+        console.log("isToken0BoughtInPool " + isToken0BoughtInPool)
+        console.log(this.swap)
+      } else {
+        console.log("isToken0SoldInPool " + isToken0SoldInPool)
+        console.log(this.swap)
+      }
 
       if (isToken0SoldInPool && replicateCommand.command === ReplicateDealCommand.SELL) {
         // в логе пул обслужил продажу token0 пользователем за token1
@@ -40,7 +46,7 @@ export class ReplicateSwapCommand implements ICommand {
           data: "0x",
         }
         // TODO: добавить executeSwap
-        await this.blockchainService.executeSwap(swapParams)
+        // await this.blockchainService.executeSwap(swapParams)
       }
       if (isToken0BoughtInPool && replicateCommand.command === ReplicateDealCommand.BUY) {
         // в логе пул обслужил покупку token0 пользователем за token1

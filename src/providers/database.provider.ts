@@ -13,7 +13,7 @@ export const databaseProvider = TypeOrmModule.forRootAsync({
     url: configService.get<string>(Config.DATABASE_URL),
     entities: [User, Token, FollowWallet, Replicate, Wallet],
     synchronize: true,
-    logging: true,
+    logging: false,
   }),
   inject: [ConfigService],
 })
