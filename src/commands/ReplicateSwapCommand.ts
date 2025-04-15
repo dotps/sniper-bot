@@ -21,8 +21,50 @@ export class ReplicateSwapCommand implements ICommand {
     const replicates = await this.walletService.getReplicatesWithWallets(this.swap.users)
     if (!replicates) return null
     console.log(this.swap)
-    const isBuy = this.swap.amount0 > 0n && this.swap.amount1 < 0n // куплен token1 за token0
-    const isSell = this.swap.amount0 < 0n && this.swap.amount1 > 0n // продан token1 за token0
+
+    /*
+    WPOL/USDT - pool
+    token0/token1
+    amount0: - / amount1: +
+    
+    - токен уходит из пула
+    + токен приходит в пул
+    
+    Если amount0 < 0 → Пользователь купил token0 (продал token1).  
+    Если amount1 < 0 → Пользователь купил token1 (продал token0).  
+    
+    ====
+    
+    amount0: - / amount1: +
+    Продать WPOL → Купить USDT
+    
+    amount0: + / amount1: -
+    Купить WPOL → Продать USDT
+    
+    ====
+    пул WPOL/USDT
+    Продажа token0 за token1:	amount0 (-, токен ушел из пула) 	amount1 (+, токен пришел в пул) 	Продали WPOL → получили USDT
+    Покупка token0 за token1:	amount0 (+, токен пришел в пул) 	amount1 (-, токен ушел из пула) 	Купили WPOL → потратили USDT
+    
+    ==============
+    =============
+    Event Swap (логика изменения баланса пула)
+    WPOL/USDT - pool
+    token0/token1
+    
+    amount0: -313838714181212341112n, // токен ушел из пула (пул продал token0)
+    amount1: 57963755n, // токен пришел в пул (пул купил token1)
+    Если amount0 (-), а amount1 (+): значит, Итог для пула: пользователь купил token0 за token1, Итог для пользователя: он продал token1 за token0
+    пул обслужил покупку token0 пользователем за token1 <<<<<<<<
+    
+    amount0: 313838714181212341112n, // токен пришел в пул (пул купил token0)
+    amount1: -57963755n, // токен ушел из пула (пул продал token1)
+    Если amount0 (+), а amount1 (-): значит, продал token0 за token1 (это именно продажа с точки зрения пула)
+    пул обслужил продажу token0 пользователем за token1 <<<<<<<<
+     */
+
+    const isBuyToken0 = this.swap.amount0 < 0n && this.swap.amount1 > 0n // пул обслужил покупку token0 пользователем за token1
+    const isSellToken0 = this.swap.amount0 > 0n && this.swap.amount1 < 0n // пул обслужил продажу token0 пользователем за token1
     const deadline = Date.now() + 60 * 20 * 1000 // +20 минут
     const slippage = 1n
 
@@ -30,29 +72,31 @@ export class ReplicateSwapCommand implements ICommand {
       const wallet = replicateCommand.user.wallets[0]
       if (!wallet || !isAddress(wallet.address)) continue
 
-      if (isSell) console.log("isSell " + isSell)
-      else console.log("isBuy " + isBuy)
+      if (isBuyToken0) console.log("isBuyToken0 " + isBuyToken0)
+      else console.log("isSellToken0 " + isSellToken0)
       // this.swap.tokens.token0.address
 
       // TODO: попробовать через uniswap sdk
       // TODO: добавить decimals
 
-      const tokenIn = isBuy ? this.swap.tokens.token0 : this.swap.tokens.token1
-      const tokenOut = isBuy ? this.swap.tokens.token1 : this.swap.tokens.token0
-      const amountIn = isBuy ? this.swap.amount0 : this.swap.amount1
+      // const tokenIn = isBuy ? this.swap.tokens.token0 : this.swap.tokens.token1
+      // const tokenOut = isBuy ? this.swap.tokens.token1 : this.swap.tokens.token0
+      // const amountIn = isBuy ? this.swap.amount0 : this.swap.amount1
 
-      const _tokenIn = new Token(
-        137, //polygon.id
-        tokenIn.address,
-        tokenIn.decimals,
-        tokenIn.symbol,
-      )
-      const _tokenOut = new Token(
-        137, // polygon.id,
-        tokenOut.address,
-        tokenOut.decimals,
-        tokenOut.symbol,
-      )
+      // const _tokenIn = new Token(
+      //   137, //polygon.id
+      //   tokenIn.address,
+      //   tokenIn.decimals,
+      //   tokenIn.symbol,
+      // )
+      // const _tokenOut = new Token(
+      //   137, // polygon.id,
+      //   tokenOut.address,
+      //   tokenOut.decimals,
+      //   tokenOut.symbol,
+      // )
+
+      /////////////////////
 
       // const swapParams = {
       //   tokenIn: isBuy ? this.swap.tokens.token0.address : this.swap.tokens.token1.address, // токен, который отдаем
@@ -93,8 +137,16 @@ export class ReplicateSwapCommand implements ICommand {
       // }
       // console.log(swapParams)
 
-      if (isBuy && replicateCommand.command === ReplicateDealCommand.BUY) {
-        // куплен token1 за token0
+      if (isSellToken0 && replicateCommand.command === ReplicateDealCommand.SELL) {
+        // в логе пул обслужил продажу token0 пользователем за token1
+        const swapParams = {
+          recipient: wallet.address,
+          zeroForOne: true, // направление обмена: token0 -> token1, отдаем token0, получаем token1
+          amountSpecified: 200n, // сколько отдаем token0
+          sqrtPriceLimitX96: 0n,
+          data: "0x",
+        }
+        // куплен token0 за token1
         // console.log(replicateCommand)
         // запустить покупку
         // const swapParams = {
@@ -119,8 +171,17 @@ export class ReplicateSwapCommand implements ICommand {
         // }
         // console.log(swapParams)
       }
-      if (isSell && replicateCommand.command === ReplicateDealCommand.SELL) {
-        // продан token1 за token0
+      if (isBuyToken0 && replicateCommand.command === ReplicateDealCommand.BUY) {
+        // в логе пул обслужил покупку token0 пользователем за token1
+        const swapParams = {
+          recipient: wallet.address,
+          zeroForOne: false, // направление обмена: token1 -> token0, отдаем token1, получаем token0
+          amountSpecified: -200n, // сколько отдаем token1
+          sqrtPriceLimitX96: 0n,
+          data: "0x",
+        }
+
+        // продан token0 за token1
         // console.log(`Selling ${isSell ? this.swap.tokens.token0.symbol : this.swap.tokens.token1.symbol} for ${isSell ? this.swap.tokens.token1.symbol : this.swap.tokens.token0.symbol}`);
         // console.log("isSell " + isSell)
         // console.log(replicateCommand)
@@ -162,11 +223,11 @@ export class ReplicateSwapCommand implements ICommand {
     // TODO: случай покупка / продажа за нативную валюту - найти в uniswap такой swap
     // TODO: покупка / продажа последовательно MATIC -> USDC -> WETH
 
-    if (isBuy) {
+    if (isSellToken0) {
       // куплен token1 за token0
       // получить и проверить баланс token0 у пользователя
       // если денег хватает провести транзакцию
-    } else if (isSell) {
+    } else if (isBuyToken0) {
       // продан token1 за token0
     } else return null
 
