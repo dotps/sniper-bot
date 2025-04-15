@@ -1,9 +1,20 @@
 import { Injectable } from "@nestjs/common"
-import { createPublicClient, erc20Abi, Hex, http, isAddress, parseAbi, parseAbiItem, PublicClient } from "viem"
+import {
+  createPublicClient,
+  erc20Abi,
+  Hex,
+  http,
+  isAddress,
+  parseAbi,
+  parseAbiItem,
+  PublicClient,
+  SimulateContractParameters,
+} from "viem"
 import { bscTestnet, polygon, polygonMumbai } from "viem/chains"
 import { Logger } from "../utils/Logger"
 import { ResponseBotError } from "../errors/ResponseBotError"
 import { Token } from "./token.entity"
+import { SwapParams } from "../commands/ReplicateSwapCommand"
 
 @Injectable()
 export class BlockchainService {
@@ -112,6 +123,43 @@ export class BlockchainService {
 
     return { token0, token1 }
   }
+
+  async executeSwap(swapParams: SwapParams) {
+    // TODO: добавить try
+
+    const poolContract = {
+      address: swapParams.poolAddress,
+      abi: poolAbi,
+    }
+
+    // const currentSqrtPriceX96 = await this.getClient().readContract({
+    //   ...poolContract,
+    //   functionName: "slot0",
+    // })
+    const currentSqrtPriceX96 = await poolContract.read.slot0().then((slot) => slot.sqrtPriceX96)
+
+    // TODO: тут ошибки
+    const sqrtPriceLimitX96 = swapParams.zeroForOne
+      ? currentSqrtPriceX96 - 1000n // Допустимое снижение цены
+      : currentSqrtPriceX96 + 1000n // Допустимый рост цены
+
+    const { request } = await this.getClient().simulateContract({
+      address: swapParams.poolAddress,
+      abi: poolAbi,
+      functionName: "swap",
+      args: [
+        swapParams.recipient,
+        true, // zeroForOne
+        swapParams.amountSpecified, // amountSpecified
+        sqrtPriceLimitX96, // sqrtPriceLimitX96
+        swapParams.data, // data
+      ],
+      account: swapParams.recipient, // "0xYourAddress",
+    })
+    console.log("SIMULATE")
+    console.log(request)
+    console.log("======")
+  }
 }
 
 enum Blockchain {
@@ -119,7 +167,13 @@ enum Blockchain {
   POLYGON = "polygon",
 }
 
-const poolAbi = parseAbi(["function token0() view returns (address)", "function token1() view returns (address)"])
+const poolAbi = parseAbi([
+  "function token0() view returns (address)",
+  "function token1() view returns (address)",
+  "function swap(address recipient, bool zeroForOne, int256 amountSpecified, uint160 sqrtPriceLimitX96, bytes calldata data) external returns (int256 amount0, int256 amount1)",
+  "function slot0() view returns (uint160 sqrtPriceX96, int24 tick, uint16 observationIndex, uint16 observationCardinality, uint16 observationCardinalityNext, uint8 feeProtocol, bool unlocked)",
+])
+
 export const swapEventAbi = parseAbiItem(
   "event Swap(address indexed sender, address indexed recipient, int256 amount0, int256 amount1, uint160 sqrtPriceX96, uint128 liquidity, int24 tick)",
 )

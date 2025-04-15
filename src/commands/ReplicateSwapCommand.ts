@@ -5,7 +5,7 @@ import { Swap } from "../blockchain/swap-observer.service"
 import { UserService } from "../users/user.service"
 import { WalletService } from "../blockchain/wallet.service"
 import { ReplicateDealCommand } from "./ReplicateCommand"
-import { isAddress } from "viem"
+import { Hex, isAddress } from "viem"
 
 export class ReplicateSwapCommand implements ICommand {
   constructor(
@@ -16,7 +16,9 @@ export class ReplicateSwapCommand implements ICommand {
   ) {}
 
   async execute(): Promise<ResponseData | null> {
+    // TODO: тут еще токены надо достать, т.к сделки то с конкретными токенами должны проводиться
     const usersReplicates = await this.walletService.getReplicatesWithUserWallet(this.swap.users)
+    // console.log(usersReplicates)
     if (!usersReplicates) return null
 
     const isToken0BoughtInPool = this.swap.amount0 < 0n && this.swap.amount1 > 0n // пул обслужил покупку token0 пользователем за token1
@@ -25,7 +27,7 @@ export class ReplicateSwapCommand implements ICommand {
 
     for (const replicateCommand of usersReplicates) {
       const userWallet = replicateCommand.user.wallets[0]
-      console.log(userWallet)
+      // console.log(userWallet)
       if (!userWallet || !isAddress(userWallet.address)) continue
 
       if (isToken0BoughtInPool) {
@@ -37,28 +39,37 @@ export class ReplicateSwapCommand implements ICommand {
       }
 
       if (isToken0SoldInPool && replicateCommand.command === ReplicateDealCommand.SELL) {
-        // в логе пул обслужил продажу token0 пользователем за token1
-        const swapParams = {
+        // в логе пул обслужил продажу token0 пользователем за token1 [token0 (-) ушел из пула, token1 (+) пришел в пул]
+        // поэтому для повтора сделки, использовать amountSpecified (отрицательное значение)
+        const swapParams: SwapParams = {
           recipient: userWallet.address,
           zeroForOne: true, // направление обмена: token0 -> token1, отдаем token0, получаем token1
-          amountSpecified: 200n, // сколько отдаем token0
+          // amountSpecified: 200n, // сколько отдаем token0
+          amountSpecified: -this.swap.amount0, // сколько отдаем token0
           sqrtPriceLimitX96: 0n,
           data: "0x",
+          poolAddress: this.swap.poolAddress,
         }
         // TODO: добавить executeSwap
-        // await this.blockchainService.executeSwap(swapParams)
-      }
-      if (isToken0BoughtInPool && replicateCommand.command === ReplicateDealCommand.BUY) {
-        // в логе пул обслужил покупку token0 пользователем за token1
-        const swapParams = {
+        await this.blockchainService.executeSwap(swapParams)
+      } else if (isToken0BoughtInPool && replicateCommand.command === ReplicateDealCommand.BUY) {
+        // в логе пул обслужил покупку token0 пользователем за token1 [token0 (+) пришел в пул, token1 (-) ушел из пула]
+        // поэтому для повтора сделки, использовать amountSpecified (отрицательное значение)
+        const swapParams: SwapParams = {
           recipient: userWallet.address,
           zeroForOne: false, // направление обмена: token1 -> token0, отдаем token1, получаем token0
-          amountSpecified: -200n, // сколько отдаем token1
+          amountSpecified: -this.swap.amount1, // сколько отдаем token1
+          // amountSpecified: -200n, // сколько отдаем token1
           sqrtPriceLimitX96: 0n,
           data: "0x",
+          poolAddress: this.swap.poolAddress,
         }
+        await this.blockchainService.executeSwap(swapParams)
       }
     }
+
+    // Если вы указываете, сколько хотите отдать (input) → amountSpecified отрицательное (exactInput).
+    // Если вы указываете, сколько хотите получить (output) → amountSpecified положительное (exactOutput).
 
     // TODO: сделать простой случай покупка / продажа за туже валюту
     // TODO: случай покупка / продажа за нативную валюту - найти в uniswap такой swap
@@ -92,4 +103,13 @@ export class ReplicateSwapCommand implements ICommand {
   Если amount0 (+), а amount1 (-): значит, продал token0 за token1 (это именно продажа с точки зрения пула)
   пул обслужил продажу token0 пользователем за token1 <<<<<<<<
   */
+}
+
+export type SwapParams = {
+  recipient: Hex
+  zeroForOne: boolean
+  amountSpecified: bigint
+  sqrtPriceLimitX96: bigint
+  data: Hex
+  poolAddress: Hex
 }
