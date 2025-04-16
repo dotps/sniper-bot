@@ -125,40 +125,42 @@ export class BlockchainService {
   }
 
   async executeSwap(swapParams: SwapParams) {
-    // TODO: добавить try
+    console.log(swapParams)
+    console.log(">>>>> имитация обмена произведена <<<<<<<")
 
-    const poolContract = {
-      address: swapParams.poolAddress,
-      abi: poolAbi,
+      // TODO: проверить наличие токенов в кошельке
+
+    // TODO: вернуть результат?
+
+    return
+
+    // TODO: при симуляции контракта возникает неизвестная ошибка, скорее всего из-за отсутствия средств на кошельке
+    try {
+      const priceSlippagePercent = swapParams.zeroForOne
+        ? 0.99 // снижение на 1%
+        : 1.01 // рост на 1%
+
+      const sqrtPriceLimitX96 = swapParams.zeroForOne
+        ? BigInt(Math.floor(Number(swapParams.sqrtPriceLimitX96) * priceSlippagePercent)) // допустимое снижение цены
+        : BigInt(Math.ceil(Number(swapParams.sqrtPriceLimitX96) * priceSlippagePercent)) // допустимый рост цены
+
+
+      const result = await this.getClient().simulateContract({
+        address: swapParams.poolAddress,
+        abi: poolAbi,
+        functionName: "swap",
+        args: [
+          swapParams.recipient,
+          swapParams.zeroForOne,
+          swapParams.amountSpecified,
+          sqrtPriceLimitX96,
+          swapParams.data || "0x",
+        ],
+        account: swapParams.recipient,
+      })
+    } catch (error) {
+      Logger.error(error)
     }
-
-    const currentSqrtPriceX96 = await this.getClient().readContract({
-      ...poolContract,
-      functionName: "slot0",
-    })
-    // const currentSqrtPriceX96 = await poolContract.read.slot0().then((slot) => slot.sqrtPriceX96)
-
-    // TODO: тут ошибки
-    const sqrtPriceLimitX96 = swapParams.zeroForOne
-      ? currentSqrtPriceX96 - 1000n // Допустимое снижение цены
-      : currentSqrtPriceX96 + 1000n // Допустимый рост цены
-
-    const { request } = await this.getClient().simulateContract({
-      address: swapParams.poolAddress,
-      abi: poolAbi,
-      functionName: "swap",
-      args: [
-        swapParams.recipient,
-        true, // zeroForOne
-        swapParams.amountSpecified, // amountSpecified
-        sqrtPriceLimitX96, // sqrtPriceLimitX96
-        swapParams.data, // data
-      ],
-      account: swapParams.recipient, // "0xYourAddress",
-    })
-    console.log("SIMULATE")
-    console.log(request)
-    console.log("======")
   }
 }
 

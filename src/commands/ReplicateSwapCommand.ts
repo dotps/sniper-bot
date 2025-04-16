@@ -27,16 +27,15 @@ export class ReplicateSwapCommand implements ICommand {
 
     for (const replicateCommand of usersReplicates) {
       const userWallet = replicateCommand.user.wallets[0]
-      // console.log(userWallet)
       if (!userWallet || !isAddress(userWallet.address)) continue
 
-      if (isToken0BoughtInPool) {
-        console.log("isToken0BoughtInPool " + isToken0BoughtInPool)
-        console.log(this.swap)
-      } else {
-        console.log("isToken0SoldInPool " + isToken0SoldInPool)
-        console.log(this.swap)
-      }
+      // if (isToken0BoughtInPool) {
+      //   console.log("isToken0BoughtInPool " + isToken0BoughtInPool)
+        // console.log(this.swap)
+      // } else {
+      //   console.log("isToken0SoldInPool " + isToken0SoldInPool)
+        // console.log(this.swap)
+      // }s
 
       if (isToken0SoldInPool && replicateCommand.command === ReplicateDealCommand.SELL) {
         // в логе пул обслужил продажу token0 пользователем за token1 [token0 (-) ушел из пула, token1 (+) пришел в пул]
@@ -44,13 +43,11 @@ export class ReplicateSwapCommand implements ICommand {
         const swapParams: SwapParams = {
           recipient: userWallet.address,
           zeroForOne: true, // направление обмена: token0 -> token1, отдаем token0, получаем token1
-          // amountSpecified: 200n, // сколько отдаем token0
           amountSpecified: -this.swap.amount0, // сколько отдаем token0
-          sqrtPriceLimitX96: 0n,
+          sqrtPriceLimitX96: this.swap.sqrtPriceX96,
           data: "0x",
           poolAddress: this.swap.poolAddress,
         }
-        // TODO: добавить executeSwap
         await this.blockchainService.executeSwap(swapParams)
       } else if (isToken0BoughtInPool && replicateCommand.command === ReplicateDealCommand.BUY) {
         // в логе пул обслужил покупку token0 пользователем за token1 [token0 (+) пришел в пул, token1 (-) ушел из пула]
@@ -59,8 +56,7 @@ export class ReplicateSwapCommand implements ICommand {
           recipient: userWallet.address,
           zeroForOne: false, // направление обмена: token1 -> token0, отдаем token1, получаем token0
           amountSpecified: -this.swap.amount1, // сколько отдаем token1
-          // amountSpecified: -200n, // сколько отдаем token1
-          sqrtPriceLimitX96: 0n,
+          sqrtPriceLimitX96: this.swap.sqrtPriceX96,
           data: "0x",
           poolAddress: this.swap.poolAddress,
         }
