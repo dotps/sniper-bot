@@ -15,7 +15,9 @@ import { Logger } from "../utils/Logger"
 import { ResponseBotError } from "../errors/ResponseBotError"
 import { Token } from "./token.entity"
 import { Swap } from "../commands/ReplicateSwapCommand"
-import { IPoolTokenPair } from "./IPoolTokenPair"
+import { PoolToken, PoolTokenPair } from "./PoolTokenPair"
+import { plainToClass } from "class-transformer"
+import { absBigInt } from "../utils/Calc"
 
 @Injectable()
 export class BlockchainService {
@@ -126,12 +128,19 @@ export class BlockchainService {
     return { token0, token1 }
   }
 
-  async executeSwap(swap: Swap, tokens: IPoolTokenPair) {
+  async executeSwap(swap: Swap, tokenForPayment: PoolToken) {
     console.log(swap)
-    console.log(tokens)
     console.log(">>>>> обмена <<<<<<<")
 
     // TODO: проверить наличие токенов в кошельке
+    const token = plainToClass(Token, tokenForPayment)
+    const tokenPaymentBalance = await this.getTokenBalance(swap.recipient, token)
+    console.log(tokenPaymentBalance)
+
+    if (!tokenPaymentBalance || tokenPaymentBalance < absBigInt(swap.amountSpecified)) {
+      // TODO: сообщение боту что нехватает средств
+      console.log("+++++++++++++++++")
+    }
 
     // TODO: вернуть результат?
 

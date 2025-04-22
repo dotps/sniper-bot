@@ -5,7 +5,7 @@ import { WalletService } from "./wallet.service"
 import { FollowWallet } from "./follow-wallet.entity"
 import { Uniswap } from "../providers/nets/uniswap"
 import { ISwapProvider } from "./ISwapProvider"
-import { IPoolTokenPair } from "./IPoolTokenPair"
+import { PoolTokenPair } from "./PoolTokenPair"
 import { ReplicateSwapCommand } from "../commands/ReplicateSwapCommand"
 import { UserService } from "../users/user.service"
 
@@ -14,7 +14,7 @@ export class SwapObserverService implements OnModuleInit {
   private readonly client: PublicClient
   private observedWallets: Map<Hex, number[]> = new Map<Hex, number[]>()
   private swapProvider: ISwapProvider
-  private pools: Map<Hex, IPoolTokenPair> = new Map<Hex, IPoolTokenPair>()
+  private pools: Map<Hex, PoolTokenPair> = new Map<Hex, PoolTokenPair>()
 
   constructor(
     private readonly blockchainService: BlockchainService,
@@ -120,7 +120,7 @@ export type SwapLog = {
   sender: Hex
   recipient: Hex
   poolAddress: Hex
-  tokens: IPoolTokenPair
+  tokens: PoolTokenPair
   amount0: bigint
   amount1: bigint
   sqrtPriceX96: bigint

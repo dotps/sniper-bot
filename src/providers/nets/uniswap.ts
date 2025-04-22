@@ -1,11 +1,11 @@
 import { Hex, parseAbi } from "viem"
 import { ISwapProvider } from "../../blockchain/ISwapProvider"
-import { IPoolTokenPair } from "../../blockchain/IPoolTokenPair"
+import { PoolTokenPair } from "../../blockchain/PoolTokenPair"
 import { BlockchainService } from "../../blockchain/blockchain.service"
 import { Logger } from "../../utils/Logger"
 
 export class Uniswap implements ISwapProvider {
-  private pools: Map<Hex, IPoolTokenPair> = new Map<Hex, IPoolTokenPair>()
+  private pools: Map<Hex, PoolTokenPair> = new Map<Hex, PoolTokenPair>()
 
   constructor(private readonly blockchainService: BlockchainService) {}
 
@@ -13,12 +13,12 @@ export class Uniswap implements ISwapProvider {
     this.pools = await this.getPoolsInfo()
   }
 
-  getPools(): Map<Hex, IPoolTokenPair> {
+  getPools(): Map<Hex, PoolTokenPair> {
     return this.pools
   }
 
-  private async getPoolsInfo(): Promise<Map<Hex, IPoolTokenPair>> {
-    const pools = new Map<Hex, IPoolTokenPair>()
+  private async getPoolsInfo(): Promise<Map<Hex, PoolTokenPair>> {
+    const pools = new Map<Hex, PoolTokenPair>()
     try {
       for (let poolAddress of poolAddresses) {
         poolAddress = poolAddress.toLowerCase() as Hex

@@ -1,8 +1,8 @@
 import { Hex } from "viem"
 
-import { IPoolTokenPair } from "./IPoolTokenPair"
+import { PoolTokenPair } from "./PoolTokenPair"
 
 export interface ISwapProvider {
-  getPools(): Map<Hex, IPoolTokenPair>
+  getPools(): Map<Hex, PoolTokenPair>
   init(): Promise<void>
 }
