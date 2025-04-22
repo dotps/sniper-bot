@@ -66,8 +66,8 @@ export class SwapObserverService implements OnModuleInit {
     })
   }
 
-  private getSwapsOfObservableWallets(logs: WatchEventOnLogsParameter<typeof swapEventAbi>): Swap[] {
-    const swaps: Swap[] = []
+  private getSwapsOfObservableWallets(logs: WatchEventOnLogsParameter<typeof swapEventAbi>): SwapLog[] {
+    const swaps: SwapLog[] = []
 
     for (const log of logs) {
       if (!log.args) continue
@@ -86,7 +86,7 @@ export class SwapObserverService implements OnModuleInit {
 
       const subscribedUsersOnWallet = this.observedWallets.get(sender) ?? this.observedWallets.get(recipient)
       if (subscribedUsersOnWallet) {
-        const swap: Swap = {
+        const swap: SwapLog = {
           sender: sender,
           recipient: recipient,
           poolAddress: poolAddress,
@@ -116,7 +116,7 @@ export class SwapObserverService implements OnModuleInit {
   }
 }
 
-export type Swap = {
+export type SwapLog = {
   sender: Hex
   recipient: Hex
   poolAddress: Hex

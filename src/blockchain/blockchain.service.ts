@@ -14,7 +14,8 @@ import { bscTestnet, polygon, polygonMumbai } from "viem/chains"
 import { Logger } from "../utils/Logger"
 import { ResponseBotError } from "../errors/ResponseBotError"
 import { Token } from "./token.entity"
-import { SwapParams } from "../commands/ReplicateSwapCommand"
+import { Swap } from "../commands/ReplicateSwapCommand"
+import { IPoolTokenPair } from "./IPoolTokenPair"
 
 @Injectable()
 export class BlockchainService {
@@ -25,6 +26,7 @@ export class BlockchainService {
     WRONG_WALLET_OR_TOKEN: "Неверный адрес кошелька или токена.",
     TOKEN_ERROR: "Ошибка с адресом токена. Возможно токен не принадлежит текущей сети.",
   } as const
+  private isSimulateSwap: boolean = false
 
   constructor() {
     this.initBlockchainClients()
@@ -124,39 +126,38 @@ export class BlockchainService {
     return { token0, token1 }
   }
 
-  async executeSwap(swapParams: SwapParams) {
-    console.log(swapParams)
-    console.log(">>>>> имитация обмена произведена <<<<<<<")
+  async executeSwap(swap: Swap, tokens: IPoolTokenPair) {
+    console.log(swap)
+    console.log(tokens)
+    console.log(">>>>> обмена <<<<<<<")
 
-      // TODO: проверить наличие токенов в кошельке
+    // TODO: проверить наличие токенов в кошельке
 
     // TODO: вернуть результат?
 
-    return
+    if (!this.isSimulateSwap) return
 
-    // TODO: при симуляции контракта возникает неизвестная ошибка, скорее всего из-за отсутствия средств на кошельке
     try {
-      const priceSlippagePercent = swapParams.zeroForOne
+      const priceSlippagePercent = swap.zeroForOne
         ? 0.99 // снижение на 1%
         : 1.01 // рост на 1%
 
-      const sqrtPriceLimitX96 = swapParams.zeroForOne
-        ? BigInt(Math.floor(Number(swapParams.sqrtPriceLimitX96) * priceSlippagePercent)) // допустимое снижение цены
-        : BigInt(Math.ceil(Number(swapParams.sqrtPriceLimitX96) * priceSlippagePercent)) // допустимый рост цены
-
+      const sqrtPriceLimitX96 = swap.zeroForOne
+        ? BigInt(Math.floor(Number(swap.sqrtPriceLimitX96) * priceSlippagePercent)) // допустимое снижение цены
+        : BigInt(Math.ceil(Number(swap.sqrtPriceLimitX96) * priceSlippagePercent)) // допустимый рост цены
 
       const result = await this.getClient().simulateContract({
-        address: swapParams.poolAddress,
+        address: swap.poolAddress,
         abi: poolAbi,
         functionName: "swap",
         args: [
-          swapParams.recipient,
-          swapParams.zeroForOne,
-          swapParams.amountSpecified,
+          swap.recipient,
+          swap.zeroForOne,
+          swap.amountSpecified,
           sqrtPriceLimitX96,
-          swapParams.data || "0x",
+          swap.data || "0x",
         ],
-        account: swapParams.recipient,
+        account: swap.recipient,
       })
     } catch (error) {
       Logger.error(error)
