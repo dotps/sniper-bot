@@ -7,11 +7,12 @@ import { BotsModule } from "./bots/bots.module"
 import { ConsoleLogger } from "./utils/ConsoleLogger"
 import { Logger } from "./utils/Logger"
 import { BlockchainModule } from "./blockchain/blockchain.module"
+import { EventEmitterModule } from "@nestjs/event-emitter"
 
 Logger.init(new ConsoleLogger(true))
 
 @Module({
-  imports: [configModule, databaseProvider, BotsModule, BlockchainModule],
+  imports: [configModule, databaseProvider, BotsModule, BlockchainModule, EventEmitterModule.forRoot()],
   controllers: [AppController],
   providers: [AppService],
 })

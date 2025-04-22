@@ -18,6 +18,7 @@ import { Wallet } from "../blockchain/wallet.entity"
 import { BlockchainService } from "../blockchain/blockchain.service"
 import { BlockchainModule } from "../blockchain/blockchain.module"
 import { SwapObserverService } from "../blockchain/swap-observer.service"
+import { EventEmitterModule } from "@nestjs/event-emitter"
 
 const webRequestService = new WebRequestFetchService()
 
@@ -61,8 +62,8 @@ const commandHandler = {
   imports: [
     UserModule,
     BlockchainModule,
-    BlockchainModule,
     TypeOrmModule.forFeature([Token, FollowWallet, Replicate, Wallet]),
+    EventEmitterModule.forRoot(),
   ],
   controllers: [BotsController],
   providers: [
@@ -73,7 +74,6 @@ const commandHandler = {
     commandHandler,
     TokenService,
     WalletService,
-    // TransactionObserverService,
     SwapObserverService,
   ],
 })

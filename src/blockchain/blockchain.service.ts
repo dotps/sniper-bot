@@ -18,6 +18,9 @@ import { Swap } from "../commands/ReplicateSwapCommand"
 import { PoolToken, PoolTokenPair } from "./PoolTokenPair"
 import { plainToClass } from "class-transformer"
 import { absBigInt } from "../utils/Calc"
+import { EventEmitter2 } from "@nestjs/event-emitter"
+import { events, SendBotEvent } from "../events/events"
+import { User } from "../users/user.entity"
 
 @Injectable()
 export class BlockchainService {
@@ -30,7 +33,7 @@ export class BlockchainService {
   } as const
   private isSimulateSwap: boolean = false
 
-  constructor() {
+  constructor(private readonly eventEmitter: EventEmitter2) {
     this.initBlockchainClients()
   }
 
@@ -128,21 +131,17 @@ export class BlockchainService {
     return { token0, token1 }
   }
 
-  async executeSwap(swap: Swap, tokenForPayment: PoolToken) {
-    console.log(swap)
-    console.log(">>>>> обмена <<<<<<<")
-
-    // TODO: проверить наличие токенов в кошельке
+  async executeSwap(swap: Swap, tokenForPayment: PoolToken, user: User) {
     const token = plainToClass(Token, tokenForPayment)
     const tokenPaymentBalance = await this.getTokenBalance(swap.recipient, token)
-    console.log(tokenPaymentBalance)
 
     if (!tokenPaymentBalance || tokenPaymentBalance < absBigInt(swap.amountSpecified)) {
-      // TODO: сообщение боту что нехватает средств
-      console.log("+++++++++++++++++")
+      const event: SendBotEvent = {
+        user: user,
+        text: `Недостаточно средств: ${token.symbol}`,
+      }
+      this.eventEmitter.emit(events.SEND_BOT_RESPONSE, event)
     }
-
-    // TODO: вернуть результат?
 
     if (!this.isSimulateSwap) return
 
@@ -159,13 +158,7 @@ export class BlockchainService {
         address: swap.poolAddress,
         abi: poolAbi,
         functionName: "swap",
-        args: [
-          swap.recipient,
-          swap.zeroForOne,
-          swap.amountSpecified,
-          sqrtPriceLimitX96,
-          swap.data || "0x",
-        ],
+        args: [swap.recipient, swap.zeroForOne, swap.amountSpecified, sqrtPriceLimitX96, swap.data || "0x"],
         account: swap.recipient,
       })
     } catch (error) {

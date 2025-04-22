@@ -8,6 +8,9 @@ import { VkApiProvider } from "../providers/bots/vk/VkApiProvider"
 import { RequestVkDto } from "./vk/request-vk.dto"
 import { IQueryData } from "../data/IQueryData"
 import { UserService } from "../users/user.service"
+import { EventEmitter2, OnEvent } from "@nestjs/event-emitter"
+import { events, SendBotEvent } from "../events/events"
+import { BotType } from "../providers/bots/IBotProvider"
 
 @Injectable()
 export class BotsService implements OnModuleInit {
@@ -18,7 +21,9 @@ export class BotsService implements OnModuleInit {
     private readonly vkBot: VkApiProvider,
     private readonly commandHandler: CommandHandler,
     private readonly userService: UserService,
-  ) {}
+    private readonly eventEmitter: EventEmitter2,
+  ) {
+  }
 
   addBot<T extends BotProvider>(botClass: new (...args: any[]) => T, bot: T): void {
     this.bots.set(botClass, bot)
@@ -73,6 +78,29 @@ export class BotsService implements OnModuleInit {
         await bot.sendResponse(text, updateData)
       }
     }
+  }
+
+  getBotByType(botType: BotType): BotProvider {
+    for (const bot of this.bots.values()) {
+      if (bot.getBotType() === botType) return bot
+    }
+    throw new NotFoundException("Бот не найден.")
+  }
+
+  @OnEvent(events.SEND_BOT_RESPONSE)
+  async eventHandlerSendResponse(event: SendBotEvent) {
+    console.log(event)
+    console.log(event.user.botType)
+
+    try {
+      const bot = this.getBotByType(event.user.botType)
+      // await bot.sendResponse(text, updateData)
+      // TODO: подготовить объект для отправки, см. TelegramApiProvider
+      console.log(bot)
+    } catch (error) {
+
+    }
+
   }
 }
 

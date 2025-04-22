@@ -19,7 +19,7 @@ export class ReplicateSwapCommand implements ICommand {
   async execute(): Promise<ResponseData | null> {
     // TODO: тут еще токены надо достать, т.к сделки то с конкретными токенами должны проводиться
     const usersReplicates = await this.walletService.getReplicatesWithUserWallet(this.swapLog.users)
-    // console.log(usersReplicates)
+    console.log(usersReplicates)
     if (!usersReplicates) return null
 
     const isToken0BoughtInPool = this.swapLog.amount0 < 0n && this.swapLog.amount1 > 0n // пул обслужил покупку token0 пользователем за token1
@@ -41,7 +41,7 @@ export class ReplicateSwapCommand implements ICommand {
           data: "0x",
           poolAddress: this.swapLog.poolAddress,
         }
-        await this.blockchainService.executeSwap(swap, this.swapLog.tokens.token0)
+        await this.blockchainService.executeSwap(swap, this.swapLog.tokens.token0, replicateCommand.user)
       } else if (isToken0BoughtInPool && replicateCommand.command === ReplicateDealCommand.BUY) {
         // в логе пул обслужил покупку token0 пользователем за token1 [token0 (+) пришел в пул, token1 (-) ушел из пула]
         // поэтому для повтора сделки, использовать amountSpecified (отрицательное значение)
@@ -53,7 +53,7 @@ export class ReplicateSwapCommand implements ICommand {
           data: "0x",
           poolAddress: this.swapLog.poolAddress,
         }
-        await this.blockchainService.executeSwap(swap, this.swapLog.tokens.token1)
+        await this.blockchainService.executeSwap(swap, this.swapLog.tokens.token1, replicateCommand.user)
       }
     }
 
