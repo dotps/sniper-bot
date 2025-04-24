@@ -6,7 +6,7 @@ import { UserService } from "../users/user.service"
 import { WalletService } from "../blockchain/wallet.service"
 import { ReplicateDealCommand } from "./ReplicateCommand"
 import { Hex, isAddress } from "viem"
-import { absBigInt } from "../utils/Calc"
+import { absBigInt, clampMax } from "../utils/Calc"
 
 export class ReplicateSwapCommand implements ICommand {
   constructor(
@@ -27,6 +27,9 @@ export class ReplicateSwapCommand implements ICommand {
     if (this.swapLog.amount0 === 0n && this.swapLog.amount1 === 0n) return null
 
     for (const replicateCommand of usersReplicates) {
+      console.log(replicateCommand.limit)
+      // TODO: добавить clamp по лимиту
+      // clampMax()
       const userWallet = replicateCommand.user.wallets[0]
       if (!userWallet || !isAddress(userWallet.address)) continue
 
