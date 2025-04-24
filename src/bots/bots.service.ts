@@ -11,6 +11,8 @@ import { UserService } from "../users/user.service"
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter"
 import { events, SendBotEvent } from "../events/events"
 import { BotType } from "../providers/bots/IBotProvider"
+import { plainToClass } from "class-transformer"
+import { QueryData } from "../data/Telegram/QueryData"
 
 @Injectable()
 export class BotsService implements OnModuleInit {
@@ -89,18 +91,13 @@ export class BotsService implements OnModuleInit {
 
   @OnEvent(events.SEND_BOT_RESPONSE)
   async eventHandlerSendResponse(event: SendBotEvent) {
-    console.log(event)
-    console.log(event.user.botType)
-
     try {
       const bot = this.getBotByType(event.user.botType)
-      // await bot.sendResponse(text, updateData)
-      // TODO: подготовить объект для отправки, см. TelegramApiProvider
-      console.log(bot)
+      const updateData = plainToClass(QueryData, { chatId: event.user.chatId })
+      await bot.sendResponse(event.text, updateData)
     } catch (error) {
-
+      Logger.error(error)
     }
-
   }
 }
 

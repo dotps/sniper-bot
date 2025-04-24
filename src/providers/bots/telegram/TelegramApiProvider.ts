@@ -47,7 +47,7 @@ export class TelegramApiProvider implements IBotProvider {
       return
     }
 
-    this.lastUpdateId = queryData.updateId
+    if (queryData.updateId) this.lastUpdateId = queryData.updateId
 
     const url = `${this.baseUrl}${TelegramCommands.SEND_MESSAGE}?chat_id=${queryData.chatId}&text=${text}`
     const telegramResponse = await this.webRequestService.tryGet<TelegramBaseDto>(url)
