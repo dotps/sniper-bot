@@ -9,8 +9,11 @@ import { Hex, isAddress } from "viem"
 import { absBigInt, clampMax } from "../utils/Calc"
 import { Wallet } from "../blockchain/wallet.entity"
 import { Replicate } from "../blockchain/replicate.entity"
+import { encodeSqrtRatioX96 } from "@uniswap/v3-sdk"
 
 export class ReplicateSwapCommand implements ICommand {
+  private readonly slippagePercent = 0.5
+
   constructor(
     private readonly blockchainService: BlockchainService,
     private readonly userService: UserService,
