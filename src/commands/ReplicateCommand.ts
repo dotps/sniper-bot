@@ -5,26 +5,44 @@ import { User } from "../users/user.entity"
 import { Commands } from "./Commands"
 import { WalletService } from "../blockchain/wallet.service"
 import { ErrorHandler } from "../errors/ErrorHandler"
+import { Hex, isAddress } from "viem"
+import { TokenService } from "../blockchain/token.service"
 
 export class ReplicateCommand implements ICommand {
-  private readonly walletService: WalletService
-  private readonly commandData: Command
-  private readonly user: User
   private readonly messages = {
-    WRONG_COMMAND: `Неверные параметры команды.\nПример: ${Commands.REPLICATE} buy/sell лимит_суммы`,
+    WRONG_COMMAND: `Неверные параметры команды.\nПример: ${Commands.REPLICATE} buy/sell адрес_токена лимит_суммы`,
     SUCCESS: "Повторные сделки подключены.",
   } as const
 
-  constructor(walletService: WalletService, user: User, commandData: Command) {
-    this.user = user
-    this.walletService = walletService
-    this.commandData = commandData
-  }
+  constructor(
+    private readonly walletService: WalletService,
+    private readonly user: User,
+    private readonly commandData: Command,
+    private readonly tokenService: TokenService,
+  ) {}
 
+  /*
+  формат команды
+   /replicate buy 0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619 100
+   /replicate [buy/sell] [адрес_токена] [лимит_суммы_human_readable]
+   */
   async execute(): Promise<ResponseData | null> {
-    const command = this.commandData?.params?.[0]?.toLowerCase() || undefined
-    const limit = Number(this.commandData.params?.[1]) || undefined
-    if (!command || !this.isValidCommand(command) || !limit) return new ResponseData(this.messages.WRONG_COMMAND)
+    const params = this.commandData.params || []
+    const command = params[0].toLowerCase() || undefined
+    const tokenAddress = (params[1].toLowerCase() as Hex) || undefined
+    const limit = params[2] || undefined
+
+    console.log(this.commandData.params)
+    // TODO: проверка что токен есть в БД (ранее добавлен через addtoken)
+    const userTokens = await this.tokenService.getUserTokens(this.user.id)
+    userTokens.find((token) => token.address === tokenAddress)
+    console.log(userTokens)
+
+    // const limit = Number(this.commandData.params?.[1]) || undefined
+    // const limit = this.commandData.params?.[1] || undefined
+    if (!command || !this.isValidCommand(command) || !isAddress(tokenAddress) || !limit) {
+      return new ResponseData(this.messages.WRONG_COMMAND)
+    }
 
     try {
       await this.walletService.createReplicate(command, this.user.id, limit)

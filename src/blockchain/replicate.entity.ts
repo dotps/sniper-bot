@@ -8,8 +8,8 @@ export class Replicate {
   @PrimaryGeneratedColumn()
   readonly id: number
 
-  @Column("decimal", { precision: 78, scale: 18 })
-  readonly limit: number
+  @Column()
+  readonly limit: string
 
   @Column({ nullable: false })
   userId: number

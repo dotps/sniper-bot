@@ -46,7 +46,7 @@ export class CommandFactory implements ICommandFactory {
       case Commands.UNFOLLOW:
         return new UnfollowCommand(this.walletService, user, commandData)
       case Commands.REPLICATE:
-        return new ReplicateCommand(this.walletService, user, commandData)
+        return new ReplicateCommand(this.walletService, user, commandData, this.tokenService)
       case Commands.SUBSCRIPTIONS:
         return new SubscriptionsCommand(this.walletService, user)
       case Commands.SEND:

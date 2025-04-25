@@ -4,7 +4,7 @@ import { Command } from "./infrastructure/CommandHandler"
 import { User } from "../users/user.entity"
 import { TokenService } from "../blockchain/token.service"
 import { TokenDto } from "../blockchain/token.dto"
-import { isAddress } from "viem"
+import { Hex, isAddress } from "viem"
 import { ResponseBotError } from "../errors/ResponseBotError"
 import { Logger } from "../utils/Logger"
 import { Commands } from "./Commands"
@@ -33,14 +33,18 @@ export class AddTokenCommand implements ICommand {
     if (!tokenAddress || !isAddress(tokenAddress)) return new ResponseData(this.messages.NEED_TOKEN)
 
     try {
-      const tokenSymbol = await this.blockchainService.getTokenSymbol(tokenAddress)
-      if (!tokenSymbol) return new ResponseData(this.messages.WRONG_TOKEN)
+      // const tokenSymbol = await this.blockchainService.getTokenSymbol(tokenAddress)
+      // if (!tokenSymbol) return new ResponseData(this.messages.WRONG_TOKEN)
+      // TODO: обработка ошибки если не может достать decimals или symbol и отправка сообщения в бота
+      // например 0xe592427a0aece92de3edee1f18e0157c05861564 или 0xd0567bb38fa5bad45150026281c43fa6031577b9 - разные ошибки
+      const tokenInfo = await this.blockchainService.getTokenInfo(tokenAddress)
 
       const tokenDto: TokenDto = {
-        balance: 0,
-        address: tokenAddress,
+        balance: 0n,
+        address: tokenAddress.toLowerCase() as Hex,
+        decimals: tokenInfo.decimals,
         userId: this.user.id,
-        symbol: tokenSymbol,
+        symbol: tokenInfo.symbol,
       }
 
       await this.tokenService.addToken(tokenDto)

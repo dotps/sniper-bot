@@ -14,8 +14,13 @@ export class Token {
   @Column()
   readonly symbol: string
 
-  @Column("decimal", { precision: 78, scale: 18 })
-  readonly balance: number
+  // @Column("decimal", { precision: 78, scale: 18 })
+  // readonly balance: number
+  @Column("bigint")
+  readonly balance: bigint
+
+  @Column()
+  readonly decimals: number
 
   @Column({ nullable: false })
   userId: number

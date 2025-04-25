@@ -19,7 +19,7 @@ export class ReplicateSwapCommand implements ICommand {
   async execute(): Promise<ResponseData | null> {
     // TODO: тут еще токены надо достать, т.к сделки то с конкретными токенами должны проводиться
     const usersReplicates = await this.walletService.getReplicatesWithUserWallet(this.swapLog.users)
-    console.log(usersReplicates)
+    console.log("usersReplicates", usersReplicates)
     if (!usersReplicates) return null
 
     const isToken0BoughtInPool = this.swapLog.amount0 < 0n && this.swapLog.amount1 > 0n // пул обслужил покупку token0 пользователем за token1
@@ -27,19 +27,18 @@ export class ReplicateSwapCommand implements ICommand {
     if (this.swapLog.amount0 === 0n && this.swapLog.amount1 === 0n) return null
 
     for (const replicateCommand of usersReplicates) {
-      console.log(replicateCommand.limit)
-      // TODO: добавить clamp по лимиту
-      // clampMax()
+      const limit = BigInt(replicateCommand.limit)
       const userWallet = replicateCommand.user.wallets[0]
       if (!userWallet || !isAddress(userWallet.address)) continue
 
       if (isToken0SoldInPool && replicateCommand.command === ReplicateDealCommand.SELL) {
         // в логе пул обслужил продажу token0 пользователем за token1 [token0 (-) ушел из пула, token1 (+) пришел в пул]
         // поэтому для повтора сделки, использовать amountSpecified (отрицательное значение)
+        const amountSpecified = clampMax(absBigInt(this.swapLog.amount0), limit)
         const swap: Swap = {
           recipient: userWallet.address,
           zeroForOne: true, // направление обмена: token0 -> token1, отдаем token0, получаем token1
-          amountSpecified: -absBigInt(this.swapLog.amount0), // сколько отдаем token0
+          amountSpecified: -amountSpecified, // сколько отдаем token0
           sqrtPriceLimitX96: this.swapLog.sqrtPriceX96,
           data: "0x",
           poolAddress: this.swapLog.poolAddress,
@@ -48,10 +47,11 @@ export class ReplicateSwapCommand implements ICommand {
       } else if (isToken0BoughtInPool && replicateCommand.command === ReplicateDealCommand.BUY) {
         // в логе пул обслужил покупку token0 пользователем за token1 [token0 (+) пришел в пул, token1 (-) ушел из пула]
         // поэтому для повтора сделки, использовать amountSpecified (отрицательное значение)
+        const amountSpecified = clampMax(absBigInt(this.swapLog.amount1), limit)
         const swap: Swap = {
           recipient: userWallet.address,
           zeroForOne: false, // направление обмена: token1 -> token0, отдаем token1, получаем token0
-          amountSpecified: -absBigInt(this.swapLog.amount1), // сколько отдаем token1
+          amountSpecified: -amountSpecified, // сколько отдаем token1
           sqrtPriceLimitX96: this.swapLog.sqrtPriceX96,
           data: "0x",
           poolAddress: this.swapLog.poolAddress,
@@ -59,9 +59,6 @@ export class ReplicateSwapCommand implements ICommand {
         await this.blockchainService.executeSwap(swap, this.swapLog.tokens.token1, replicateCommand.user)
       }
     }
-
-    // Если вы указываете, сколько хотите отдать (input) → amountSpecified отрицательное (exactInput).
-    // Если вы указываете, сколько хотите получить (output) → amountSpecified положительное (exactOutput).
 
     // TODO: сделать простой случай покупка / продажа за туже валюту
     // TODO: случай покупка / продажа за нативную валюту - найти в uniswap такой swap

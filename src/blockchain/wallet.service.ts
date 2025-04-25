@@ -96,7 +96,7 @@ export class WalletService {
     return wallet
   }
 
-  async createReplicate(command: ReplicateDealCommand, userId: number, limit: number): Promise<Replicate | undefined> {
+  async createReplicate(command: ReplicateDealCommand, userId: number, limit: string): Promise<Replicate | undefined> {
     const replicateDto: Partial<Replicate> = {
       command: command,
       limit: limit,
