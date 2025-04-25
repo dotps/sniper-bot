@@ -162,7 +162,7 @@ export class WalletService {
   async getReplicatesWithUserWallet(users: number[]): Promise<Replicate[]> {
     const commands = await this.replicateRepository.find({
       where: { userId: In(users) },
-      relations: ["user.wallets"],
+      relations: ["user.wallets", "token"],
     })
 
     return commands

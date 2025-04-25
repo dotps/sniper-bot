@@ -91,8 +91,8 @@ export class BotsService implements OnModuleInit {
 
   @OnEvent(events.SEND_BOT_RESPONSE)
   async eventHandlerSendResponse(event: SendBotEvent) {
-    console.log("сообщение отправлено, убрать return")
-    return
+    // console.log("сообщение отправлено, убрать return")
+    // return
     try {
       const bot = this.getBotByType(event.user.botType)
       const updateData = plainToClass(QueryData, { chatId: event.user.chatId })

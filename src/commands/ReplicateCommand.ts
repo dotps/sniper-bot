@@ -8,6 +8,7 @@ import { ErrorHandler } from "../errors/ErrorHandler"
 import { Hex, isAddress } from "viem"
 import { TokenService } from "../blockchain/token.service"
 import { ResponseBotError } from "../errors/ResponseBotError"
+import { Token } from "../blockchain/token.entity"
 
 export class ReplicateCommand implements ICommand {
   private readonly messages = {
@@ -32,25 +33,9 @@ export class ReplicateCommand implements ICommand {
    */
   async execute(): Promise<ResponseData | null> {
     try {
-      const { command, tokenAddress, limit } = this.validateAndParseParams()
-
-      // const params = this.commandData.params || []
-      // const command = params[0].toLowerCase() || undefined
-      // const tokenAddress = (params[1].toLowerCase() as Hex) || undefined
-      // const limit = BigInt(params[2]) || undefined
-
-      // const userTokens = await this.tokenService.getUserTokens(this.user.id)
-      // const existedToken = userTokens.find((token) => token.address === tokenAddress)
-      // if (!existedToken) return new ResponseData(this.messages.NOT_FOUND_TOKEN)
-
-      // TODO: протестировать рефакторинг
-      const token = await this.getUserTokenOrThrow(tokenAddress)
-
-      if (!command || !this.isValidCommand(command) || !isAddress(tokenAddress) || !limit) {
-        return new ResponseData(this.messages.WRONG_COMMAND)
-      }
-
+      const { command, token, limit } = await this.validateAndParseParams()
       const replicate = await this.walletService.createReplicate(command, this.user.id, limit, token)
+
       return new ResponseData(
         `${this.messages.SUCCESS}\nКоманда: ${replicate.command}\nТокен: ${replicate.token.symbol}\nЛимит: ${replicate.limit}`,
       )
@@ -63,11 +48,7 @@ export class ReplicateCommand implements ICommand {
     return Object.values(ReplicateDealCommand).includes(command as ReplicateDealCommand)
   }
 
-  private validateAndParseParams(): {
-    command: ReplicateDealCommand
-    tokenAddress: Hex
-    limit: bigint
-  } {
+  private async validateAndParseParams(): Promise<{ command: ReplicateDealCommand; token: Token; limit: bigint }> {
     const params = this.commandData.params || []
 
     const command = params[0].toLowerCase()
@@ -76,11 +57,13 @@ export class ReplicateCommand implements ICommand {
     const tokenAddress = params[1].toLowerCase() as Hex
     if (!isAddress(tokenAddress)) throw new ResponseBotError(this.messages.INVALID_TOKEN)
 
+    const token = await this.getUserTokenOrThrow(tokenAddress)
+
     // TODO: конвертацию лимита из human в bigint + валидация
     const limit = BigInt(params[2])
     if (limit <= 0) throw new ResponseBotError(this.messages.INVALID_LIMIT)
 
-    return { command, tokenAddress, limit }
+    return { command, token, limit }
   }
 
   private async getUserTokenOrThrow(tokenAddress: Hex) {

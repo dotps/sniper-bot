@@ -55,9 +55,6 @@ export class SwapObserverService implements OnModuleInit {
       event: swapEventAbi,
       onLogs: (logs) => {
         const swaps = this.getSwapsOfObservableWallets(logs)
-        console.log(logs.length)
-
-        // TODO: сделать паралельное выполнение
         for (const swap of swaps) {
           const command = new ReplicateSwapCommand(this.blockchainService, this.userService, this.walletService, swap)
           command.execute()

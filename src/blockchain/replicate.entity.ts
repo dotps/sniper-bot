@@ -4,13 +4,11 @@ import { ReplicateDealCommand } from "../commands/ReplicateCommand"
 import { Token } from "./token.entity"
 
 @Entity()
-@Unique(["command", "userId", "limit"])
+@Unique(["command", "userId", "token", "limit"])
 export class Replicate {
   @PrimaryGeneratedColumn()
   readonly id: number
 
-  // @Column()
-  // readonly limit: string
   @Column("bigint")
   readonly limit: bigint
 
