@@ -13,6 +13,7 @@ import { BlockchainService } from "./blockchain.service"
 import { TransactionObserverService } from "./transaction-observer.service"
 import { Commands } from "../commands/Commands"
 import { SwapObserverService } from "./swap-observer.service"
+import { Token } from "./token.entity"
 
 @Injectable()
 export class WalletService {
@@ -96,17 +97,24 @@ export class WalletService {
     return wallet
   }
 
-  async createReplicate(command: ReplicateDealCommand, userId: number, limit: string): Promise<Replicate | undefined> {
+  async createReplicate(
+    command: ReplicateDealCommand,
+    userId: number,
+    limit: bigint,
+    token: Token,
+  ): Promise<Replicate> {
     const replicateDto: Partial<Replicate> = {
       command: command,
       limit: limit,
       userId: userId,
+      token: token,
     }
     try {
       const replicate = this.replicateRepository.create(replicateDto)
       return await this.replicateRepository.save(replicate)
     } catch (error) {
       DBError.handle(error, this.messages.REPEATED_DEALS)
+      throw error
     }
   }
 

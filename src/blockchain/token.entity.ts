@@ -1,6 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, Unique } from "typeorm"
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, Unique, OneToMany } from "typeorm"
 import { Hex } from "viem"
 import { User } from "../users/user.entity"
+import { Replicate } from "./replicate.entity"
 
 @Entity()
 @Unique(["address", "userId"])
@@ -27,4 +28,7 @@ export class Token {
 
   @ManyToOne(() => User, (user) => user.tokens)
   user: User
+
+  @OneToMany(() => Replicate, (replicate) => replicate.token)
+  replicates: Replicate[]
 }

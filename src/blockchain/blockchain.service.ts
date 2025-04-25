@@ -30,6 +30,7 @@ export class BlockchainService {
   private readonly messages = {
     WRONG_WALLET_OR_TOKEN: "Неверный адрес кошелька или токена.",
     TOKEN_ERROR: "Ошибка с адресом токена. Возможно токен не принадлежит текущей сети.",
+    TOKEN_CONTRACT_ERROR: "Не удалось прочитать контракт токена.",
   } as const
   private isSimulateSwap: boolean = false
 
@@ -90,25 +91,31 @@ export class BlockchainService {
       })
     } catch (error) {
       Logger.error(error)
-      return null
+      throw new ResponseBotError(`${this.messages.TOKEN_CONTRACT_ERROR}\n ${address}`)
     }
   }
 
+  // TODO: добавить типы
   async getTokenInfo(tokenAddress: Hex) {
-    const [symbol, decimals] = await Promise.all([
-      this.getClient().readContract({
-        address: tokenAddress,
-        abi: erc20Abi,
-        functionName: "symbol",
-      }),
-      this.getClient().readContract({
-        address: tokenAddress,
-        abi: erc20Abi,
-        functionName: "decimals",
-      }),
-    ])
+    try {
+      const [symbol, decimals] = await Promise.all([
+        this.getClient().readContract({
+          address: tokenAddress,
+          abi: erc20Abi,
+          functionName: "symbol",
+        }),
+        this.getClient().readContract({
+          address: tokenAddress,
+          abi: erc20Abi,
+          functionName: "decimals",
+        }),
+      ])
 
-    return { symbol, decimals }
+      return { symbol, decimals }
+    } catch (error) {
+      Logger.error(error)
+      throw new ResponseBotError(`${this.messages.TOKEN_CONTRACT_ERROR}\n ${tokenAddress}`)
+    }
   }
 
   async getTokensForPool(poolAddress: Hex) {
@@ -200,6 +207,10 @@ export const swapEventAbi = parseAbiItem(
 0x802b65b5d9016621e66003aed0b16615093f328b
 0x7f20a7a526d1bab092e3be0733d96287e93cef59
 0x85cd07ea01423b1e937929b44e4ad8c40bbb5e71
+
+токены
+0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359
+0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619
 
 ====================
 Токены BSC:
