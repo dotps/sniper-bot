@@ -1,5 +1,5 @@
 import { forwardRef, Inject, Injectable, OnModuleInit } from "@nestjs/common"
-import { Hex, isAddress, Log, parseAbi, parseAbiItem, PublicClient, WatchEventOnLogsParameter } from "viem"
+import { Hex, isAddress, PublicClient, WatchEventOnLogsParameter } from "viem"
 import { BlockchainService, swapEventAbi } from "./blockchain.service"
 import { WalletService } from "./wallet.service"
 import { FollowWallet } from "./follow-wallet.entity"
@@ -18,7 +18,7 @@ export class SwapObserverService implements OnModuleInit {
 
   constructor(
     private readonly blockchainService: BlockchainService,
-    @Inject(forwardRef(() => WalletService)) // TODO: посмотреть как можно выйти из циклической зависимости
+    @Inject(forwardRef(() => WalletService))
     private readonly walletService: WalletService,
     private readonly userService: UserService,
   ) {
@@ -125,23 +125,3 @@ export type SwapLog = {
   tick: number
   users: number[]
 }
-
-/*
-NOTE:
-transaction.from - всегда кошелек
-transaction.to -
- */
-
-/*
-address - адрес контракта пула, где произошел обмен
-sender - адрес, инициировавший обмен
-recipient - адрес получателя
-  * может быть равен sender - тогда это покупка/продажа
-  * != sender, то это перевод?
-amount0 - изменение количества первого токена, если положительный, то был продан
-amount1 - изменение количества второго токена, если отризацельный, то был куплен
-
-Логика обмена токенов:
-Пользователь sender продал токены token0 и получил токены token1 в пуле address
-В логе токены не отображаются, нужно делать запрос или получить из пула
- */
