@@ -6,7 +6,7 @@ import { UserService } from "../users/user.service"
 import { WalletService } from "../blockchain/wallet.service"
 import { ReplicateDealCommand } from "./ReplicateCommand"
 import { Hex, isAddress } from "viem"
-import { absBigInt, clampMax } from "../utils/Calc"
+import { absBigInt, calculateSqrtPriceWithSlippage, clampMax } from "../utils/Calc"
 import { Wallet } from "../blockchain/wallet.entity"
 import { Replicate } from "../blockchain/replicate.entity"
 import { encodeSqrtRatioX96 } from "@uniswap/v3-sdk"
@@ -49,36 +49,38 @@ export class ReplicateSwapCommand implements ICommand {
 
   private async handleSellOperation(replicate: Replicate, userWallet: Wallet, userLimit: bigint) {
     const amountSpecified = clampMax(absBigInt(this.swapLog.amount0), userLimit)
+    const zeroForOne = true
     // в логе пул обслужил продажу token0 пользователем за token1 [token0 (-) ушел из пула, token1 (+) пришел в пул]
     // поэтому для повтора сделки, использовать amountSpecified (отрицательное значение)
-    const swapParams: Swap = {
+    const swap: Swap = {
       recipient: userWallet.address,
-      zeroForOne: true, // направление обмена: token0 -> token1, отдаем token0, получаем token1
+      zeroForOne: zeroForOne, // направление обмена: token0 -> token1, отдаем token0, получаем token1
       amountSpecified: -amountSpecified, // сколько отдаем token0
-      sqrtPriceLimitX96: this.swapLog.sqrtPriceX96,
+      sqrtPriceLimitX96: calculateSqrtPriceWithSlippage(this.swapLog.sqrtPriceX96, this.slippagePercent, zeroForOne),
       data: "0x",
       poolAddress: this.swapLog.poolAddress,
     }
 
     // TODO: добавить проскальзывание
 
-    await this.blockchainService.executeSwap(swapParams, this.swapLog.tokens.token0, replicate.user)
+    await this.blockchainService.executeSwap(swap, this.swapLog.tokens.token0, replicate.user)
   }
 
   private async handleBuyOperation(replicate: Replicate, userWallet: Wallet, userLimit: bigint) {
     const amountSpecified = clampMax(absBigInt(this.swapLog.amount1), userLimit)
+    const zeroForOne = false
     // в логе пул обслужил покупку token0 пользователем за token1 [token0 (+) пришел в пул, token1 (-) ушел из пула]
     // поэтому для повтора сделки, использовать amountSpecified (отрицательное значение)
-    const swapParams: Swap = {
+    const swap: Swap = {
       recipient: userWallet.address,
-      zeroForOne: false, // направление обмена: token1 -> token0, отдаем token1, получаем token0
+      zeroForOne: zeroForOne, // направление обмена: token1 -> token0, отдаем token1, получаем token0
       amountSpecified: -amountSpecified, // сколько отдаем token1
-      sqrtPriceLimitX96: this.swapLog.sqrtPriceX96,
+      sqrtPriceLimitX96: calculateSqrtPriceWithSlippage(this.swapLog.sqrtPriceX96, this.slippagePercent, zeroForOne),
       data: "0x",
       poolAddress: this.swapLog.poolAddress,
     }
 
-    await this.blockchainService.executeSwap(swapParams, this.swapLog.tokens.token1, replicate.user)
+    await this.blockchainService.executeSwap(swap, this.swapLog.tokens.token1, replicate.user)
   }
 }
 
