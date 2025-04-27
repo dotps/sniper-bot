@@ -2,7 +2,7 @@ import { Logger } from "../utils/Logger"
 import { IWebRequestService } from "./IWebRequestService"
 
 export class WebRequestFetchService implements IWebRequestService {
-  async tryGet<T>(url: string): Promise<T> {
+  async tryGet<T>(url: string): Promise<T | null> {
     try {
       Logger.log(`Query: ${url}`)
 
@@ -11,8 +11,7 @@ export class WebRequestFetchService implements IWebRequestService {
 
       if (!response.ok) {
         Logger.error(`${response.status} ${response.statusText} ${JSON.stringify(responseData)}`)
-        return null as T
-        // throw new Error("WebRequest Error")
+        return null
       }
 
       Logger.log(`Response: ${JSON.stringify(responseData)}`)
@@ -20,8 +19,7 @@ export class WebRequestFetchService implements IWebRequestService {
       return responseData
     } catch (e) {
       Logger.error(`${e}`)
-      throw new Error("WebRequest Error")
-      // TODO: останавливает приложение, если нет интернета
+      return null
     }
   }
 }

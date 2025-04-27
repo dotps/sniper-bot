@@ -62,6 +62,8 @@ export class ReplicateSwapCommand implements ICommand {
     }
 
     // TODO: протестировать
+    console.log("sqrtPriceX96", this.swapLog.sqrtPriceX96)
+    console.log("sqrtPriceLimitX96", swap.sqrtPriceLimitX96)
 
     await this.blockchainService.executeSwap(swap, this.swapLog.tokens.token0, replicate.user)
   }
@@ -79,6 +81,9 @@ export class ReplicateSwapCommand implements ICommand {
       data: "0x",
       poolAddress: this.swapLog.poolAddress,
     }
+
+    console.log("sqrtPriceX96", this.swapLog.sqrtPriceX96)
+    console.log("sqrtPriceLimitX96", swap.sqrtPriceLimitX96)
 
     await this.blockchainService.executeSwap(swap, this.swapLog.tokens.token1, replicate.user)
   }

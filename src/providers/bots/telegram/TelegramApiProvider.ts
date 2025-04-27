@@ -86,6 +86,8 @@ export class TelegramApiProvider implements IBotProvider {
   }
 
   private async validateResponse(telegramResponseDto: TelegramUpdatesDto | TelegramBaseDto) {
+    if (!telegramResponseDto) return false
+
     const errors = await validate(telegramResponseDto)
     if (errors.length > 0) {
       Logger.error("Ошибка валидации " + JSON.stringify(errors))

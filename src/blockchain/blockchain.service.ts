@@ -153,19 +153,11 @@ export class BlockchainService {
     if (!this.isSimulateSwap) return
 
     try {
-      const priceSlippagePercent = swap.zeroForOne
-        ? 0.99 // снижение на 1%
-        : 1.01 // рост на 1%
-
-      const sqrtPriceLimitX96 = swap.zeroForOne
-        ? BigInt(Math.floor(Number(swap.sqrtPriceLimitX96) * priceSlippagePercent)) // допустимое снижение цены
-        : BigInt(Math.ceil(Number(swap.sqrtPriceLimitX96) * priceSlippagePercent)) // допустимый рост цены
-
       const result = await this.getClient().simulateContract({
         address: swap.poolAddress,
         abi: poolAbi,
         functionName: "swap",
-        args: [swap.recipient, swap.zeroForOne, swap.amountSpecified, sqrtPriceLimitX96, swap.data || "0x"],
+        args: [swap.recipient, swap.zeroForOne, swap.amountSpecified, swap.sqrtPriceLimitX96, swap.data || "0x"],
         account: swap.recipient,
       })
     } catch (error) {
