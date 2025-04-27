@@ -147,7 +147,9 @@ export class WalletService {
     if (!result || result.affected === 0) throw new ResponseBotError(this.messages.FOLLOW_WALLET_NOT_FOUND)
   }
 
-  async send(fromAddress: Hex, toAddress: Hex, transferAmount: number, userId: number) {
+  async sendToken(fromAddress: Hex, toAddress: Hex, transferAmount: bigint, userId: number) {
+    // await this.blockchainService.executeTokenTransfer(fromAddress, toAddress, transferAmount, this.user.id)
+
     console.log(fromAddress, toAddress, transferAmount, userId)
   }
 

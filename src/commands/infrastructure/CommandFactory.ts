@@ -50,7 +50,7 @@ export class CommandFactory implements ICommandFactory {
       case Commands.SUBSCRIPTIONS:
         return new SubscriptionsCommand(this.walletService, user)
       case Commands.SEND:
-        return new SendCommand(this.walletService, user, commandData)
+        return new SendCommand(this.blockchainService, this.walletService, user, commandData)
       case Commands.WALLET:
         return new WalletCommand(this.walletService, user)
       default:

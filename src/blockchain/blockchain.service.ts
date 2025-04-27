@@ -164,6 +164,10 @@ export class BlockchainService {
       Logger.error(error)
     }
   }
+
+  async executeTokenTransfer(fromAddress: Hex, toAddress: Hex, transferAmount: number, id: number) {
+    console.log("+++++")
+  }
 }
 
 enum Blockchain {
