@@ -5,7 +5,7 @@ import { User } from "../users/user.entity"
 import { Commands } from "./Commands"
 import { WalletService } from "../blockchain/wallet.service"
 import { ErrorHandler } from "../errors/ErrorHandler"
-import { Hex, isAddress } from "viem"
+import { Hex, isAddress, parseUnits } from "viem"
 import { TokenService } from "../blockchain/token.service"
 import { ResponseBotError } from "../errors/ResponseBotError"
 import { Token } from "../blockchain/token.entity"
@@ -60,6 +60,7 @@ export class ReplicateCommand implements ICommand {
     const token = await this.getUserTokenOrThrow(tokenAddress)
 
     // TODO: конвертацию лимита из human в bigint + валидация
+    // const transferAmount = parseUnits(amount, token.decimals)
     const limit = BigInt(params[2])
     if (limit <= 0) throw new ResponseBotError(this.messages.INVALID_LIMIT)
 

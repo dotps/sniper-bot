@@ -25,16 +25,14 @@ export class SendCommand implements ICommand {
 
   async execute(): Promise<ResponseData | null> {
     const [tokenAddress, amount, toAddress] = this.commandData.params || []
-    // const transferAmount = Number(amount) || 0
 
     if (!tokenAddress || !isAddress(tokenAddress)) return new ResponseData(this.messages.NEED_TOKEN)
     if (!toAddress || !isAddress(toAddress)) return new ResponseData(this.messages.NEED_TO_ADDRESS)
+    if (!amount || isNaN(Number(amount))) return new ResponseData(this.messages.NEED_AMOUNT)
 
     const token = await this.blockchainService.getTokenInfo(tokenAddress)
     const transferAmount = parseUnits(amount, token.decimals)
     if (!transferAmount) return new ResponseData(this.messages.NEED_AMOUNT)
-
-    console.log(transferAmount)
 
     try {
       await this.walletService.sendToken(tokenAddress, toAddress, transferAmount, this.user.id)
