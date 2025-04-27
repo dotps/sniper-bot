@@ -61,7 +61,7 @@ export class ReplicateSwapCommand implements ICommand {
       poolAddress: this.swapLog.poolAddress,
     }
 
-    // TODO: добавить проскальзывание
+    // TODO: протестировать
 
     await this.blockchainService.executeSwap(swap, this.swapLog.tokens.token0, replicate.user)
   }
