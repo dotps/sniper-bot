@@ -34,6 +34,8 @@ export class SendCommand implements ICommand {
     const transferAmount = parseUnits(amount, token.decimals)
     if (!transferAmount) return new ResponseData(this.messages.NEED_AMOUNT)
 
+    // TODO: продолжить
+
     try {
       await this.walletService.sendToken(tokenAddress, toAddress, transferAmount, this.user.id)
       return new ResponseData(this.messages.SUCCESS)
