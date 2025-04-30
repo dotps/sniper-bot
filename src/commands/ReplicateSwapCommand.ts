@@ -9,7 +9,6 @@ import { Hex, isAddress } from "viem"
 import { absBigInt, calculateSqrtPriceWithSlippage, clampMax } from "../utils/Calc"
 import { Wallet } from "../blockchain/wallet.entity"
 import { Replicate } from "../blockchain/replicate.entity"
-import { encodeSqrtRatioX96 } from "@uniswap/v3-sdk"
 
 export class ReplicateSwapCommand implements ICommand {
   private readonly slippagePercent = 0.5
@@ -61,10 +60,6 @@ export class ReplicateSwapCommand implements ICommand {
       poolAddress: this.swapLog.poolAddress,
     }
 
-    // TODO: протестировать
-    console.log("sqrtPriceX96", this.swapLog.sqrtPriceX96)
-    console.log("sqrtPriceLimitX96", swap.sqrtPriceLimitX96)
-
     await this.blockchainService.executeSwap(swap, this.swapLog.tokens.token0, replicate.user)
   }
 
@@ -81,9 +76,6 @@ export class ReplicateSwapCommand implements ICommand {
       data: "0x",
       poolAddress: this.swapLog.poolAddress,
     }
-
-    console.log("sqrtPriceX96", this.swapLog.sqrtPriceX96)
-    console.log("sqrtPriceLimitX96", swap.sqrtPriceLimitX96)
 
     await this.blockchainService.executeSwap(swap, this.swapLog.tokens.token1, replicate.user)
   }

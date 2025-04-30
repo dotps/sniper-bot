@@ -2,7 +2,7 @@ import { forwardRef, Inject, Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { In, Repository } from "typeorm"
 import { FollowWallet } from "./follow-wallet.entity"
-import { createWalletClient, Hex, http, Transport, TransportConfig, WalletClient } from "viem"
+import { createWalletClient, Hex, http, WalletClient } from "viem"
 import { ResponseBotError } from "../errors/ResponseBotError"
 import { ReplicateDealCommand } from "../commands/ReplicateCommand"
 import { Replicate } from "./replicate.entity"
@@ -10,7 +10,6 @@ import { DBError } from "../errors/DBError"
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts"
 import { Wallet } from "./wallet.entity"
 import { BlockchainService } from "./blockchain.service"
-import { TransactionObserverService } from "./transaction-observer.service"
 import { Commands } from "../commands/Commands"
 import { SwapObserverService } from "./swap-observer.service"
 import { Token } from "./token.entity"
@@ -147,10 +146,9 @@ export class WalletService {
     if (!result || result.affected === 0) throw new ResponseBotError(this.messages.FOLLOW_WALLET_NOT_FOUND)
   }
 
-  async sendToken(fromAddress: Hex, toAddress: Hex, transferAmount: bigint, userId: number) {
+  async sendToken(tokenAddress: Hex, toAddress: Hex, transferAmount: bigint, userId: number) {
     // await this.blockchainService.executeTokenTransfer(fromAddress, toAddress, transferAmount, this.user.id)
-
-    console.log(fromAddress, toAddress, transferAmount, userId)
+    console.log(tokenAddress, toAddress, transferAmount, userId)
   }
 
   private encrypt(data: Hex) {

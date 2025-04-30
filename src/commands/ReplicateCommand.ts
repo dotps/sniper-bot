@@ -48,7 +48,7 @@ export class ReplicateCommand implements ICommand {
     return Object.values(ReplicateDealCommand).includes(command as ReplicateDealCommand)
   }
 
-  private async validateAndParseParams(): Promise<{ command: ReplicateDealCommand; token: Token; limit: bigint }> {
+  private async validateAndParseParams(): Promise<ReplicateParsedData> {
     const params = this.commandData.params || []
 
     const command = params[0].toLowerCase()
@@ -78,4 +78,10 @@ export class ReplicateCommand implements ICommand {
 export enum ReplicateDealCommand {
   BUY = "buy",
   SELL = "sell",
+}
+
+type ReplicateParsedData = {
+  command: ReplicateDealCommand
+  token: Token
+  limit: bigint
 }

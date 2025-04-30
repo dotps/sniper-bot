@@ -2,11 +2,12 @@ import { ICommand } from "./infrastructure/ICommand"
 import { ResponseData } from "../data/ResponseData"
 import { Command } from "./infrastructure/CommandHandler"
 import { User } from "../users/user.entity"
-import { isAddress, parseUnits } from "viem"
+import { Hex, isAddress, parseUnits } from "viem"
 import { Commands } from "./Commands"
 import { ErrorHandler } from "../errors/ErrorHandler"
 import { WalletService } from "../blockchain/wallet.service"
 import { BlockchainService } from "../blockchain/blockchain.service"
+import { ResponseBotError } from "../errors/ResponseBotError"
 
 export class SendCommand implements ICommand {
   private readonly messages = {
@@ -23,24 +24,39 @@ export class SendCommand implements ICommand {
     private readonly commandData: Command,
   ) {}
 
+  // Формат команды /send 0x7ceb23fd6bc0add59e62ac25578270cff1b9f619 0.41 0xF6dD294C065DDE53CcA856249FB34ae67BE5C54C
+  // адрес_токена сумма_human_формат адрес_кошелька
   async execute(): Promise<ResponseData | null> {
-    const [tokenAddress, amount, toAddress] = this.commandData.params || []
-
-    if (!tokenAddress || !isAddress(tokenAddress)) return new ResponseData(this.messages.NEED_TOKEN)
-    if (!toAddress || !isAddress(toAddress)) return new ResponseData(this.messages.NEED_TO_ADDRESS)
-    if (!amount || isNaN(Number(amount))) return new ResponseData(this.messages.NEED_AMOUNT)
-
-    const token = await this.blockchainService.getTokenInfo(tokenAddress)
-    const transferAmount = parseUnits(amount, token.decimals)
-    if (!transferAmount) return new ResponseData(this.messages.NEED_AMOUNT)
-
-    // TODO: продолжить
-
     try {
-      await this.walletService.sendToken(tokenAddress, toAddress, transferAmount, this.user.id)
+      const { tokenAddress, amount, toAddress } = this.validateAndParseParams()
+      const tokenInfo = await this.blockchainService.getTokenInfo(tokenAddress)
+      const transferAmount = parseUnits(amount, tokenInfo.decimals)
+      if (!transferAmount) return new ResponseData(this.messages.NEED_AMOUNT)
+
+      const fromAddress = await this.walletService.getWalletAddress(this.user.id)
+      // await this.walletService.sendToken(tokenAddress, toAddress, transferAmount, this.user.id)
+      //
+      await this.blockchainService.executeTokenTransfer(fromAddress, toAddress, tokenAddress, transferAmount)
+
       return new ResponseData(this.messages.SUCCESS)
     } catch (error) {
       return ErrorHandler.handleAndResponse(error)
     }
   }
+
+  private validateAndParseParams(): SendParsedData {
+    const [tokenAddress, amount, toAddress] = this.commandData.params || []
+
+    if (!tokenAddress || !isAddress(tokenAddress)) throw new ResponseBotError(this.messages.NEED_TOKEN)
+    if (!toAddress || !isAddress(toAddress)) throw new ResponseBotError(this.messages.NEED_TO_ADDRESS)
+    if (!amount || isNaN(Number(amount))) throw new ResponseBotError(this.messages.NEED_AMOUNT)
+
+    return { tokenAddress, amount, toAddress }
+  }
+}
+
+type SendParsedData = {
+  tokenAddress: Hex
+  amount: string
+  toAddress: Hex
 }

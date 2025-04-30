@@ -1,16 +1,6 @@
 import { Injectable } from "@nestjs/common"
-import {
-  createPublicClient,
-  erc20Abi,
-  Hex,
-  http,
-  isAddress,
-  parseAbi,
-  parseAbiItem,
-  PublicClient,
-  SimulateContractParameters,
-} from "viem"
-import { bscTestnet, polygon, polygonMumbai } from "viem/chains"
+import { createPublicClient, erc20Abi, Hex, http, isAddress, parseAbi, parseAbiItem, PublicClient } from "viem"
+import { bscTestnet, polygon } from "viem/chains"
 import { Logger } from "../utils/Logger"
 import { ResponseBotError } from "../errors/ResponseBotError"
 import { Token } from "./token.entity"
@@ -21,6 +11,7 @@ import { absBigInt } from "../utils/Calc"
 import { EventEmitter2 } from "@nestjs/event-emitter"
 import { events, SendBotEvent } from "../events/events"
 import { User } from "../users/user.entity"
+import { ErrorHandler } from "../errors/ErrorHandler"
 
 @Injectable()
 export class BlockchainService {
@@ -95,8 +86,7 @@ export class BlockchainService {
     }
   }
 
-  // TODO: добавить типы
-  async getTokenInfo(tokenAddress: Hex) {
+  async getTokenInfo(tokenAddress: Hex): Promise<TokenInfo> {
     try {
       const [symbol, decimals] = await Promise.all([
         this.getClient().readContract({
@@ -118,6 +108,7 @@ export class BlockchainService {
     }
   }
 
+  // TODO: добавить типы
   async getTokensForPool(poolAddress: Hex) {
     let [token0, token1] = await Promise.all([
       this.getClient().readContract({
@@ -165,8 +156,24 @@ export class BlockchainService {
     }
   }
 
-  async executeTokenTransfer(fromAddress: Hex, toAddress: Hex, transferAmount: number, id: number) {
+  async executeTokenTransfer(fromAddress: Hex, toAddress: Hex, tokenAddress: Hex, transferAmount: bigint) {
     console.log("+++++")
+    // TODO: отправка токена
+    try {
+      const result = await this.getClient().simulateContract({
+        address: tokenAddress,
+        abi: erc20Abi,
+        functionName: "transfer",
+        args: [toAddress, transferAmount],
+        account: fromAddress,
+      })
+      console.log("Результат симуляции:", result)
+      console.log(tokenAddress, toAddress, transferAmount, fromAddress)
+      // TODO: тут ошибка, а идет сообщение что перевод успешен
+    } catch (error) {
+      // console.log(error.message)
+      // return ErrorHandler.handleAndResponse(error)
+    }
   }
 }
 
@@ -185,6 +192,11 @@ const poolAbi = parseAbi([
 export const swapEventAbi = parseAbiItem(
   "event Swap(address indexed sender, address indexed recipient, int256 amount0, int256 amount1, uint160 sqrtPriceX96, uint128 liquidity, int24 tick)",
 )
+
+export type TokenInfo = {
+  symbol: string
+  decimals: number
+}
 
 /*
 Токены BSC TestNet:
