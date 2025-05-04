@@ -1,4 +1,4 @@
-import { forwardRef, Module } from "@nestjs/common"
+import { Module } from "@nestjs/common"
 import { BotsController } from "./bots.controller"
 import { BotsService } from "./bots.service"
 import { TelegramApiProvider } from "../providers/bots/telegram/TelegramApiProvider"

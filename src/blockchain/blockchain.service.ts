@@ -11,12 +11,18 @@ import { absBigInt } from "../utils/Calc"
 import { EventEmitter2 } from "@nestjs/event-emitter"
 import { events, SendBotEvent } from "../events/events"
 import { User } from "../users/user.entity"
+import { ConfigService } from "@nestjs/config"
+import { Config } from "../config/config"
+import { ISwapProvider } from "./ISwapProvider"
+import { Uniswap } from "../providers/nets/Uniswap"
+import { Pancake } from "../providers/nets/Pancake"
 
 @Injectable()
 export class BlockchainService {
   // private readonly defaultBlockchain = Blockchain.BSC
-  private readonly defaultBlockchain = Blockchain.POLYGON
+  private readonly defaultBlockchain: Blockchain
   private clients: Map<Blockchain, PublicClient> = new Map()
+  private pools: Map<Blockchain, ISwapProvider> = new Map()
   private readonly messages = {
     WRONG_WALLET_OR_TOKEN: "Неверный адрес кошелька или токена.",
     TOKEN_ERROR: "Ошибка с адресом токена. Возможно токен не принадлежит текущей сети.",
@@ -25,25 +31,41 @@ export class BlockchainService {
   } as const
   private isSimulateSwap: boolean = false
 
-  constructor(private readonly eventEmitter: EventEmitter2) {
+  constructor(
+    private readonly eventEmitter: EventEmitter2,
+    private readonly configService: ConfigService,
+  ) {
+    const blockchain = configService.get<string>(Config.BLOCKCHAIN)
+    this.defaultBlockchain = Object.values(Blockchain).includes(blockchain as Blockchain)
+      ? (blockchain as Blockchain)
+      : Blockchain.POLYGON
     this.initBlockchainClients()
   }
 
   private initBlockchainClients() {
     const bscClient = createPublicClient({
       chain: bscTestnet,
-      // chain: bsc,
       transport: http(),
     })
     const polygonClient = createPublicClient({
       chain: polygon,
-      // chain: polygonMumbai,
       transport: http(),
     })
 
-    this.clients.set(Blockchain.BSC, bscClient)
     this.clients.set(Blockchain.POLYGON, polygonClient)
+    this.clients.set(Blockchain.BSC, bscClient)
+
+    this.pools.set(Blockchain.POLYGON, new Uniswap(this))
+    this.pools.set(Blockchain.BSC, new Pancake(this))
+
     console.log(this.defaultBlockchain)
+  }
+
+  // TODO: вызвать из swap observer
+  getPool(poolType: Blockchain = this.defaultBlockchain) {
+    const pool = this.pools.get(poolType)
+    if (!pool) throw Error("Обменник не найден.")
+    return pool
   }
 
   getClient(clientType: Blockchain = this.defaultBlockchain): PublicClient {
