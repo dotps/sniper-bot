@@ -61,7 +61,7 @@ export class BlockchainService {
     console.log(this.defaultBlockchain)
   }
 
-  // TODO: вызвать из swap observer
+  // TODO: вызвать из  swap observer
   getPool(poolType: Blockchain = this.defaultBlockchain) {
     const pool = this.pools.get(poolType)
     if (!pool) throw Error("Обменник не найден.")
