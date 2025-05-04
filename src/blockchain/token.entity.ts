@@ -10,7 +10,7 @@ export class Token {
   readonly id: number
 
   @Column()
-  readonly address: Hex
+   address: Hex
 
   @Column()
   readonly symbol: string

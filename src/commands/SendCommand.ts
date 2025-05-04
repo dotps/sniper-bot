@@ -8,6 +8,8 @@ import { ErrorHandler } from "../errors/ErrorHandler"
 import { WalletService } from "../blockchain/wallet.service"
 import { BlockchainService } from "../blockchain/blockchain.service"
 import { ResponseBotError } from "../errors/ResponseBotError"
+import { Token } from "../blockchain/token.entity"
+import { plainToClass } from "class-transformer"
 
 export class SendCommand implements ICommand {
   private readonly messages = {
@@ -15,6 +17,7 @@ export class SendCommand implements ICommand {
     NEED_TO_ADDRESS: `Требуется адрес получателя.\n${Commands.SEND} адрес_токена сумма адрес_получателя`,
     NEED_AMOUNT: `Требуется сумма для перевода.\n${Commands.SEND} адрес_токена сумма адрес_получателя`,
     SUCCESS: "Перевод на кошелек успешно проведен.",
+    ERROR: "Ошибка при переводе.",
   } as const
 
   constructor(
@@ -30,13 +33,13 @@ export class SendCommand implements ICommand {
     try {
       const { tokenAddress, amount, toAddress } = this.validateAndParseParams()
       const tokenInfo = await this.blockchainService.getTokenInfo(tokenAddress)
-      const transferAmount = parseUnits(amount, tokenInfo.decimals)
+      const token = plainToClass(Token, { address: tokenAddress, ...tokenInfo })
+
+      const transferAmount = parseUnits(amount, token.decimals)
       if (!transferAmount) return new ResponseData(this.messages.NEED_AMOUNT)
 
       const fromAddress = await this.walletService.getWalletAddress(this.user.id)
-      // await this.walletService.sendToken(tokenAddress, toAddress, transferAmount, this.user.id)
-      //
-      await this.blockchainService.executeTokenTransfer(fromAddress, toAddress, tokenAddress, transferAmount)
+      await this.blockchainService.transferToken(fromAddress, toAddress, token, transferAmount)
 
       return new ResponseData(this.messages.SUCCESS)
     } catch (error) {

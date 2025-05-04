@@ -1,6 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, Unique } from "typeorm"
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, Unique, Relation } from "typeorm"
 import { Hex } from "viem"
 import { User } from "../users/user.entity"
+import { forwardRef } from "@nestjs/common"
 
 @Entity()
 @Unique(["wallet", "userId"])
@@ -17,4 +18,9 @@ export class FollowWallet {
 
   @ManyToOne(() => User, (user) => user.followWallets)
   user: User
+
+  // TODO: разобраться с циклическими зависимостями для компилятора swc
+
+  // @ManyToOne(() => User, (user) => user.followWallets)
+  // user: Relation<User>
 }

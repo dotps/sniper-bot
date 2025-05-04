@@ -22,6 +22,7 @@ export class BlockchainService {
     WRONG_WALLET_OR_TOKEN: "Неверный адрес кошелька или токена.",
     TOKEN_ERROR: "Ошибка с адресом токена. Возможно токен не принадлежит текущей сети.",
     TOKEN_CONTRACT_ERROR: "Не удалось прочитать контракт токена.",
+    BALANCE_EMPTY: "Не хватает средств на балансе.",
   } as const
   private isSimulateSwap: boolean = false
 
@@ -133,12 +134,14 @@ export class BlockchainService {
     const token = plainToClass(Token, tokenForPayment)
     const tokenPaymentBalance = await this.getTokenBalance(swap.recipient, token)
 
+    // TODO: можно не через событие делать а через ResponseBotError
     if (!tokenPaymentBalance || tokenPaymentBalance < absBigInt(swap.amountSpecified)) {
       const event: SendBotEvent = {
         user: user,
         text: `Недостаточно средств: ${token.symbol}`,
       }
       this.eventEmitter.emit(events.SEND_BOT_RESPONSE, event)
+      return
     }
 
     if (!this.isSimulateSwap) return
@@ -156,23 +159,20 @@ export class BlockchainService {
     }
   }
 
-  async executeTokenTransfer(fromAddress: Hex, toAddress: Hex, tokenAddress: Hex, transferAmount: bigint) {
-    console.log("+++++")
-    // TODO: отправка токена
+  async transferToken(fromAddress: Hex, toAddress: Hex, token: Token, transferAmount: bigint): Promise<void> {
+    const balance = await this.getTokenBalance(fromAddress, token)
+    if (transferAmount >= balance) throw new ResponseBotError(this.messages.BALANCE_EMPTY)
+
     try {
       const result = await this.getClient().simulateContract({
-        address: tokenAddress,
+        address: token.address,
         abi: erc20Abi,
         functionName: "transfer",
         args: [toAddress, transferAmount],
         account: fromAddress,
       })
-      console.log("Результат симуляции:", result)
-      console.log(tokenAddress, toAddress, transferAmount, fromAddress)
-      // TODO: тут ошибка, а идет сообщение что перевод успешен
     } catch (error) {
-      // console.log(error.message)
-      // return ErrorHandler.handleAndResponse(error)
+      throw new ResponseBotError(`Ошибка при переводе ${token.symbol}.`, error)
     }
   }
 }
