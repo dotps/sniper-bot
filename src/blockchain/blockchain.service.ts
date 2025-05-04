@@ -11,7 +11,6 @@ import { absBigInt } from "../utils/Calc"
 import { EventEmitter2 } from "@nestjs/event-emitter"
 import { events, SendBotEvent } from "../events/events"
 import { User } from "../users/user.entity"
-import { ErrorHandler } from "../errors/ErrorHandler"
 
 @Injectable()
 export class BlockchainService {
@@ -42,7 +41,7 @@ export class BlockchainService {
       transport: http(),
     })
 
-    this.clients.set(Blockchain.BSC, bscClient) // TODO: можно перейти на строки bscClient.chain.name, чтобы не создавать enum
+    this.clients.set(Blockchain.BSC, bscClient)
     this.clients.set(Blockchain.POLYGON, polygonClient)
     console.log(this.defaultBlockchain)
   }
@@ -130,11 +129,10 @@ export class BlockchainService {
     return { token0, token1 }
   }
 
-  async executeSwap(swap: Swap, tokenForPayment: PoolToken, user: User) {
+  async executeSwap(swap: Swap, tokenForPayment: PoolToken, user: User): Promise<void> {
     const token = plainToClass(Token, tokenForPayment)
     const tokenPaymentBalance = await this.getTokenBalance(swap.recipient, token)
 
-    // TODO: можно не через событие делать а через ResponseBotError
     if (!tokenPaymentBalance || tokenPaymentBalance < absBigInt(swap.amountSpecified)) {
       const event: SendBotEvent = {
         user: user,
@@ -199,16 +197,8 @@ export type TokenInfo = {
 }
 
 /*
-Токены BSC TestNet:
-Токен USDT: 0x337610d27c682E347C9cD60BD4b3b107C9d34dDd
-Токен BUSD: 0x8301F2213c0eeD49a7E28Ae4c3e91722919B8B47
-Токен CAKE: 0x8d008B313C1d6C7fE2982F62d32Da7507cF43551
-
 0xd0567bb38fa5bad45150026281c43fa6031577b9 - часто идут транзакции
-
 0xF6dD294C065DDE53CcA856249FB34ae67BE5C54C - мой кошелек
-
-0x22579CA45eE22E2E16dDF72D955D6cf4c767B0eF - кошелек (кран) с celo
 
 Популярные адреса polygon uniswap
 0xe592427a0aece92de3edee1f18e0157c05861564
@@ -220,23 +210,4 @@ export type TokenInfo = {
 0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359
 0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619
 
-====================
-Токены BSC:
-Токен USDT: 0x55d398326f99059fF775485246999027B3197955
-Токен BUSD: 0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56
-Токен CAKE: 0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82
  */
-
-/*
-TODO:
- Автоматическое повторение сделок
- Оповещение при недостатке баланса
- Перевод токенов (подключить блокчейн)
- */
-
-// TODO: попробовать через pancake
-// const pancakeSwapRouterAddress: Hex = "0xD99D1c33F9fC3444f8101754aBC46c52416550D1" // для BSC Testnet
-// export const pancakeSwapRouter = {
-//   address: pancakeSwapRouterAddress,
-//   abi: pancakeRouterV2Abi,
-// }
