@@ -24,8 +24,7 @@ export class BotsService implements OnModuleInit {
     private readonly commandHandler: BotCommandHandler,
     private readonly userService: UserService,
     private readonly eventEmitter: EventEmitter2,
-  ) {
-  }
+  ) {}
 
   addBot<T extends BotProvider>(botClass: new (...args: any[]) => T, bot: T): void {
     this.bots.set(botClass, bot)
@@ -42,7 +41,7 @@ export class BotsService implements OnModuleInit {
       await bot.init()
       if (bot.isUseIntervalUpdate()) {
         setInterval(() => {
-          this.getUpdates(bot).catch((error) => {
+          this.getUpdates(bot).catch(() => {
             Logger.error("Ошибка обработки данных от провайдера бота.")
           })
         }, bot.getUpdateInterval())

@@ -9,20 +9,33 @@ import { RequestDto } from "../../../bots/bots.service"
 import { TelegramUpdatesDto, TelegramBaseDto } from "../../../bots/telegram/telegramUpdatesDto"
 import { plainToClass } from "class-transformer"
 import { validate } from "class-validator"
+import { ConfigService } from "@nestjs/config"
+import { Config } from "../../../config/config"
 
 export class TelegramApiProvider implements IBotProvider {
-  private readonly apiUrl: string = "https://api.telegram.org/bot"
-  private readonly token: string = TelegramConfig.token
-  private readonly baseUrl: string = this.apiUrl + this.token + "/"
-  private readonly canUseWebhook: boolean = TelegramConfig.canUseWebhook
-  private readonly canUseUpdate: boolean = TelegramConfig.canUseUpdate
+  private readonly apiUrl: string
+  private readonly token: string
+  private readonly baseUrl: string
+  private readonly canUseWebhook: boolean
+  private readonly canUseUpdate: boolean
   private readonly botType: BotType = BotType.TELEGRAM
   private lastUpdateId: number = 0
   private isBotRunning: boolean = false
   private updateInterval: number = 5000
 
-  constructor(private readonly webRequestService: IWebRequestService) {
+  constructor(
+    private readonly webRequestService: IWebRequestService,
+    private readonly configService: ConfigService,
+  ) {
     // TODO: добавить загрузку настроек
+    this.token = this.configService.get<string>(Config.TELEGRAM_TOKEN) ?? ""
+    this.apiUrl = this.configService.get<string>(Config.TELEGRAM_API_URL) ?? ""
+    this.canUseWebhook = this.configService.get<boolean>(Config.TELEGRAM_USE_WEBHOOK) ?? true
+    this.canUseUpdate = this.configService.get<boolean>(Config.TELEGRAM_USE_UPDATE) ?? false
+    console.log(this.canUseWebhook)
+    console.log(this.canUseUpdate)
+    this.baseUrl = this.apiUrl + this.token + "/"
+    // TODO: почему-то update продолжает работать
   }
 
   getBotType(): BotType {

@@ -35,7 +35,7 @@ export class BlockchainService {
     private readonly eventEmitter: EventEmitter2,
     private readonly configService: ConfigService,
   ) {
-    const blockchain = configService.get<string>(Config.BLOCKCHAIN)
+    const blockchain = this.configService.get<string>(Config.BLOCKCHAIN)
     this.defaultBlockchain = Object.values(Blockchain).includes(blockchain as Blockchain)
       ? (blockchain as Blockchain)
       : Blockchain.POLYGON

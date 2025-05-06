@@ -19,21 +19,24 @@ import { BlockchainService } from "../blockchain/blockchain.service"
 import { BlockchainModule } from "../blockchain/blockchain.module"
 import { SwapObserverService } from "../blockchain/swap-observer.service"
 import { EventEmitterModule } from "@nestjs/event-emitter"
+import { ConfigModule, ConfigService } from "@nestjs/config"
 
 const webRequestService = new WebRequestFetchService()
 
 const telegramBot = {
   provide: TelegramApiProvider,
-  useFactory: () => {
-    return new TelegramApiProvider(webRequestService)
+  useFactory: (configService: ConfigService) => {
+    return new TelegramApiProvider(webRequestService, configService)
   },
+  inject: [ConfigService],
 }
 
 const vkBot = {
   provide: VkApiProvider,
-  useFactory: () => {
-    return new VkApiProvider(webRequestService)
+  useFactory: (configService: ConfigService) => {
+    return new VkApiProvider(webRequestService, configService)
   },
+  inject: [ConfigService],
 }
 
 const commandFactory = {
@@ -64,6 +67,7 @@ const commandHandler = {
     BlockchainModule,
     TypeOrmModule.forFeature([Token, FollowWallet, Replicate, Wallet]),
     EventEmitterModule.forRoot(),
+    ConfigModule,
   ],
   controllers: [BotsController],
   providers: [
@@ -75,6 +79,7 @@ const commandHandler = {
     TokenService,
     WalletService,
     SwapObserverService,
+    ConfigService,
   ],
 })
 export class BotsModule {}
