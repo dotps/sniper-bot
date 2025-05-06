@@ -22,7 +22,7 @@ export class BlockchainService {
   // private readonly defaultBlockchain = Blockchain.BSC
   private readonly defaultBlockchain: Blockchain
   private clients: Map<Blockchain, PublicClient> = new Map()
-  private pools: Map<Blockchain, ISwapProvider> = new Map()
+  private swapProviders: Map<Blockchain, ISwapProvider> = new Map()
   private readonly messages = {
     WRONG_WALLET_OR_TOKEN: "Неверный адрес кошелька или токена.",
     TOKEN_ERROR: "Ошибка с адресом токена. Возможно токен не принадлежит текущей сети.",
@@ -55,17 +55,16 @@ export class BlockchainService {
     this.clients.set(Blockchain.POLYGON, polygonClient)
     this.clients.set(Blockchain.BSC, bscClient)
 
-    this.pools.set(Blockchain.POLYGON, new Uniswap(this))
-    this.pools.set(Blockchain.BSC, new Pancake(this))
+    this.swapProviders.set(Blockchain.POLYGON, new Uniswap(this))
+    this.swapProviders.set(Blockchain.BSC, new Pancake(this))
 
     console.log(this.defaultBlockchain)
   }
 
-  // TODO: вызвать из  swap observer
-  getPool(poolType: Blockchain = this.defaultBlockchain) {
-    const pool = this.pools.get(poolType)
-    if (!pool) throw Error("Обменник не найден.")
-    return pool
+  getSwapProvider(poolType: Blockchain = this.defaultBlockchain) {
+    const swapProvider = this.swapProviders.get(poolType)
+    if (!swapProvider) throw Error("Обменник не найден.")
+    return swapProvider
   }
 
   getClient(clientType: Blockchain = this.defaultBlockchain): PublicClient {

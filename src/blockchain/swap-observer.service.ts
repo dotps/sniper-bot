@@ -23,10 +23,10 @@ export class SwapObserverService implements OnModuleInit {
     private readonly userService: UserService,
   ) {
     this.client = this.blockchainService.getClient()
+    this.swapProvider = this.blockchainService.getSwapProvider()
   }
 
   async onModuleInit() {
-    this.swapProvider = new Uniswap(this.blockchainService)
     await this.swapProvider.init()
     await this.updateObservedWallets()
     await this.watchSwaps()
