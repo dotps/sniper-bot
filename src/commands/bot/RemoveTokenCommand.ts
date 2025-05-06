@@ -1,19 +1,19 @@
-import { ICommand } from "./infrastructure/ICommand"
-import { ResponseData } from "../data/ResponseData"
-import { Command } from "./infrastructure/CommandHandler"
-import { User } from "../users/user.entity"
-import { TokenService } from "../blockchain/token.service"
-import { TokenDto } from "../blockchain/token.dto"
+import { ICommand } from "../infrastructure/ICommand"
+import { ResponseData } from "../../data/ResponseData"
+import { Command } from "../infrastructure/BotCommandHandler"
+import { User } from "../../users/user.entity"
+import { TokenService } from "../../blockchain/token.service"
+import { TokenDto } from "../../blockchain/token.dto"
 import { Hex, isAddress } from "viem"
-import { Commands } from "./Commands"
-import { ErrorHandler } from "../errors/ErrorHandler"
+import { BotCommands } from "./BotCommands"
+import { ErrorHandler } from "../../errors/ErrorHandler"
 
 export class RemoveTokenCommand implements ICommand {
   private readonly tokenService: TokenService
   private readonly commandData: Command
   private readonly user: User
   private readonly messages = {
-    NEED_TOKEN: `Требуется адрес токена или all для удаления всех токенов из списка.\n${Commands.REMOVE_TOKEN} адрес_токена\n${Commands.REMOVE_TOKEN} all`,
+    NEED_TOKEN: `Требуется адрес токена или all для удаления всех токенов из списка.\n${BotCommands.REMOVE_TOKEN} адрес_токена\n${BotCommands.REMOVE_TOKEN} all`,
     SUCCESS: "Токен успешно удален.",
     SUCCESS_ALL: "Все токены успешно удалены.",
   } as const

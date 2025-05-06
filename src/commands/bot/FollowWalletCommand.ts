@@ -1,18 +1,18 @@
-import { ICommand } from "./infrastructure/ICommand"
-import { ResponseData } from "../data/ResponseData"
-import { Command } from "./infrastructure/CommandHandler"
-import { User } from "../users/user.entity"
-import { Commands } from "./Commands"
-import { WalletService } from "../blockchain/wallet.service"
+import { ICommand } from "../infrastructure/ICommand"
+import { ResponseData } from "../../data/ResponseData"
+import { Command } from "../infrastructure/BotCommandHandler"
+import { User } from "../../users/user.entity"
+import { BotCommands } from "./BotCommands"
+import { WalletService } from "../../blockchain/wallet.service"
 import { isAddress } from "viem"
-import { ErrorHandler } from "../errors/ErrorHandler"
+import { ErrorHandler } from "../../errors/ErrorHandler"
 
 export class FollowWalletCommand implements ICommand {
   private readonly walletService: WalletService
   private readonly commandData: Command
   private readonly user: User
   private readonly messages = {
-    NEED_WALLET: `Требуется адрес кошелька.\n${Commands.FOLLOW} адрес_кошелька`,
+    NEED_WALLET: `Требуется адрес кошелька.\n${BotCommands.FOLLOW} адрес_кошелька`,
     SUCCESS: "Подписка на кошелек успешно оформлена.",
   } as const
 

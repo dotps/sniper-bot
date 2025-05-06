@@ -1,20 +1,20 @@
-import { ICommand } from "./infrastructure/ICommand"
-import { ResponseData } from "../data/ResponseData"
-import { Command } from "./infrastructure/CommandHandler"
-import { User } from "../users/user.entity"
-import { TokenService } from "../blockchain/token.service"
-import { TokenDto } from "../blockchain/token.dto"
+import { ICommand } from "../infrastructure/ICommand"
+import { ResponseData } from "../../data/ResponseData"
+import { Command } from "../infrastructure/BotCommandHandler"
+import { User } from "../../users/user.entity"
+import { TokenService } from "../../blockchain/token.service"
+import { TokenDto } from "../../blockchain/token.dto"
 import { Hex, isAddress } from "viem"
-import { ResponseBotError } from "../errors/ResponseBotError"
-import { Logger } from "../utils/Logger"
-import { Commands } from "./Commands"
-import { BlockchainService } from "../blockchain/blockchain.service"
+import { ResponseBotError } from "../../errors/ResponseBotError"
+import { Logger } from "../../utils/Logger"
+import { BotCommands } from "./BotCommands"
+import { BlockchainService } from "../../blockchain/blockchain.service"
 
 export class AddTokenCommand implements ICommand {
   private readonly messages = {
     TOKEN_LIST: "Список токенов:\n",
     ADDED: "Токен успешно добавлен.",
-    NEED_TOKEN: "Укажите токен. " + Commands.ADD_TOKEN + " адрес_токена",
+    NEED_TOKEN: "Укажите токен. " + BotCommands.ADD_TOKEN + " адрес_токена",
     WRONG_TOKEN: "Токен не валиден для текущей сети.",
   } as const
 

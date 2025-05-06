@@ -3,11 +3,11 @@ import { Hex, isAddress, PublicClient, WatchEventOnLogsParameter } from "viem"
 import { BlockchainService, swapEventAbi } from "./blockchain.service"
 import { WalletService } from "./wallet.service"
 import { FollowWallet } from "./follow-wallet.entity"
-import { Uniswap } from "../providers/nets/Uniswap"
-import { ISwapProvider } from "./ISwapProvider"
+import { ISwapProvider } from "../providers/nets/ISwapProvider"
 import { PoolTokenPair } from "./PoolTokenPair"
-import { ReplicateSwapCommand } from "../commands/ReplicateSwapCommand"
+import { ReplicateSwapCommand } from "../commands/blockchain/ReplicateSwapCommand"
 import { UserService } from "../users/user.service"
+import { Logger } from "src/utils/Logger"
 
 @Injectable()
 export class SwapObserverService implements OnModuleInit {
@@ -38,20 +38,24 @@ export class SwapObserverService implements OnModuleInit {
   }
 
   async watchSwaps() {
-    this.pools = this.swapProvider.getPools()
-    const poolsAddresses = [...this.pools.keys()]
+    try {
+      this.pools = this.swapProvider.getPools()
+      const poolsAddresses = [...this.pools.keys()]
 
-    const unwatch = this.client.watchEvent({
-      address: poolsAddresses,
-      event: swapEventAbi,
-      onLogs: (logs) => {
-        const swaps = this.getSwapsOfObservableWallets(logs)
-        for (const swap of swaps) {
-          const command = new ReplicateSwapCommand(this.blockchainService, this.userService, this.walletService, swap)
-          command.execute()
-        }
-      },
-    })
+      const unwatch = this.client.watchEvent({
+        address: poolsAddresses,
+        event: swapEventAbi,
+        onLogs: (logs) => {
+          const swaps = this.getSwapsOfObservableWallets(logs)
+          for (const swap of swaps) {
+            const command = new ReplicateSwapCommand(this.blockchainService, this.walletService, swap)
+            command.execute()
+          }
+        },
+      })
+    } catch (error) {
+      Logger.error(error)
+    }
   }
 
   private getSwapsOfObservableWallets(logs: WatchEventOnLogsParameter<typeof swapEventAbi>): SwapLog[] {

@@ -1,8 +1,8 @@
-import { ICommand } from "./infrastructure/ICommand"
-import { ResponseData } from "../data/ResponseData"
-import { User } from "../users/user.entity"
-import { WalletService } from "../blockchain/wallet.service"
-import { ErrorHandler } from "../errors/ErrorHandler"
+import { ICommand } from "../infrastructure/ICommand"
+import { ResponseData } from "../../data/ResponseData"
+import { User } from "../../users/user.entity"
+import { WalletService } from "../../blockchain/wallet.service"
+import { ErrorHandler } from "../../errors/ErrorHandler"
 
 export class SubscriptionsCommand implements ICommand {
   private readonly walletService: WalletService

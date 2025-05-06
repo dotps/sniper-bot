@@ -1,21 +1,19 @@
-import { ICommand } from "./infrastructure/ICommand"
-import { ResponseData } from "../data/ResponseData"
-import { BlockchainService } from "../blockchain/blockchain.service"
-import { SwapLog } from "../blockchain/swap-observer.service"
-import { UserService } from "../users/user.service"
-import { WalletService } from "../blockchain/wallet.service"
-import { ReplicateDealCommand } from "./ReplicateCommand"
+import { ICommand } from "../infrastructure/ICommand"
+import { ResponseData } from "../../data/ResponseData"
+import { BlockchainService } from "../../blockchain/blockchain.service"
+import { SwapLog } from "../../blockchain/swap-observer.service"
+import { WalletService } from "../../blockchain/wallet.service"
+import { ReplicateDealCommand } from "../bot/ReplicateCommand"
 import { Hex, isAddress } from "viem"
-import { absBigInt, calculateSqrtPriceWithSlippage, clampMax } from "../utils/Calc"
-import { Wallet } from "../blockchain/wallet.entity"
-import { Replicate } from "../blockchain/replicate.entity"
+import { absBigInt, calculateSqrtPriceWithSlippage, clampMax } from "../../utils/Calc"
+import { Wallet } from "../../blockchain/wallet.entity"
+import { Replicate } from "../../blockchain/replicate.entity"
 
 export class ReplicateSwapCommand implements ICommand {
   private readonly slippagePercent = 0.5
 
   constructor(
     private readonly blockchainService: BlockchainService,
-    private readonly userService: UserService,
     private readonly walletService: WalletService,
     private readonly swapLog: SwapLog,
   ) {}

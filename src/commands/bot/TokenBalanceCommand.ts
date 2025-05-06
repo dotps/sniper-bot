@@ -1,11 +1,11 @@
-import { ICommand } from "./infrastructure/ICommand"
-import { ResponseData } from "../data/ResponseData"
-import { User } from "../users/user.entity"
-import { TokenService } from "../blockchain/token.service"
-import { ResponseBotError } from "../errors/ResponseBotError"
-import { Logger } from "../utils/Logger"
-import { BlockchainService } from "../blockchain/blockchain.service"
-import { WalletService } from "../blockchain/wallet.service"
+import { ICommand } from "../infrastructure/ICommand"
+import { ResponseData } from "../../data/ResponseData"
+import { User } from "../../users/user.entity"
+import { TokenService } from "../../blockchain/token.service"
+import { ResponseBotError } from "../../errors/ResponseBotError"
+import { Logger } from "../../utils/Logger"
+import { BlockchainService } from "../../blockchain/blockchain.service"
+import { WalletService } from "../../blockchain/wallet.service"
 
 export class TokenBalanceCommand implements ICommand {
   private readonly messages = {

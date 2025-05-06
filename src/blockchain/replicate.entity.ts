@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, Unique } from "typeorm"
 import { User } from "../users/user.entity"
-import { ReplicateDealCommand } from "../commands/ReplicateCommand"
+import { ReplicateDealCommand } from "../commands/bot/ReplicateCommand"
 import { Token } from "./token.entity"
 
 @Entity()

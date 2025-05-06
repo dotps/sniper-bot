@@ -10,7 +10,7 @@ export class TelegramGetUpdatesResponse {
       return
     }
 
-    // TODO: все проверить и реализовать проще, по идее это все не нужно т.к есть QueryDto в bots контроллере
+    // TODO: все проверить и реализовать проще, по идее это все не нужно т.к есть QueryDto в bot контроллере
     this.updates = data.map((update) => {
       const updateData: IQueryData = {
         updateId: Number(update?.update_id) || 0,

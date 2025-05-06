@@ -1,5 +1,5 @@
 import { ICommand } from "./ICommand"
-import { Command } from "./CommandHandler"
+import { Command } from "./BotCommandHandler"
 import { User } from "../../users/user.entity"
 
 export interface ICommandFactory {

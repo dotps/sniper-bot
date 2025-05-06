@@ -1,8 +1,8 @@
-import { ICommand } from "./infrastructure/ICommand"
-import { ResponseData } from "../data/ResponseData"
-import { UserService } from "../users/user.service"
-import { User } from "../users/user.entity"
-import { WalletService } from "../blockchain/wallet.service"
+import { ICommand } from "../infrastructure/ICommand"
+import { ResponseData } from "../../data/ResponseData"
+import { UserService } from "../../users/user.service"
+import { User } from "../../users/user.entity"
+import { WalletService } from "../../blockchain/wallet.service"
 
 export class StartCommand implements ICommand {
   private readonly messages = {

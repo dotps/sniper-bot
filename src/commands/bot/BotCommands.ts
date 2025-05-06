@@ -1,4 +1,4 @@
-export enum Commands {
+export enum BotCommands {
   EXIT = "/exit",
   START = "/start",
   ADD_TOKEN = "/addtoken",

@@ -3,15 +3,14 @@ import { IQueryData } from "../../data/IQueryData"
 import { Injectable } from "@nestjs/common"
 import { Logger } from "../../utils/Logger"
 import { ICommandFactory } from "./ICommandFactory"
-import { Commands } from "../Commands"
+import { BotCommands } from "../bot/BotCommands"
 import { UserService } from "../../users/user.service"
 
 @Injectable()
-export class CommandHandler {
-  // TODO: переделать сообщения в одном стиле this.messages.TEST
+export class BotCommandHandler {
   private defaultMessage: string = "Неизвестная команда."
-  private needRegisterMessage: string = `Для взаимодействия с ботом необходимо зарегистрироваться. Отправьте ${Commands.START} для начала.`
-  private enterCommandMessage: string = `Для взаимодействия с ботом необходимо ввести команду. Отправьте ${Commands.START} для начала.`
+  private needRegisterMessage: string = `Для взаимодействия с ботом необходимо зарегистрироваться. Отправьте ${BotCommands.START} для начала.`
+  private enterCommandMessage: string = `Для взаимодействия с ботом необходимо ввести команду. Отправьте ${BotCommands.START} для начала.`
 
   constructor(
     private commandFactory: ICommandFactory,
@@ -24,7 +23,7 @@ export class CommandHandler {
       if (!parsedCommand) return new ResponseData(this.enterCommandMessage)
 
       let user = await this.userService.getUser(updateData.userId, updateData.botType)
-      if (parsedCommand.command !== Commands.START && !user) return new ResponseData(this.needRegisterMessage)
+      if (parsedCommand.command !== BotCommands.START && !user) return new ResponseData(this.needRegisterMessage)
       if (!user) user = this.userService.createUnregisteredUser(updateData)
 
       const command = this.commandFactory.createCommand(user, parsedCommand)
@@ -40,7 +39,7 @@ export class CommandHandler {
     const commands = input.toLowerCase().trim().match(/\/\w+/g)
     if (!commands || commands.length > 1) return null
 
-    const command = commands[0] as Commands
+    const command = commands[0] as BotCommands
     const clearedInput = input.replace(command, "").trim()
     const params = clearedInput ? clearedInput.split(/\s+/) : undefined
 
@@ -52,6 +51,6 @@ export class CommandHandler {
 }
 
 export type Command = {
-  command: Commands
+  command: BotCommands
   params?: string[]
 }

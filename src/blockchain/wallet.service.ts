@@ -4,13 +4,13 @@ import { In, Repository } from "typeorm"
 import { FollowWallet } from "./follow-wallet.entity"
 import { createWalletClient, Hex, http, WalletClient } from "viem"
 import { ResponseBotError } from "../errors/ResponseBotError"
-import { ReplicateDealCommand } from "../commands/ReplicateCommand"
+import { ReplicateDealCommand } from "../commands/bot/ReplicateCommand"
 import { Replicate } from "./replicate.entity"
 import { DBError } from "../errors/DBError"
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts"
 import { Wallet } from "./wallet.entity"
 import { BlockchainService } from "./blockchain.service"
-import { Commands } from "../commands/Commands"
+import { BotCommands } from "../commands/bot/BotCommands"
 import { SwapObserverService } from "./swap-observer.service"
 import { Token } from "./token.entity"
 
@@ -20,7 +20,7 @@ export class WalletService {
     FOLLOW_WALLET_EXIST: "Такой кошелек уже отслеживается.",
     FOLLOW_WALLET_NOT_FOUND: "Подписка не найдена.",
     REPEATED_DEALS: "Повторные сделки: ",
-    WALLET_NOT_FOUND: `Кошелек не найден. ${Commands.WALLET} для создания кошелька.`,
+    WALLET_NOT_FOUND: `Кошелек не найден. ${BotCommands.WALLET} для создания кошелька.`,
   } as const
 
   constructor(

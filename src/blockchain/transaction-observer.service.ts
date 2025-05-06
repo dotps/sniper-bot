@@ -4,7 +4,7 @@ import { Logger } from "../utils/Logger"
 import { BlockchainService } from "./blockchain.service"
 import { WalletService } from "./wallet.service"
 import { FollowWallet } from "./follow-wallet.entity"
-import { ReplicateSwapCommand } from "../commands/ReplicateSwapCommand"
+import { ReplicateSwapCommand } from "../commands/blockchain/ReplicateSwapCommand"
 
 @Injectable()
 export class TransactionObserverService implements OnModuleInit {

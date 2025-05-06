@@ -6,8 +6,8 @@ import { WebRequestFetchService } from "../providers/WebRequestFetchService"
 import { UserModule } from "../users/user.module"
 import { VkApiProvider } from "../providers/bots/vk/VkApiProvider"
 import { UserService } from "../users/user.service"
-import { CommandFactory } from "../commands/infrastructure/CommandFactory"
-import { CommandHandler } from "../commands/infrastructure/CommandHandler"
+import { BotCommandFactory } from "../commands/infrastructure/BotCommandFactory"
+import { BotCommandHandler } from "../commands/infrastructure/BotCommandHandler"
 import { TokenService } from "../blockchain/token.service"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import { Token } from "../blockchain/token.entity"
@@ -37,24 +37,24 @@ const vkBot = {
 }
 
 const commandFactory = {
-  provide: CommandFactory,
+  provide: BotCommandFactory,
   useFactory: (
     userService: UserService,
     tokenService: TokenService,
     walletService: WalletService,
     blockchainService: BlockchainService,
   ) => {
-    return new CommandFactory(userService, tokenService, walletService, blockchainService)
+    return new BotCommandFactory(userService, tokenService, walletService, blockchainService)
   },
   inject: [UserService, TokenService, WalletService, BlockchainService],
 }
 
 const commandHandler = {
-  provide: CommandHandler,
-  useFactory: (commandFactory: CommandFactory, userService: UserService) => {
-    return new CommandHandler(commandFactory, userService)
+  provide: BotCommandHandler,
+  useFactory: (commandFactory: BotCommandFactory, userService: UserService) => {
+    return new BotCommandHandler(commandFactory, userService)
   },
-  inject: [CommandFactory, UserService],
+  inject: [BotCommandFactory, UserService],
 }
 
 // TODO: раскидать по разным модулям? что-то тут много всего (часть перенести в AppModule)

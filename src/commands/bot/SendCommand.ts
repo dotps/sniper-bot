@@ -1,21 +1,21 @@
-import { ICommand } from "./infrastructure/ICommand"
-import { ResponseData } from "../data/ResponseData"
-import { Command } from "./infrastructure/CommandHandler"
-import { User } from "../users/user.entity"
+import { ICommand } from "../infrastructure/ICommand"
+import { ResponseData } from "../../data/ResponseData"
+import { Command } from "../infrastructure/BotCommandHandler"
+import { User } from "../../users/user.entity"
 import { Hex, isAddress, parseUnits } from "viem"
-import { Commands } from "./Commands"
-import { ErrorHandler } from "../errors/ErrorHandler"
-import { WalletService } from "../blockchain/wallet.service"
-import { BlockchainService } from "../blockchain/blockchain.service"
-import { ResponseBotError } from "../errors/ResponseBotError"
-import { Token } from "../blockchain/token.entity"
+import { BotCommands } from "./BotCommands"
+import { ErrorHandler } from "../../errors/ErrorHandler"
+import { WalletService } from "../../blockchain/wallet.service"
+import { BlockchainService } from "../../blockchain/blockchain.service"
+import { ResponseBotError } from "../../errors/ResponseBotError"
+import { Token } from "../../blockchain/token.entity"
 import { plainToClass } from "class-transformer"
 
 export class SendCommand implements ICommand {
   private readonly messages = {
-    NEED_TOKEN: `Требуется адрес токена.\n${Commands.SEND} адрес_токена сумма адрес_получателя`,
-    NEED_TO_ADDRESS: `Требуется адрес получателя.\n${Commands.SEND} адрес_токена сумма адрес_получателя`,
-    NEED_AMOUNT: `Требуется сумма для перевода.\n${Commands.SEND} адрес_токена сумма адрес_получателя`,
+    NEED_TOKEN: `Требуется адрес токена.\n${BotCommands.SEND} адрес_токена сумма адрес_получателя`,
+    NEED_TO_ADDRESS: `Требуется адрес получателя.\n${BotCommands.SEND} адрес_токена сумма адрес_получателя`,
+    NEED_AMOUNT: `Требуется сумма для перевода.\n${BotCommands.SEND} адрес_токена сумма адрес_получателя`,
     SUCCESS: "Перевод на кошелек успешно проведен.",
     ERROR: "Ошибка при переводе.",
   } as const

@@ -1,27 +1,27 @@
 import { ICommand } from "./ICommand"
 import { Injectable } from "@nestjs/common"
 import { UserService } from "../../users/user.service"
-import { Command } from "./CommandHandler"
+import { Command } from "./BotCommandHandler"
 import { ICommandFactory } from "./ICommandFactory"
-import { Commands } from "../Commands"
-import { ExitCommand } from "../ExitCommand"
-import { StartCommand } from "../StartCommand"
+import { BotCommands } from "../bot/BotCommands"
+import { ExitCommand } from "../bot/ExitCommand"
+import { StartCommand } from "../bot/StartCommand"
 import { User } from "../../users/user.entity"
-import { AddTokenCommand } from "../AddTokenCommand"
+import { AddTokenCommand } from "../bot/AddTokenCommand"
 import { TokenService } from "../../blockchain/token.service"
-import { TokenBalanceCommand } from "../TokenBalanceCommand"
-import { RemoveTokenCommand } from "../RemoveTokenCommand"
-import { FollowWalletCommand } from "../FollowWalletCommand"
+import { TokenBalanceCommand } from "../bot/TokenBalanceCommand"
+import { RemoveTokenCommand } from "../bot/RemoveTokenCommand"
+import { FollowWalletCommand } from "../bot/FollowWalletCommand"
 import { WalletService } from "../../blockchain/wallet.service"
-import { ReplicateCommand } from "../ReplicateCommand"
-import { SubscriptionsCommand } from "../SubscriptionsCommand"
-import { UnfollowCommand } from "../UnfollowCommand"
-import { SendCommand } from "../SendCommand"
+import { ReplicateCommand } from "../bot/ReplicateCommand"
+import { SubscriptionsCommand } from "../bot/SubscriptionsCommand"
+import { UnfollowCommand } from "../bot/UnfollowCommand"
+import { SendCommand } from "../bot/SendCommand"
 import { BlockchainService } from "../../blockchain/blockchain.service"
-import { WalletCommand } from "../WalletCommand"
+import { WalletCommand } from "../bot/WalletCommand"
 
 @Injectable()
-export class CommandFactory implements ICommandFactory {
+export class BotCommandFactory implements ICommandFactory {
   constructor(
     private readonly userService: UserService,
     private readonly tokenService: TokenService,
@@ -31,27 +31,27 @@ export class CommandFactory implements ICommandFactory {
 
   createCommand(user: User, commandData: Command): ICommand | null {
     switch (commandData.command) {
-      case Commands.EXIT:
+      case BotCommands.EXIT:
         return new ExitCommand()
-      case Commands.START:
+      case BotCommands.START:
         return new StartCommand(this.userService, this.walletService, user)
-      case Commands.ADD_TOKEN:
+      case BotCommands.ADD_TOKEN:
         return new AddTokenCommand(this.tokenService, this.blockchainService, user, commandData)
-      case Commands.REMOVE_TOKEN:
+      case BotCommands.REMOVE_TOKEN:
         return new RemoveTokenCommand(this.tokenService, user, commandData)
-      case Commands.BALANCE:
+      case BotCommands.BALANCE:
         return new TokenBalanceCommand(this.tokenService, this.blockchainService, this.walletService, user)
-      case Commands.FOLLOW:
+      case BotCommands.FOLLOW:
         return new FollowWalletCommand(this.walletService, user, commandData)
-      case Commands.UNFOLLOW:
+      case BotCommands.UNFOLLOW:
         return new UnfollowCommand(this.walletService, user, commandData)
-      case Commands.REPLICATE:
+      case BotCommands.REPLICATE:
         return new ReplicateCommand(this.walletService, user, commandData, this.tokenService)
-      case Commands.SUBSCRIPTIONS:
+      case BotCommands.SUBSCRIPTIONS:
         return new SubscriptionsCommand(this.walletService, user)
-      case Commands.SEND:
+      case BotCommands.SEND:
         return new SendCommand(this.blockchainService, this.walletService, user, commandData)
-      case Commands.WALLET:
+      case BotCommands.WALLET:
         return new WalletCommand(this.walletService, user)
       default:
         return null

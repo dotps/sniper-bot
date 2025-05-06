@@ -1,15 +1,15 @@
-import { ICommand } from "./infrastructure/ICommand"
-import { ResponseData } from "../data/ResponseData"
-import { Command } from "./infrastructure/CommandHandler"
-import { User } from "../users/user.entity"
+import { ICommand } from "../infrastructure/ICommand"
+import { ResponseData } from "../../data/ResponseData"
+import { Command } from "../infrastructure/BotCommandHandler"
+import { User } from "../../users/user.entity"
 import { isAddress } from "viem"
-import { Commands } from "./Commands"
-import { ErrorHandler } from "../errors/ErrorHandler"
-import { WalletService } from "../blockchain/wallet.service"
+import { BotCommands } from "./BotCommands"
+import { ErrorHandler } from "../../errors/ErrorHandler"
+import { WalletService } from "../../blockchain/wallet.service"
 
 export class UnfollowCommand implements ICommand {
   private readonly messages = {
-    NEED_WALLET: `Требуется адрес кошелька.\n${Commands.UNFOLLOW} адрес_кошелька`,
+    NEED_WALLET: `Требуется адрес кошелька.\n${BotCommands.UNFOLLOW} адрес_кошелька`,
     SUCCESS: "Подписка на кошелек успешно удалена.",
   } as const
 

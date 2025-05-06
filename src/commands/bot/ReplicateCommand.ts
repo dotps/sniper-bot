@@ -1,19 +1,19 @@
-import { ICommand } from "./infrastructure/ICommand"
-import { ResponseData } from "../data/ResponseData"
-import { Command } from "./infrastructure/CommandHandler"
-import { User } from "../users/user.entity"
-import { Commands } from "./Commands"
-import { WalletService } from "../blockchain/wallet.service"
-import { ErrorHandler } from "../errors/ErrorHandler"
-import { Hex, isAddress, parseUnits } from "viem"
-import { TokenService } from "../blockchain/token.service"
-import { ResponseBotError } from "../errors/ResponseBotError"
-import { Token } from "../blockchain/token.entity"
+import { ICommand } from "../infrastructure/ICommand"
+import { ResponseData } from "../../data/ResponseData"
+import { Command } from "../infrastructure/BotCommandHandler"
+import { User } from "../../users/user.entity"
+import { BotCommands } from "./BotCommands"
+import { WalletService } from "../../blockchain/wallet.service"
+import { ErrorHandler } from "../../errors/ErrorHandler"
+import { Hex, isAddress } from "viem"
+import { TokenService } from "../../blockchain/token.service"
+import { ResponseBotError } from "../../errors/ResponseBotError"
+import { Token } from "../../blockchain/token.entity"
 
 export class ReplicateCommand implements ICommand {
   private readonly messages = {
-    WRONG_COMMAND: `Неверные параметры команды.\nПример: ${Commands.REPLICATE} buy/sell адрес_токена лимит_суммы.\nПроверьте правильность команды, адреса токена и формат лимита.`,
-    NOT_FOUND_TOKEN: `Токен не обнаружен в списке для торговли.\nИспользуйте команду ${Commands.ADD_TOKEN} чтобы добавить.`,
+    WRONG_COMMAND: `Неверные параметры команды.\nПример: ${BotCommands.REPLICATE} buy/sell адрес_токена лимит_суммы.\nПроверьте правильность команды, адреса токена и формат лимита.`,
+    NOT_FOUND_TOKEN: `Токен не обнаружен в списке для торговли.\nИспользуйте команду ${BotCommands.ADD_TOKEN} чтобы добавить.`,
     SUCCESS: "Повторные сделки подключены.",
     INVALID_TOKEN: "Неверный формат адреса токена.",
     INVALID_LIMIT: "Неверный формат лимита.",
