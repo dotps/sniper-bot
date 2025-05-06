@@ -1,10 +1,9 @@
 import { BotType } from "src/providers/bots/IBotProvider"
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, Relation } from "typeorm"
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm"
 import { Expose } from "class-transformer"
 import { Token } from "../blockchain/token.entity"
 import { FollowWallet } from "../blockchain/follow-wallet.entity"
 import { Wallet } from "../blockchain/wallet.entity"
-import { forwardRef } from "@nestjs/common"
 
 @Entity()
 export class User {

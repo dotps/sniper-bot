@@ -21,7 +21,9 @@ export class TelegramApiProvider implements IBotProvider {
   private isBotRunning: boolean = false
   private updateInterval: number = 5000
 
-  constructor(private readonly webRequestService: IWebRequestService) {}
+  constructor(private readonly webRequestService: IWebRequestService) {
+    // TODO: добавить загрузку настроек
+  }
 
   getBotType(): BotType {
     return this.botType

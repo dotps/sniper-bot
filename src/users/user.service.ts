@@ -24,8 +24,4 @@ export class UserService {
   createUnregisteredUser(data: IQueryData): User {
     return plainToClass(User, data, { excludeExtraneousValues: true })
   }
-
-  // getUsers(usersIds: number[]) {
-  //   return await this.repository.findBy({ id: usersIds })
-  // }
 }
