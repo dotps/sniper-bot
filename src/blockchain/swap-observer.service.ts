@@ -38,15 +38,6 @@ export class SwapObserverService implements OnModuleInit {
   }
 
   async watchSwaps() {
-    // TODO: для сделок нужен fee его надо загружать из пула, доработать getPoolsInfo
-    // сейчас fee просто число в ReplicateSwapCommand
-    /*
-  const fee = await client.readContract({
-  address: poolAddress,
-  abi: poolAbi,
-  functionName: 'fee'
-})
-     */
     this.pools = this.swapProvider.getPools()
     const poolsAddresses = [...this.pools.keys()]
 
