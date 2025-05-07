@@ -1,6 +1,6 @@
-import { BotType } from "../providers/bots/IBotProvider"
+import { BotType } from "./IBotProvider"
 
-export interface IQueryData {
+export interface IBotResponseDto {
   updateId: number
   chatId: number
   userId: number

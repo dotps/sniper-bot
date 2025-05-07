@@ -1,7 +1,7 @@
 import { BotType } from "src/providers/bots/IBotProvider"
-import { IQueryData } from "../IQueryData"
+import { IBotResponseDto } from "./IBotResponseDto"
 
-export class QueryData implements IQueryData {
+export class BotResponseDto implements IBotResponseDto {
   text: string
   updateId: number
   chatId: number

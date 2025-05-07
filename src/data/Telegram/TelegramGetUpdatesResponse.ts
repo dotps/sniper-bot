@@ -1,8 +1,8 @@
-import { IQueryData } from "../IQueryData"
+import { IBotResponseDto } from "../../providers/bots/IBotResponseDto"
 import { BotType } from "../../providers/bots/IBotProvider"
 
 export class TelegramGetUpdatesResponse {
-  updates: IQueryData[]
+  updates: IBotResponseDto[]
 
   constructor(data: any) {
     if (!Array.isArray(data)) {
@@ -12,7 +12,7 @@ export class TelegramGetUpdatesResponse {
 
     // TODO: все проверить и реализовать проще, по идее это все не нужно т.к есть QueryDto в bot контроллере
     this.updates = data.map((update) => {
-      const updateData: IQueryData = {
+      const updateData: IBotResponseDto = {
         updateId: Number(update?.update_id) || 0,
         chatId: Number(update?.message?.chat?.id) || 0,
         userId: Number(update?.message?.from?.id) || 0,
@@ -26,7 +26,7 @@ export class TelegramGetUpdatesResponse {
     })
   }
 
-  getLastUpdate(): IQueryData | null {
+  getLastUpdate(): IBotResponseDto | null {
     if (this.updates.length === 0) return null
     return this.updates[this.updates.length - 1]
   }

@@ -1,5 +1,5 @@
 import { ResponseData } from "../../data/ResponseData"
-import { IQueryData } from "../../data/IQueryData"
+import { IBotResponseDto } from "../../providers/bots/IBotResponseDto"
 import { Injectable } from "@nestjs/common"
 import { Logger } from "../../utils/Logger"
 import { ICommandFactory } from "./ICommandFactory"
@@ -17,7 +17,7 @@ export class BotCommandHandler {
     private readonly userService: UserService,
   ) {}
 
-  async handleCommandFromUpdates(updateData: IQueryData): Promise<ResponseData | null> {
+  async handleCommandFromUpdates(updateData: IBotResponseDto): Promise<ResponseData | null> {
     try {
       const parsedCommand = this.parseCommand(updateData.text)
       if (!parsedCommand) return new ResponseData(this.enterCommandMessage)

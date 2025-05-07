@@ -3,7 +3,7 @@ import { IWebRequestService } from "../../IWebRequestService"
 import { Logger } from "../../../utils/Logger"
 import { TelegramCommands } from "./TelegramCommands"
 import { TelegramGetUpdatesResponse } from "../../../data/Telegram/TelegramGetUpdatesResponse"
-import { IQueryData } from "../../../data/IQueryData"
+import { IBotResponseDto } from "../IBotResponseDto"
 import { RequestDto } from "../../../bots/bots.service"
 import { TelegramUpdatesDto, TelegramBaseDto } from "../../../bots/telegram/telegramUpdatesDto"
 import { plainToClass } from "class-transformer"
@@ -52,7 +52,7 @@ export class TelegramApiProvider implements IBotProvider {
     }
   }
 
-  async sendResponse(text: string, queryData: IQueryData): Promise<void> {
+  async sendResponse(text: string, queryData: IBotResponseDto): Promise<void> {
     if (!this.isBotRunning) {
       Logger.log("Бот не инициализирован.")
       return
@@ -66,7 +66,7 @@ export class TelegramApiProvider implements IBotProvider {
     await this.validateResponse(telegramResponseDto)
   }
 
-  async getUpdates(): Promise<IQueryData[]> {
+  async getUpdates(): Promise<IBotResponseDto[]> {
     const offset = this.lastUpdateId ? `offset=${this.lastUpdateId + 1}&` : ``
     const updatesUrl = `${this.baseUrl}${TelegramCommands.GET_UPDATES}?${offset}`
     const telegramResponse = await this.webRequestService.tryGet<TelegramUpdatesDto>(updatesUrl)
@@ -83,7 +83,7 @@ export class TelegramApiProvider implements IBotProvider {
     return this.canUseUpdate
   }
 
-  getUpdatesData(requestData: RequestDto): IQueryData[] {
+  getUpdatesData(requestData: RequestDto): IBotResponseDto[] {
     const updateData = new TelegramGetUpdatesResponse(requestData.result)
     return updateData.updates
   }

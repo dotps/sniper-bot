@@ -1,12 +1,12 @@
-import { IQueryData } from "../../data/IQueryData"
+import { IBotResponseDto } from "./IBotResponseDto"
 import { RequestDto } from "../../bots/bots.service"
 
 export interface IBotProvider {
   getBotType(): BotType
-  sendResponse(text: string, queryData: IQueryData): Promise<void>
-  getUpdates(): Promise<IQueryData[]>
+  sendResponse(text: string, queryData: IBotResponseDto): Promise<void>
+  getUpdates(): Promise<IBotResponseDto[]>
   init(): Promise<void>
-  getUpdatesData(requestData: RequestDto): IQueryData[]
+  getUpdatesData(requestData: RequestDto): IBotResponseDto[]
   isUseWebhook(): boolean
   isUseIntervalUpdate(): boolean
   getUpdateInterval(): number

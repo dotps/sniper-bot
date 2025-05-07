@@ -5,12 +5,12 @@ import { BotCommandHandler } from "../commands/infrastructure/BotCommandHandler"
 import { Logger } from "../utils/Logger"
 import { TelegramApiProvider } from "../providers/bots/telegram/TelegramApiProvider"
 import { RequestVkDto } from "./vk/request-vk.dto"
-import { IQueryData } from "../data/IQueryData"
+import { IBotResponseDto } from "../providers/bots/IBotResponseDto"
 import { OnEvent } from "@nestjs/event-emitter"
 import { events, SendBotEvent } from "../events/events"
 import { BotType } from "../providers/bots/IBotProvider"
 import { plainToClass } from "class-transformer"
-import { QueryData } from "../data/Telegram/QueryData"
+import { BotResponseDto } from "../providers/bots/BotResponseDto"
 
 @Injectable()
 export class BotsService implements OnModuleInit {
@@ -65,7 +65,7 @@ export class BotsService implements OnModuleInit {
     await this.handleUpdatesAndSendResponse(bot, queryDataList)
   }
 
-  async handleUpdatesAndSendResponse(bot: BotProvider, updateDataList: IQueryData[]) {
+  async handleUpdatesAndSendResponse(bot: BotProvider, updateDataList: IBotResponseDto[]) {
     for (const updateData of updateDataList) {
       updateData.botType = bot.getBotType()
       const response = await this.commandHandler.handleCommandFromUpdates(updateData)
@@ -92,7 +92,7 @@ export class BotsService implements OnModuleInit {
 
     try {
       const bot = this.getBotByType(event.user.botType)
-      const updateData = plainToClass(QueryData, { chatId: event.user.chatId })
+      const updateData = plainToClass(BotResponseDto, { chatId: event.user.chatId })
       await bot.sendResponse(event.text, updateData)
     } catch (error) {
       Logger.error(error)

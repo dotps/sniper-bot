@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
 import { User } from "./user.entity"
 import { BotType } from "../providers/bots/IBotProvider"
-import { IQueryData } from "../data/IQueryData"
+import { IBotResponseDto } from "../providers/bots/IBotResponseDto"
 import { plainToClass } from "class-transformer"
 
 @Injectable()
@@ -21,7 +21,7 @@ export class UserService {
     return await this.repository.save(user)
   }
 
-  createUnregisteredUser(data: IQueryData): User {
+  createUnregisteredUser(data: IBotResponseDto): User {
     return plainToClass(User, data, { excludeExtraneousValues: true })
   }
 }
