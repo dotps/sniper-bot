@@ -25,18 +25,18 @@ export class SwapObserverService implements OnModuleInit {
     this.swapProvider = this.blockchainService.getSwapProvider()
   }
 
-  async onModuleInit() {
+  async onModuleInit(): Promise<void> {
     await this.swapProvider.init()
     await this.updateObservedWallets()
     this.watchSwaps()
   }
 
-  private async updateObservedWallets() {
+  private async updateObservedWallets(): Promise<void> {
     this.observedWallets = await this.walletService.getFollowWallets()
     console.log(this.observedWallets)
   }
 
-  watchSwaps() {
+  watchSwaps(): void {
     try {
       this.pools = this.swapProvider.getPools()
       const poolsAddresses = [...this.pools.keys()]
@@ -106,7 +106,7 @@ export class SwapObserverService implements OnModuleInit {
     }
   }
 
-  addFollowWalletIntoObserver(followWallet: FollowWallet) {
+  addFollowWalletIntoObserver(followWallet: FollowWallet): void {
     const users = this.observedWallets.get(followWallet.wallet)
 
     if (!users) {
