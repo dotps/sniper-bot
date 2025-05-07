@@ -25,7 +25,7 @@ export class ReplicateSwapCommand implements ICommand {
     if (!usersReplicates || usersReplicates.length === 0) return null
 
     for (const replicate of usersReplicates) {
-      if (!this.isUserSubscribedOnToken(replicate.token.address)) continue
+      if (!this.isUserSubscribedOnToken(replicate.token.address)) continue // не подписаны на повтор сделки для токена
       await this.executeReplicateOperation(replicate)
     }
 
@@ -45,7 +45,6 @@ export class ReplicateSwapCommand implements ICommand {
     }
   }
 
-  // не подписаны на повтор сделки для токена
   private isUserSubscribedOnToken(replicateTokenAddress: Hex): boolean {
     return this.swapLog.tokens.token0.address === replicateTokenAddress
   }
