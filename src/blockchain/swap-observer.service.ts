@@ -1,5 +1,5 @@
 import { forwardRef, Inject, Injectable, OnModuleInit } from "@nestjs/common"
-import { Hex, isAddress, PublicClient, WatchEventOnLogsParameter } from "viem"
+import { Hex, isAddress, Log, PublicClient, WatchEventOnLogsParameter } from "viem"
 import { BlockchainService, swapEventAbi } from "./blockchain.service"
 import { WalletService } from "./wallet/wallet.service"
 import { FollowWallet } from "./wallet/follow-wallet.entity"
@@ -62,17 +62,25 @@ export class SwapObserverService implements OnModuleInit {
     const swaps: SwapLog[] = []
 
     for (const log of logs) {
-      if (!log.args) continue
-      let sender = log.args.sender
-      let recipient = log.args.recipient
+      const addresses = this.getAddressesFromLog(log)
+      if (!addresses) continue
+      // TODO: вынести в одельный метод getValidatedAddresses + проверить рефакторинг
 
-      if (!sender || !isAddress(sender)) continue
-      if (!recipient || !isAddress(recipient)) continue
+      const { sender, recipient, poolAddress } = addresses
 
-      sender = sender.toLowerCase() as Hex
-      recipient = recipient.toLowerCase() as Hex
+      // if (!log.args) continue
+      // let sender = log.args.sender
+      // let recipient = log.args.recipient
+      //
+      // if (!sender || !isAddress(sender)) continue
+      // if (!recipient || !isAddress(recipient)) continue
+      //
+      // sender = sender.toLowerCase() as Hex
+      // recipient = recipient.toLowerCase() as Hex
+      //
+      // const poolAddress = log.address.toLowerCase() as Hex
+      //
 
-      const poolAddress = log.address.toLowerCase() as Hex
       const tokens = this.pools.get(poolAddress)
       if (!tokens) continue
 
@@ -97,6 +105,22 @@ export class SwapObserverService implements OnModuleInit {
     return swaps
   }
 
+  private getAddressesFromLog(log: WatchEventOnLogsParameter<typeof swapEventAbi>[number]): Addresses | null {
+    if (!log.args) return null
+
+    const sender = log.args.sender
+    const recipient = log.args.recipient
+
+    if (!sender || !isAddress(sender)) return null
+    if (!recipient || !isAddress(recipient)) return null
+
+    return {
+      sender: sender.toLowerCase() as Hex,
+      recipient: recipient.toLowerCase() as Hex,
+      poolAddress: log.address.toLowerCase() as Hex,
+    }
+  }
+
   addFollowWalletIntoObserver(followWallet: FollowWallet) {
     const users = this.observedWallets.get(followWallet.wallet)
 
@@ -119,4 +143,10 @@ export type SwapLog = {
   liquidity: bigint
   tick: number
   users: number[]
+}
+
+type Addresses = {
+  sender: Hex
+  recipient: Hex
+  poolAddress: Hex
 }
