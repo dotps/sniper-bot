@@ -4,11 +4,9 @@ import { BotProvider } from "../providers/bots/BotProvider"
 import { BotCommandHandler } from "../commands/infrastructure/BotCommandHandler"
 import { Logger } from "../utils/Logger"
 import { TelegramApiProvider } from "../providers/bots/telegram/TelegramApiProvider"
-import { VkApiProvider } from "../providers/bots/vk/VkApiProvider"
 import { RequestVkDto } from "./vk/request-vk.dto"
 import { IQueryData } from "../data/IQueryData"
-import { UserService } from "../users/user.service"
-import { EventEmitter2, OnEvent } from "@nestjs/event-emitter"
+import { OnEvent } from "@nestjs/event-emitter"
 import { events, SendBotEvent } from "../events/events"
 import { BotType } from "../providers/bots/IBotProvider"
 import { plainToClass } from "class-transformer"
@@ -20,10 +18,8 @@ export class BotsService implements OnModuleInit {
 
   constructor(
     private readonly telegramBot: TelegramApiProvider,
-    private readonly vkBot: VkApiProvider,
+    // private readonly vkBot: VkApiProvider,
     private readonly commandHandler: BotCommandHandler,
-    private readonly userService: UserService,
-    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   addBot<T extends BotProvider>(botClass: new (...args: any[]) => T, bot: T): void {
@@ -90,6 +86,7 @@ export class BotsService implements OnModuleInit {
 
   @OnEvent(events.SEND_BOT_RESPONSE)
   async eventHandlerSendResponse(event: SendBotEvent) {
+    // TODO: убрать return
     console.log("сообщение отправлено, убрать return")
     return
 
