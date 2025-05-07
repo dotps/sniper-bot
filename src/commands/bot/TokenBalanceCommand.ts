@@ -5,6 +5,7 @@ import { TokenService } from "../../blockchain/token/token.service"
 import { BlockchainService } from "../../blockchain/blockchain.service"
 import { WalletService } from "../../blockchain/wallet/wallet.service"
 import { ErrorHandler } from "../../errors/ErrorHandler"
+import { BlockchainTokenService } from "../../blockchain/blockchain-token.service"
 
 export class TokenBalanceCommand implements ICommand {
   private readonly messages = {
@@ -16,6 +17,7 @@ export class TokenBalanceCommand implements ICommand {
   constructor(
     private readonly tokenService: TokenService,
     private readonly blockchainService: BlockchainService,
+    private readonly blockchainTokenService: BlockchainTokenService,
     private readonly walletService: WalletService,
     private readonly user: User,
   ) {}
@@ -31,7 +33,7 @@ export class TokenBalanceCommand implements ICommand {
 
       let balanceMessage = ""
       for (const token of tokens) {
-        const balance = await this.blockchainService.getTokenBalance(walletAddress, token)
+        const balance = await this.blockchainTokenService.getTokenBalance(walletAddress, token)
         balanceMessage += `${token.symbol} ${token.address}: ${balance}\n`
       }
 

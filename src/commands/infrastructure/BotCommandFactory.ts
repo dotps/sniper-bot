@@ -19,6 +19,7 @@ import { UnfollowCommand } from "../bot/UnfollowCommand"
 import { SendCommand } from "../bot/SendCommand"
 import { BlockchainService } from "../../blockchain/blockchain.service"
 import { WalletCommand } from "../bot/WalletCommand"
+import { BlockchainTokenService } from "../../blockchain/blockchain-token.service"
 
 @Injectable()
 export class BotCommandFactory implements ICommandFactory {
@@ -27,6 +28,7 @@ export class BotCommandFactory implements ICommandFactory {
     private readonly tokenService: TokenService,
     private readonly walletService: WalletService,
     private readonly blockchainService: BlockchainService,
+    private readonly blockchainTokenService: BlockchainTokenService,
   ) {}
 
   createCommand(user: User, commandData: Command): ICommand | null {
@@ -36,11 +38,17 @@ export class BotCommandFactory implements ICommandFactory {
       case BotCommands.START:
         return new StartCommand(this.userService, this.walletService, user)
       case BotCommands.ADD_TOKEN:
-        return new AddTokenCommand(this.tokenService, this.blockchainService, user, commandData)
+        return new AddTokenCommand(this.tokenService, this.blockchainTokenService, user, commandData)
       case BotCommands.REMOVE_TOKEN:
         return new RemoveTokenCommand(this.tokenService, user, commandData)
       case BotCommands.BALANCE:
-        return new TokenBalanceCommand(this.tokenService, this.blockchainService, this.walletService, user)
+        return new TokenBalanceCommand(
+          this.tokenService,
+          this.blockchainService,
+          this.blockchainTokenService,
+          this.walletService,
+          user,
+        )
       case BotCommands.FOLLOW:
         return new FollowWalletCommand(this.walletService, user, commandData)
       case BotCommands.UNFOLLOW:
@@ -50,7 +58,7 @@ export class BotCommandFactory implements ICommandFactory {
       case BotCommands.SUBSCRIPTIONS:
         return new SubscriptionsCommand(this.walletService, user)
       case BotCommands.SEND:
-        return new SendCommand(this.blockchainService, this.walletService, user, commandData)
+        return new SendCommand(this.blockchainTokenService, this.walletService, user, commandData)
       case BotCommands.WALLET:
         return new WalletCommand(this.walletService, user)
       default:

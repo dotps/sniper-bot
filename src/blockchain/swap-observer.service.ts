@@ -36,6 +36,7 @@ export class SwapObserverService implements OnModuleInit {
   }
 
   watchSwaps(): void {
+    console.log("watchSwaps")
     try {
       this.pools = this.swapProvider.getPools()
       const poolsAddresses = [...this.pools.keys()]

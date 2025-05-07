@@ -6,8 +6,8 @@ import { TokenService } from "../../blockchain/token/token.service"
 import { TokenDto } from "../../blockchain/token/token.dto"
 import { Hex, isAddress } from "viem"
 import { BotCommands } from "./BotCommands"
-import { BlockchainService } from "../../blockchain/blockchain.service"
 import { ErrorHandler } from "../../errors/ErrorHandler"
+import { BlockchainTokenService } from "../../blockchain/blockchain-token.service"
 
 export class AddTokenCommand implements ICommand {
   private readonly messages = {
@@ -19,7 +19,7 @@ export class AddTokenCommand implements ICommand {
 
   constructor(
     private readonly tokenService: TokenService,
-    private readonly blockchainService: BlockchainService,
+    private readonly blockchainTokenService: BlockchainTokenService,
     private readonly user: User,
     private readonly commandData: Command,
   ) {}
@@ -31,7 +31,7 @@ export class AddTokenCommand implements ICommand {
     if (!tokenAddress || !isAddress(tokenAddress)) return new BotResponseData(this.messages.NEED_TOKEN)
 
     try {
-      const tokenInfo = await this.blockchainService.getTokenInfo(tokenAddress)
+      const tokenInfo = await this.blockchainTokenService.getTokenInfo(tokenAddress)
 
       const tokenDto: TokenDto = {
         balance: 0n,

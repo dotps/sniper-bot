@@ -6,10 +6,10 @@ import { Hex, isAddress, parseUnits } from "viem"
 import { BotCommands } from "./BotCommands"
 import { ErrorHandler } from "../../errors/ErrorHandler"
 import { WalletService } from "../../blockchain/wallet/wallet.service"
-import { BlockchainService } from "../../blockchain/blockchain.service"
 import { ResponseBotError } from "../../errors/ResponseBotError"
 import { Token } from "../../blockchain/token/token.entity"
 import { plainToClass } from "class-transformer"
+import { BlockchainTokenService } from "../../blockchain/blockchain-token.service"
 
 export class SendCommand implements ICommand {
   private readonly messages = {
@@ -21,7 +21,7 @@ export class SendCommand implements ICommand {
   } as const
 
   constructor(
-    private readonly blockchainService: BlockchainService,
+    private readonly blockchainTokenService: BlockchainTokenService,
     private readonly walletService: WalletService,
     private readonly user: User,
     private readonly commandData: Command,
@@ -32,14 +32,14 @@ export class SendCommand implements ICommand {
   async execute(): Promise<BotResponseData | null> {
     try {
       const { tokenAddress, amount, toAddress } = this.validateAndParseParams()
-      const tokenInfo = await this.blockchainService.getTokenInfo(tokenAddress)
+      const tokenInfo = await this.blockchainTokenService.getTokenInfo(tokenAddress)
       const token = plainToClass(Token, { address: tokenAddress, ...tokenInfo })
 
       const transferAmount = parseUnits(amount, token.decimals)
       if (!transferAmount) return new BotResponseData(this.messages.NEED_AMOUNT)
 
       const fromAddress = await this.walletService.getWalletAddress(this.user.id)
-      await this.blockchainService.transferToken(fromAddress, toAddress, token, transferAmount)
+      await this.blockchainTokenService.transferToken(fromAddress, toAddress, token, transferAmount)
 
       return new BotResponseData(this.messages.SUCCESS)
     } catch (error) {

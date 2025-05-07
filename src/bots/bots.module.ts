@@ -47,7 +47,13 @@ const commandFactory = {
     walletService: WalletService,
     blockchainService: BlockchainService,
   ) => {
-    return new BotCommandFactory(userService, tokenService, walletService, blockchainService)
+    return new BotCommandFactory(
+      userService,
+      tokenService,
+      walletService,
+      blockchainService,
+      blockchainService.getTokenService(),
+    )
   },
   inject: [UserService, TokenService, WalletService, BlockchainService],
 }
@@ -60,7 +66,6 @@ const commandHandler = {
   inject: [BotCommandFactory, UserService],
 }
 
-// TODO: раскидать по разным модулям? что-то тут много всего (часть перенести в AppModule)
 @Module({
   imports: [
     UserModule,

@@ -3,11 +3,15 @@ import { ISwapProvider } from "./ISwapProvider"
 import { PoolTokenPair } from "./PoolTokenPair"
 import { BlockchainService } from "../blockchain.service"
 import { Logger } from "../../services/logger/Logger"
+import { BlockchainTokenService } from "../blockchain-token.service"
 
 export class Uniswap implements ISwapProvider {
   private pools: Map<Hex, PoolTokenPair> = new Map<Hex, PoolTokenPair>()
 
-  constructor(private readonly blockchainService: BlockchainService) {}
+  constructor(
+    private readonly blockchainService: BlockchainService,
+    private readonly blockchainTokenService: BlockchainTokenService,
+  ) {}
 
   async init(): Promise<void> {
     this.pools = await this.getPoolsInfo()
@@ -23,8 +27,8 @@ export class Uniswap implements ISwapProvider {
       for (let poolAddress of poolAddresses) {
         poolAddress = poolAddress.toLowerCase() as Hex
         const { token0, token1 } = await this.blockchainService.getTokensForPool(poolAddress)
-        const { symbol: symbol0 } = await this.blockchainService.getTokenInfo(token0)
-        const { symbol: symbol1 } = await this.blockchainService.getTokenInfo(token1)
+        const { symbol: symbol0 } = await this.blockchainTokenService.getTokenInfo(token0)
+        const { symbol: symbol1 } = await this.blockchainTokenService.getTokenInfo(token1)
         pools.set(poolAddress, {
           token0: { symbol: symbol0, address: token0 },
           token1: { symbol: symbol1, address: token1 },

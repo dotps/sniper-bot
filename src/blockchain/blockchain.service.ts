@@ -1,8 +1,7 @@
 import { Injectable } from "@nestjs/common"
-import { createPublicClient, erc20Abi, Hex, http, isAddress, parseAbi, parseAbiItem, PublicClient } from "viem"
+import { createPublicClient, Hex, http, parseAbi, parseAbiItem, PublicClient } from "viem"
 import { bscTestnet, polygon } from "viem/chains"
 import { Logger } from "../services/logger/Logger"
-import { ResponseBotError } from "../errors/ResponseBotError"
 import { Token } from "./token/token.entity"
 import { Swap } from "../commands/blockchain/ReplicateSwapCommand"
 import { PoolToken } from "./dex/PoolTokenPair"
@@ -16,18 +15,17 @@ import { Config } from "../config/config"
 import { ISwapProvider } from "./dex/ISwapProvider"
 import { Uniswap } from "./dex/Uniswap"
 import { Pancake } from "./dex/Pancake"
+import { BlockchainTokenService } from "./blockchain-token.service"
 
 @Injectable()
 export class BlockchainService {
-  // private readonly defaultBlockchain = Blockchain.BSC
+  private readonly blockchainTokenService: BlockchainTokenService
   private readonly defaultBlockchain: Blockchain
   private clients: Map<Blockchain, PublicClient> = new Map()
   private swapProviders: Map<Blockchain, ISwapProvider> = new Map()
   private readonly messages = {
-    WRONG_WALLET_OR_TOKEN: "Неверный адрес кошелька или токена.",
-    TOKEN_ERROR: "Ошибка с адресом токена. Возможно токен не принадлежит текущей сети.",
-    TOKEN_CONTRACT_ERROR: "Не удалось прочитать контракт токена.",
-    BALANCE_EMPTY: "Не хватает средств на балансе.",
+    CLIENT_NOT_FOUND: "Клиент не найден.",
+    SWAP_PROVIDER_NOT_FOUND: "Обменник не найден.",
   } as const
   private isSimulateSwap: boolean = false
 
@@ -40,6 +38,7 @@ export class BlockchainService {
       ? (blockchain as Blockchain)
       : Blockchain.POLYGON
     this.initBlockchainClients()
+    this.blockchainTokenService = new BlockchainTokenService(this.getClient())
   }
 
   private initBlockchainClients() {
@@ -55,78 +54,26 @@ export class BlockchainService {
     this.clients.set(Blockchain.POLYGON, polygonClient)
     this.clients.set(Blockchain.BSC, bscClient)
 
-    this.swapProviders.set(Blockchain.POLYGON, new Uniswap(this))
-    this.swapProviders.set(Blockchain.BSC, new Pancake(this))
+    this.swapProviders.set(Blockchain.POLYGON, new Uniswap(this, this.blockchainTokenService))
+    this.swapProviders.set(Blockchain.BSC, new Pancake())
 
     console.log(this.defaultBlockchain)
   }
 
   getSwapProvider(poolType: Blockchain = this.defaultBlockchain) {
     const swapProvider = this.swapProviders.get(poolType)
-    if (!swapProvider) throw Error("Обменник не найден.")
+    if (!swapProvider) throw Error(this.messages.SWAP_PROVIDER_NOT_FOUND)
     return swapProvider
   }
 
   getClient(clientType: Blockchain = this.defaultBlockchain): PublicClient {
     const client = this.clients.get(clientType)
-    if (!client) throw Error("Клиент не найден.")
+    if (!client) throw Error(this.messages.CLIENT_NOT_FOUND)
     return client
   }
 
   async getBalance(address: Hex) {
     return await this.getClient().getBalance({ address: address })
-  }
-
-  async getTokenBalance(walletAddress: Hex, token: Token): Promise<bigint> {
-    if (!isAddress(walletAddress) || !isAddress(token.address))
-      throw new ResponseBotError(this.messages.WRONG_WALLET_OR_TOKEN)
-
-    try {
-      return await this.getClient().readContract({
-        address: token.address,
-        abi: erc20Abi, // TODO: в настройки, еще где-то встречается
-        functionName: "balanceOf",
-        args: [walletAddress],
-      })
-    } catch (error) {
-      Logger.error(error)
-      throw new ResponseBotError(`${this.messages.TOKEN_ERROR}\n${token.symbol} ${token.address}`)
-    }
-  }
-
-  async getTokenSymbol(address: Hex): Promise<string | null> {
-    try {
-      return await this.getClient().readContract({
-        address: address,
-        abi: erc20Abi,
-        functionName: "symbol",
-      })
-    } catch (error) {
-      Logger.error(error)
-      throw new ResponseBotError(`${this.messages.TOKEN_CONTRACT_ERROR}\n ${address}`)
-    }
-  }
-
-  async getTokenInfo(tokenAddress: Hex): Promise<TokenInfo> {
-    try {
-      const [symbol, decimals] = await Promise.all([
-        this.getClient().readContract({
-          address: tokenAddress,
-          abi: erc20Abi,
-          functionName: "symbol",
-        }),
-        this.getClient().readContract({
-          address: tokenAddress,
-          abi: erc20Abi,
-          functionName: "decimals",
-        }),
-      ])
-
-      return { symbol, decimals }
-    } catch (error) {
-      Logger.error(error)
-      throw new ResponseBotError(`${this.messages.TOKEN_CONTRACT_ERROR}\n ${tokenAddress}`)
-    }
   }
 
   // TODO: добавить типы
@@ -152,7 +99,7 @@ export class BlockchainService {
 
   async executeSwap(swap: Swap, tokenForPayment: PoolToken, user: User): Promise<void> {
     const token = plainToClass(Token, tokenForPayment)
-    const tokenPaymentBalance = await this.getTokenBalance(swap.recipient, token)
+    const tokenPaymentBalance = await this.blockchainTokenService.getTokenBalance(swap.recipient, token)
 
     if (!tokenPaymentBalance || tokenPaymentBalance < absBigInt(swap.amountSpecified)) {
       const event: SendBotEvent = {
@@ -166,7 +113,7 @@ export class BlockchainService {
     if (!this.isSimulateSwap) return
 
     try {
-      const result = await this.getClient().simulateContract({
+      await this.getClient().simulateContract({
         address: swap.poolAddress,
         abi: poolAbi,
         functionName: "swap",
@@ -178,21 +125,8 @@ export class BlockchainService {
     }
   }
 
-  async transferToken(fromAddress: Hex, toAddress: Hex, token: Token, transferAmount: bigint): Promise<void> {
-    const balance = await this.getTokenBalance(fromAddress, token)
-    if (transferAmount >= balance) throw new ResponseBotError(this.messages.BALANCE_EMPTY)
-
-    try {
-      const result = await this.getClient().simulateContract({
-        address: token.address,
-        abi: erc20Abi,
-        functionName: "transfer",
-        args: [toAddress, transferAmount],
-        account: fromAddress,
-      })
-    } catch (error) {
-      throw new ResponseBotError(`Ошибка при переводе ${token.symbol}.`, error)
-    }
+  getTokenService(): BlockchainTokenService {
+    return this.blockchainTokenService
   }
 }
 
@@ -211,11 +145,11 @@ const poolAbi = parseAbi([
 export const swapEventAbi = parseAbiItem(
   "event Swap(address indexed sender, address indexed recipient, int256 amount0, int256 amount1, uint160 sqrtPriceX96, uint128 liquidity, int24 tick)",
 )
-
+/*
 export type TokenInfo = {
   symbol: string
   decimals: number
-}
+}*/
 
 /*
 0xd0567bb38fa5bad45150026281c43fa6031577b9 - часто идут транзакции
