@@ -1,16 +1,18 @@
 import { forwardRef, Inject, Injectable, OnModuleInit } from "@nestjs/common"
 import { Hex, isAddress, PublicClient, WatchEventOnLogsParameter } from "viem"
-import { BlockchainService, swapEventAbi } from "./blockchain.service"
+import { BlockchainService } from "./blockchain.service"
 import { WalletService } from "./wallet/wallet.service"
 import { FollowWallet } from "./wallet/follow-wallet.entity"
 import { ISwapProvider } from "./dex/ISwapProvider"
 import { PoolTokenPair } from "./dex/PoolTokenPair"
 import { ReplicateSwapCommand } from "../commands/blockchain/ReplicateSwapCommand"
 import { Logger } from "src/services/logger/Logger"
+import { BlockchainPoolService, swapEventAbi } from "./blockchain-pool.service"
 
 @Injectable()
 export class SwapObserverService implements OnModuleInit {
   private readonly client: PublicClient
+  private readonly blockchainPoolService: BlockchainPoolService
   private observedWallets: Map<Hex, number[]> = new Map<Hex, number[]>()
   private swapProvider: ISwapProvider
   private pools: Map<Hex, PoolTokenPair> = new Map<Hex, PoolTokenPair>()
@@ -22,6 +24,7 @@ export class SwapObserverService implements OnModuleInit {
   ) {
     this.client = this.blockchainService.getClient()
     this.swapProvider = this.blockchainService.getSwapProvider()
+    this.blockchainPoolService = this.blockchainService.getPoolService()
   }
 
   async onModuleInit(): Promise<void> {
@@ -36,7 +39,6 @@ export class SwapObserverService implements OnModuleInit {
   }
 
   watchSwaps(): void {
-    console.log("watchSwaps")
     try {
       this.pools = this.swapProvider.getPools()
       const poolsAddresses = [...this.pools.keys()]
@@ -47,7 +49,7 @@ export class SwapObserverService implements OnModuleInit {
         onLogs: (logs) => {
           const swaps = this.getSwapsOfObservableWallets(logs)
           for (const swap of swaps) {
-            const command = new ReplicateSwapCommand(this.blockchainService, this.walletService, swap)
+            const command = new ReplicateSwapCommand(this.blockchainPoolService, this.walletService, swap)
             command.execute().catch((error) => Logger.error(error))
           }
         },

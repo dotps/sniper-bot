@@ -4,6 +4,7 @@ import { PoolTokenPair } from "./PoolTokenPair"
 import { BlockchainService } from "../blockchain.service"
 import { Logger } from "../../services/logger/Logger"
 import { BlockchainTokenService } from "../blockchain-token.service"
+import { BlockchainPoolService } from "../blockchain-pool.service"
 
 export class Uniswap implements ISwapProvider {
   private pools: Map<Hex, PoolTokenPair> = new Map<Hex, PoolTokenPair>()
@@ -11,6 +12,7 @@ export class Uniswap implements ISwapProvider {
   constructor(
     private readonly blockchainService: BlockchainService,
     private readonly blockchainTokenService: BlockchainTokenService,
+    private readonly blockchainPoolService: BlockchainPoolService,
   ) {}
 
   async init(): Promise<void> {
@@ -26,7 +28,7 @@ export class Uniswap implements ISwapProvider {
     try {
       for (let poolAddress of poolAddresses) {
         poolAddress = poolAddress.toLowerCase() as Hex
-        const { tokenAddress0, tokenAddress1 } = await this.blockchainService.getTokensForPool(poolAddress)
+        const { tokenAddress0, tokenAddress1 } = await this.blockchainPoolService.getTokensForPool(poolAddress)
         // TODO: не эффективно 2 раза обращаться, предавать как Hex так Hex[] и одним запросом
         const { symbol: symbol0 } = await this.blockchainTokenService.getTokenInfo(tokenAddress0)
         const { symbol: symbol1 } = await this.blockchainTokenService.getTokenInfo(tokenAddress1)

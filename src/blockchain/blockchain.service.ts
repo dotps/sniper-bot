@@ -1,25 +1,19 @@
 import { Injectable } from "@nestjs/common"
-import { createPublicClient, Hex, http, parseAbi, parseAbiItem, PublicClient } from "viem"
+import { createPublicClient, Hex, http, PublicClient } from "viem"
 import { bscTestnet, polygon } from "viem/chains"
-import { Logger } from "../services/logger/Logger"
-import { Token } from "./token/token.entity"
-import { Swap } from "../commands/blockchain/ReplicateSwapCommand"
-import { PoolToken } from "./dex/PoolTokenPair"
-import { plainToClass } from "class-transformer"
-import { absBigInt } from "../utils/Calc"
 import { EventEmitter2 } from "@nestjs/event-emitter"
-import { events, SendBotEvent } from "../events/events"
-import { User } from "../users/user.entity"
 import { ConfigService } from "@nestjs/config"
 import { Config } from "../config/config"
 import { ISwapProvider } from "./dex/ISwapProvider"
 import { Uniswap } from "./dex/Uniswap"
 import { Pancake } from "./dex/Pancake"
 import { BlockchainTokenService } from "./blockchain-token.service"
+import { BlockchainPoolService } from "./blockchain-pool.service"
 
 @Injectable()
 export class BlockchainService {
   private readonly blockchainTokenService: BlockchainTokenService
+  private readonly blockchainPoolService: BlockchainPoolService
   private readonly defaultBlockchain: Blockchain
   private clients: Map<Blockchain, PublicClient> = new Map()
   private swapProviders: Map<Blockchain, ISwapProvider> = new Map()
@@ -27,7 +21,6 @@ export class BlockchainService {
     CLIENT_NOT_FOUND: "Клиент не найден.",
     SWAP_PROVIDER_NOT_FOUND: "Обменник не найден.",
   } as const
-  private isSimulateSwap: boolean = false
 
   constructor(
     private readonly eventEmitter: EventEmitter2,
@@ -39,6 +32,7 @@ export class BlockchainService {
       : Blockchain.POLYGON
     this.initBlockchainClients()
     this.blockchainTokenService = new BlockchainTokenService(this.getClient())
+    this.blockchainPoolService = new BlockchainPoolService(this.getClient(), this.blockchainTokenService, eventEmitter)
   }
 
   private initBlockchainClients(): void {
@@ -54,7 +48,7 @@ export class BlockchainService {
     this.clients.set(Blockchain.POLYGON, polygonClient)
     this.clients.set(Blockchain.BSC, bscClient)
 
-    this.swapProviders.set(Blockchain.POLYGON, new Uniswap(this, this.blockchainTokenService))
+    this.swapProviders.set(Blockchain.POLYGON, new Uniswap(this, this.blockchainTokenService, this.blockchainPoolService))
     this.swapProviders.set(Blockchain.BSC, new Pancake())
 
     console.log(this.defaultBlockchain)
@@ -76,78 +70,18 @@ export class BlockchainService {
     return await this.getClient().getBalance({ address: address })
   }
 
-  async getTokensForPool(poolAddress: Hex): Promise<TokenAddressPair> {
-    let [tokenAddress0, tokenAddress1] = await Promise.all([
-      this.getClient().readContract({
-        address: poolAddress,
-        abi: poolAbi,
-        functionName: "token0",
-      }),
-      this.getClient().readContract({
-        address: poolAddress,
-        abi: poolAbi,
-        functionName: "token1",
-      }),
-    ])
-
-    tokenAddress0 = tokenAddress0.toLowerCase() as Hex
-    tokenAddress1 = tokenAddress1.toLowerCase() as Hex
-
-    return { tokenAddress0, tokenAddress1 }
-  }
-
-  async executeSwap(swap: Swap, tokenForPayment: PoolToken, user: User): Promise<void> {
-    const token = plainToClass(Token, tokenForPayment)
-    const tokenPaymentBalance = await this.blockchainTokenService.getTokenBalance(swap.recipient, token)
-
-    if (!tokenPaymentBalance || tokenPaymentBalance < absBigInt(swap.amountSpecified)) {
-      const event: SendBotEvent = {
-        user: user,
-        text: `Недостаточно средств: ${token.symbol}`,
-      }
-      this.eventEmitter.emit(events.SEND_BOT_RESPONSE, event)
-      return
-    }
-
-    if (!this.isSimulateSwap) return
-
-    try {
-      await this.getClient().simulateContract({
-        address: swap.poolAddress,
-        abi: poolAbi,
-        functionName: "swap",
-        args: [swap.recipient, swap.zeroForOne, swap.amountSpecified, swap.sqrtPriceLimitX96, swap.data || "0x"],
-        account: swap.recipient,
-      })
-    } catch (error) {
-      Logger.error(error)
-    }
-  }
-
   getTokenService(): BlockchainTokenService {
     return this.blockchainTokenService
+  }
+
+  getPoolService(): BlockchainPoolService {
+    return this.blockchainPoolService
   }
 }
 
 enum Blockchain {
   BSC = "bsc",
   POLYGON = "polygon",
-}
-
-const poolAbi = parseAbi([
-  "function token0() view returns (address)",
-  "function token1() view returns (address)",
-  "function swap(address recipient, bool zeroForOne, int256 amountSpecified, uint160 sqrtPriceLimitX96, bytes calldata data) external returns (int256 amount0, int256 amount1)",
-  "function slot0() view returns (uint160 sqrtPriceX96, int24 tick, uint16 observationIndex, uint16 observationCardinality, uint16 observationCardinalityNext, uint8 feeProtocol, bool unlocked)",
-])
-
-export const swapEventAbi = parseAbiItem(
-  "event Swap(address indexed sender, address indexed recipient, int256 amount0, int256 amount1, uint160 sqrtPriceX96, uint128 liquidity, int24 tick)",
-)
-
-export type TokenAddressPair = {
-  tokenAddress0: Hex
-  tokenAddress1: Hex
 }
 
 /*

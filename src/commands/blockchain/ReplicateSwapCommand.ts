@@ -1,6 +1,5 @@
 import { ICommand } from "../infrastructure/ICommand"
 import { BotResponseData } from "../../bots/infrastructure/BotResponseData"
-import { BlockchainService } from "../../blockchain/blockchain.service"
 import { SwapLog } from "../../blockchain/swap-observer.service"
 import { WalletService } from "../../blockchain/wallet/wallet.service"
 import { ReplicateDealCommand } from "../bot/ReplicateCommand"
@@ -9,12 +8,13 @@ import { absBigInt, calculateSqrtPriceWithSlippage, clampMax } from "../../utils
 import { Wallet } from "../../blockchain/wallet/wallet.entity"
 import { Replicate } from "../../blockchain/replicate.entity"
 import { ErrorHandler } from "../../errors/ErrorHandler"
+import { BlockchainPoolService } from "../../blockchain/blockchain-pool.service"
 
 export class ReplicateSwapCommand implements ICommand {
   private readonly slippagePercent = 0.5
 
   constructor(
-    private readonly blockchainService: BlockchainService,
+    private readonly blockchainPoolService: BlockchainPoolService,
     private readonly walletService: WalletService,
     private readonly swapLog: SwapLog,
   ) {}
@@ -78,7 +78,7 @@ export class ReplicateSwapCommand implements ICommand {
       poolAddress: this.swapLog.poolAddress,
     }
 
-    await this.blockchainService.executeSwap(swap, this.swapLog.tokens.tokenAddress0, replicate.user)
+    await this.blockchainPoolService.executeSwap(swap, this.swapLog.tokens.tokenAddress0, replicate.user)
   }
 
   private async handleBuyOperation(replicate: Replicate, userWallet: Wallet, userLimit: bigint) {
@@ -95,7 +95,7 @@ export class ReplicateSwapCommand implements ICommand {
       poolAddress: this.swapLog.poolAddress,
     }
 
-    await this.blockchainService.executeSwap(swap, this.swapLog.tokens.tokenAddress1, replicate.user)
+    await this.blockchainPoolService.executeSwap(swap, this.swapLog.tokens.tokenAddress1, replicate.user)
   }
 }
 
