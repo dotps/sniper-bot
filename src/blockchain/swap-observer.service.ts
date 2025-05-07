@@ -6,7 +6,6 @@ import { FollowWallet } from "./wallet/follow-wallet.entity"
 import { ISwapProvider } from "./dex/ISwapProvider"
 import { PoolTokenPair } from "./dex/PoolTokenPair"
 import { ReplicateSwapCommand } from "../commands/blockchain/ReplicateSwapCommand"
-import { UserService } from "../users/user.service"
 import { Logger } from "src/services/logger/Logger"
 
 @Injectable()
