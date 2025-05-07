@@ -1,6 +1,6 @@
 import { IBotResponseDto } from "./IBotResponseDto"
 import { BotType, IBotProvider } from "./IBotProvider"
-import { RequestDto } from "../../bots/bots.service"
+import { RequestDto } from "../bots.service"
 
 export abstract class BotProvider implements IBotProvider {
   abstract getBotType(): BotType

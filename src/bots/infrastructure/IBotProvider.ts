@@ -1,5 +1,5 @@
 import { IBotResponseDto } from "./IBotResponseDto"
-import { RequestDto } from "../../bots/bots.service"
+import { RequestDto } from "../bots.service"
 
 export interface IBotProvider {
   getBotType(): BotType

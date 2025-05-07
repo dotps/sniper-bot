@@ -1,9 +1,9 @@
 import { ICommand } from "../infrastructure/ICommand"
-import { BotResponseData } from "../../providers/bots/BotResponseData"
+import { BotResponseData } from "../../bots/infrastructure/BotResponseData"
 import { User } from "../../users/user.entity"
 import { TokenService } from "../../blockchain/token.service"
 import { ResponseBotError } from "../../errors/ResponseBotError"
-import { Logger } from "../../utils/Logger"
+import { Logger } from "../../services/logger/Logger"
 import { BlockchainService } from "../../blockchain/blockchain.service"
 import { WalletService } from "../../blockchain/wallet.service"
 

@@ -1,4 +1,4 @@
-import { BotType } from "src/providers/bots/IBotProvider"
+import { BotType } from "src/bots/infrastructure/IBotProvider"
 import { IBotResponseDto } from "./IBotResponseDto"
 
 export class BotResponseDto implements IBotResponseDto {

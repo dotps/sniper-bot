@@ -1,8 +1,8 @@
 import { Hex, parseAbi } from "viem"
 import { ISwapProvider } from "./ISwapProvider"
-import { PoolTokenPair } from "../../blockchain/PoolTokenPair"
-import { BlockchainService } from "../../blockchain/blockchain.service"
-import { Logger } from "../../utils/Logger"
+import { PoolTokenPair } from "../PoolTokenPair"
+import { BlockchainService } from "../blockchain.service"
+import { Logger } from "../../services/logger/Logger"
 
 export class Uniswap implements ISwapProvider {
   private pools: Map<Hex, PoolTokenPair> = new Map<Hex, PoolTokenPair>()

@@ -1,5 +1,5 @@
 import { ICommand } from "../infrastructure/ICommand"
-import { BotResponseData } from "../../providers/bots/BotResponseData"
+import { BotResponseData } from "../../bots/infrastructure/BotResponseData"
 import { Command } from "../infrastructure/BotCommandHandler"
 import { User } from "../../users/user.entity"
 import { isAddress } from "viem"

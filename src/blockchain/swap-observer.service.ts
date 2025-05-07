@@ -3,11 +3,11 @@ import { Hex, isAddress, PublicClient, WatchEventOnLogsParameter } from "viem"
 import { BlockchainService, swapEventAbi } from "./blockchain.service"
 import { WalletService } from "./wallet.service"
 import { FollowWallet } from "./follow-wallet.entity"
-import { ISwapProvider } from "../providers/nets/ISwapProvider"
+import { ISwapProvider } from "./dex/ISwapProvider"
 import { PoolTokenPair } from "./PoolTokenPair"
 import { ReplicateSwapCommand } from "../commands/blockchain/ReplicateSwapCommand"
 import { UserService } from "../users/user.service"
-import { Logger } from "src/utils/Logger"
+import { Logger } from "src/services/logger/Logger"
 
 @Injectable()
 export class SwapObserverService implements OnModuleInit {

@@ -1,6 +1,6 @@
 import { forwardRef, Inject, Injectable, OnModuleInit } from "@nestjs/common"
 import { Hex, isAddress, Log, parseAbi, parseAbiItem, PublicClient, WatchEventOnLogsParameter } from "viem"
-import { Logger } from "../utils/Logger"
+import { Logger } from "../services/logger/Logger"
 import { BlockchainService } from "./blockchain.service"
 import { WalletService } from "./wallet.service"
 import { FollowWallet } from "./follow-wallet.entity"

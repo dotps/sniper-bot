@@ -1,4 +1,4 @@
-import { BotResponseData } from "../../providers/bots/BotResponseData"
+import { BotResponseData } from "../../bots/infrastructure/BotResponseData"
 import { ICommand } from "../infrastructure/ICommand"
 
 export class ExitCommand implements ICommand {

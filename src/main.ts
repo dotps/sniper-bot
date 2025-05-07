@@ -9,9 +9,9 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }))
   const configService = app.get(ConfigService)
-  const port = configService.get<number>(Config.APP_PORT)
+  const port = configService.get<number>(Config.APP_PORT) ?? 3000
 
-  await app.listen(port ?? 3000)
+  await app.listen(port)
 }
 
 bootstrap()

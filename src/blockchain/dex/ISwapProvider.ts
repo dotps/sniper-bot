@@ -1,6 +1,6 @@
 import { Hex } from "viem"
 
-import { PoolTokenPair } from "../../blockchain/PoolTokenPair"
+import { PoolTokenPair } from "../PoolTokenPair"
 
 export interface ISwapProvider {
   getPools(): Map<Hex, PoolTokenPair>

@@ -1,15 +1,15 @@
-import { BotType, IBotProvider } from "../IBotProvider"
-import { IWebRequestService } from "../../IWebRequestService"
-import { Logger } from "../../../utils/Logger"
+import { BotType, IBotProvider } from "../infrastructure/IBotProvider"
+import { IWebRequestService } from "../../services/web-request/IWebRequestService"
+import { Logger } from "../../services/logger/Logger"
 import { TelegramCommands } from "./TelegramCommands"
 import { TelegramGetUpdatesResponse } from "./TelegramGetUpdatesResponse"
-import { IBotResponseDto } from "../IBotResponseDto"
-import { RequestDto } from "../../../bots/bots.service"
-import { TelegramUpdatesDto, TelegramBaseDto } from "../../../bots/telegram/telegram-updates.dto"
+import { IBotResponseDto } from "../infrastructure/IBotResponseDto"
+import { RequestDto } from "../bots.service"
+import { TelegramUpdatesDto, TelegramBaseDto } from "./telegram-updates.dto"
 import { plainToClass } from "class-transformer"
 import { validate } from "class-validator"
 import { ConfigService } from "@nestjs/config"
-import { Config } from "../../../config/config"
+import { Config } from "../../config/config"
 
 export class TelegramApiProvider implements IBotProvider {
   private readonly apiUrl: string

@@ -1,4 +1,4 @@
-import { Logger } from "../utils/Logger"
+import { Logger } from "../logger/Logger"
 import { IWebRequestService } from "./IWebRequestService"
 
 export class WebRequestFetchService implements IWebRequestService {

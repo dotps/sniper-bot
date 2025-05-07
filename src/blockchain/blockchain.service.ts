@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common"
 import { createPublicClient, erc20Abi, Hex, http, isAddress, parseAbi, parseAbiItem, PublicClient } from "viem"
 import { bscTestnet, polygon } from "viem/chains"
-import { Logger } from "../utils/Logger"
+import { Logger } from "../services/logger/Logger"
 import { ResponseBotError } from "../errors/ResponseBotError"
 import { Token } from "./token.entity"
 import { Swap } from "../commands/blockchain/ReplicateSwapCommand"
@@ -13,9 +13,9 @@ import { events, SendBotEvent } from "../events/events"
 import { User } from "../users/user.entity"
 import { ConfigService } from "@nestjs/config"
 import { Config } from "../config/config"
-import { ISwapProvider } from "../providers/nets/ISwapProvider"
-import { Uniswap } from "../providers/nets/Uniswap"
-import { Pancake } from "../providers/nets/Pancake"
+import { ISwapProvider } from "./dex/ISwapProvider"
+import { Uniswap } from "./dex/Uniswap"
+import { Pancake } from "./dex/Pancake"
 
 @Injectable()
 export class BlockchainService {

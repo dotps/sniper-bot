@@ -1,5 +1,5 @@
 import { ICommand } from "../infrastructure/ICommand"
-import { BotResponseData } from "../../providers/bots/BotResponseData"
+import { BotResponseData } from "../../bots/infrastructure/BotResponseData"
 import { UserService } from "../../users/user.service"
 import { User } from "../../users/user.entity"
 import { WalletService } from "../../blockchain/wallet.service"

@@ -2,8 +2,8 @@ import { Body, Controller, HttpCode, HttpStatus, Post, UsePipes, ValidationPipe 
 import { TelegramUpdatesDto } from "./telegram/telegram-updates.dto"
 import { BotsService } from "./bots.service"
 import { VkUpdatesDto } from "./vk/vk-updates.dto"
-import { TelegramApiProvider } from "../providers/bots/telegram/TelegramApiProvider"
-import { VkApiProvider } from "../providers/bots/vk/VkApiProvider"
+import { TelegramApiProvider } from "./telegram/TelegramApiProvider"
+import { VkApiProvider } from "./vk/VkApiProvider"
 
 @Controller("bots")
 export class BotsController {

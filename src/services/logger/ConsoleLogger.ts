@@ -13,13 +13,13 @@ export class ConsoleLogger implements ILoggerService {
   }
 
   error(text: any): void {
-    const date = new Date() + " | "
+    const date = new Date().toString() + " | "
     console.error(date + this.errorPrefix + text)
   }
 
   log(text: string): void {
     if (!this.enabled) return
-    const date = new Date() + " | "
+    const date = new Date().toString() + " | "
     console.log(date + text)
   }
 }
