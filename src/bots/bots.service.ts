@@ -15,6 +15,11 @@ import { BotResponseDto } from "./infrastructure/BotResponseDto"
 @Injectable()
 export class BotsService implements OnModuleInit {
   private bots: Map<new (...args: any[]) => BotProvider, BotProvider> = new Map()
+  private readonly messages = {
+    BOT_ERROR: "Ошибка обработки данных от провайдера бота.",
+    BOT_NOT_RESPONSE: "Данные от бота не получены.",
+    BOT_NOT_FOUND: "Бот не найден.",
+  } as const
 
   constructor(
     private readonly telegramBot: TelegramApiProvider,
@@ -38,7 +43,7 @@ export class BotsService implements OnModuleInit {
       if (bot.isUseIntervalUpdate()) {
         setInterval(() => {
           this.getUpdates(bot).catch(() => {
-            Logger.error("Ошибка обработки данных от провайдера бота.")
+            Logger.error(this.messages.BOT_ERROR)
           })
         }, bot.getUpdateInterval())
       }
@@ -53,12 +58,12 @@ export class BotsService implements OnModuleInit {
 
   async handleRequest<T extends BotProvider>(data: RequestDto, botClass: new (...args: any[]) => T) {
     if (!data.ok || !data.result) {
-      Logger.error("Данные от бота не получены.")
+      Logger.error(this.messages.BOT_NOT_RESPONSE)
       return
     }
 
     const bot = this.bots.get(botClass)
-    if (!bot) throw new NotFoundException("Бот не найден.")
+    if (!bot) throw new NotFoundException(this.messages.BOT_NOT_FOUND)
 
     const queryDataList = bot.getUpdatesData(data)
 
