@@ -19,29 +19,45 @@ export class ReplicateSwapCommand implements ICommand {
   ) {}
 
   async execute(): Promise<BotResponseData | null> {
-    const usersReplicates = await this.walletService.getReplicatesWithUserWallet(this.swapLog.users)
-    if (!usersReplicates || usersReplicates.length === 0) return null
     if (this.swapLog.amount0 === 0n || this.swapLog.amount1 === 0n) return null
 
-    const isToken0BoughtInPool = this.swapLog.amount0 < 0n && this.swapLog.amount1 > 0n // пул обслужил покупку token0 пользователем за token1
-    const isToken0SoldInPool = this.swapLog.amount0 > 0n && this.swapLog.amount1 < 0n // пул обслужил продажу token0 пользователем за token1
+    const usersReplicates = await this.walletService.getReplicatesWithUserWallet(this.swapLog.users)
+    if (!usersReplicates || usersReplicates.length === 0) return null
 
     for (const replicate of usersReplicates) {
-      if (this.swapLog.tokens.token0.address !== replicate.token.address) continue // не подписаны на повтор сделки для токена
-
-      const limit = BigInt(replicate.limit)
-      const userWallet = replicate.user.wallets[0]
-
-      if (!userWallet || !isAddress(userWallet.address)) continue
-
-      if (isToken0SoldInPool && replicate.command === ReplicateDealCommand.SELL) {
-        await this.handleSellOperation(replicate, userWallet, limit)
-      } else if (isToken0BoughtInPool && replicate.command === ReplicateDealCommand.BUY) {
-        await this.handleBuyOperation(replicate, userWallet, limit)
-      }
+      if (!this.isUserSubscribedOnToken(replicate.token.address)) continue
+      await this.executeReplicateOperation(replicate)
     }
 
     return null
+  }
+
+  private async executeReplicateOperation(replicate: Replicate): Promise<void> {
+    const limit = BigInt(replicate.limit)
+    const userWallet = replicate.user.wallets[0]
+
+    if (!userWallet || !isAddress(userWallet.address)) return
+
+    if (this.isToken0SoldInPool() && replicate.command === ReplicateDealCommand.SELL) {
+      await this.handleSellOperation(replicate, userWallet, limit)
+    } else if (this.isToken0BoughtInPool() && replicate.command === ReplicateDealCommand.BUY) {
+      await this.handleBuyOperation(replicate, userWallet, limit)
+    }
+  }
+
+  // не подписаны на повтор сделки для токена
+  private isUserSubscribedOnToken(replicateTokenAddress: Hex): boolean {
+    return this.swapLog.tokens.token0.address === replicateTokenAddress
+  }
+
+  // пул обслужил покупку token0 пользователем за token1
+  private isToken0BoughtInPool(): boolean {
+    return this.swapLog.amount0 < 0n && this.swapLog.amount1 > 0n
+  }
+
+  // пул обслужил продажу token0 пользователем за token1
+  private isToken0SoldInPool(): boolean {
+    return this.swapLog.amount0 > 0n && this.swapLog.amount1 < 0n
   }
 
   private async handleSellOperation(replicate: Replicate, userWallet: Wallet, userLimit: bigint) {
