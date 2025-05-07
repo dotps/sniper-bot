@@ -5,10 +5,9 @@ import { User } from "../../users/user.entity"
 import { TokenService } from "../../blockchain/token.service"
 import { TokenDto } from "../../blockchain/token.dto"
 import { Hex, isAddress } from "viem"
-import { ResponseBotError } from "../../errors/ResponseBotError"
-import { Logger } from "../../services/logger/Logger"
 import { BotCommands } from "./BotCommands"
 import { BlockchainService } from "../../blockchain/blockchain.service"
+import { ErrorHandler } from "../../errors/ErrorHandler"
 
 export class AddTokenCommand implements ICommand {
   private readonly messages = {
@@ -49,8 +48,7 @@ export class AddTokenCommand implements ICommand {
       response.push(this.messages.ADDED)
       response.push(this.messages.TOKEN_LIST + addresses)
     } catch (error) {
-      if (error instanceof ResponseBotError) response.push(error.message)
-      else Logger.error(error)
+      return ErrorHandler.handleAndResponse(error)
     }
     return new BotResponseData(response)
   }

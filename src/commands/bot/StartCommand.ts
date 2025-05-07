@@ -3,6 +3,7 @@ import { BotResponseData } from "../../bots/infrastructure/BotResponseData"
 import { UserService } from "../../users/user.service"
 import { User } from "../../users/user.entity"
 import { WalletService } from "../../blockchain/wallet.service"
+import { ErrorHandler } from "../../errors/ErrorHandler"
 
 export class StartCommand implements ICommand {
   private readonly messages = {
@@ -21,17 +22,21 @@ export class StartCommand implements ICommand {
   async execute(): Promise<BotResponseData | null> {
     const response: string[] = []
 
-    if (this.user.id) {
-      response.push(this.messages.EXIST)
-    } else {
-      const user = await this.userService.createUser(this.user)
-      if (user) {
-        const walletAddress = await this.walletService.createWallet(user.id)
-        response.push(this.messages.SUCCESS)
-        response.push(this.messages.WALLET_CREATED + walletAddress)
+    try {
+      if (this.user.id) {
+        response.push(this.messages.EXIST)
       } else {
-        response.push(this.messages.ERROR)
+        const user = await this.userService.createUser(this.user)
+        if (user) {
+          const walletAddress = await this.walletService.createWallet(user.id)
+          response.push(this.messages.SUCCESS)
+          response.push(this.messages.WALLET_CREATED + walletAddress)
+        } else {
+          response.push(this.messages.ERROR)
+        }
       }
+    } catch (error) {
+      return ErrorHandler.handleAndResponse(error)
     }
 
     return new BotResponseData(response)

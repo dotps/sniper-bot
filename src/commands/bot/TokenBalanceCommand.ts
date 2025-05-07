@@ -2,15 +2,15 @@ import { ICommand } from "../infrastructure/ICommand"
 import { BotResponseData } from "../../bots/infrastructure/BotResponseData"
 import { User } from "../../users/user.entity"
 import { TokenService } from "../../blockchain/token.service"
-import { ResponseBotError } from "../../errors/ResponseBotError"
-import { Logger } from "../../services/logger/Logger"
 import { BlockchainService } from "../../blockchain/blockchain.service"
 import { WalletService } from "../../blockchain/wallet.service"
+import { ErrorHandler } from "../../errors/ErrorHandler"
 
 export class TokenBalanceCommand implements ICommand {
   private readonly messages = {
     TOKEN_NOT_FOUND: "Токены не найдены.",
     CURRENT_BALANCE: "Текущий баланс:\n",
+    BASE_COIN: "BASE COIN: ",
   } as const
 
   constructor(
@@ -36,12 +36,11 @@ export class TokenBalanceCommand implements ICommand {
       }
 
       const balance = await this.blockchainService.getBalance(walletAddress)
-      balanceMessage += `BASE COIN: ${balance}\n`
+      balanceMessage += `${this.messages.BASE_COIN} ${balance}\n`
 
       response.push(this.messages.CURRENT_BALANCE + balanceMessage)
     } catch (error) {
-      if (error instanceof ResponseBotError) response.push(error.message)
-      else Logger.error(error)
+      return ErrorHandler.handleAndResponse(error)
     }
     return new BotResponseData(response)
   }
