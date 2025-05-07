@@ -51,7 +51,7 @@ export class ReplicateSwapCommand implements ICommand {
   }
 
   private isUserSubscribedOnToken(replicateTokenAddress: Hex): boolean {
-    return this.swapLog.tokens.token0.address === replicateTokenAddress
+    return this.swapLog.tokens.tokenAddress0.address === replicateTokenAddress
   }
 
   // пул обслужил покупку token0 пользователем за token1
@@ -78,7 +78,7 @@ export class ReplicateSwapCommand implements ICommand {
       poolAddress: this.swapLog.poolAddress,
     }
 
-    await this.blockchainService.executeSwap(swap, this.swapLog.tokens.token0, replicate.user)
+    await this.blockchainService.executeSwap(swap, this.swapLog.tokens.tokenAddress0, replicate.user)
   }
 
   private async handleBuyOperation(replicate: Replicate, userWallet: Wallet, userLimit: bigint) {
@@ -95,7 +95,7 @@ export class ReplicateSwapCommand implements ICommand {
       poolAddress: this.swapLog.poolAddress,
     }
 
-    await this.blockchainService.executeSwap(swap, this.swapLog.tokens.token1, replicate.user)
+    await this.blockchainService.executeSwap(swap, this.swapLog.tokens.tokenAddress1, replicate.user)
   }
 }
 

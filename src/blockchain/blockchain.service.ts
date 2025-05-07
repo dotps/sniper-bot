@@ -41,7 +41,7 @@ export class BlockchainService {
     this.blockchainTokenService = new BlockchainTokenService(this.getClient())
   }
 
-  private initBlockchainClients() {
+  private initBlockchainClients(): void {
     const bscClient = createPublicClient({
       chain: bscTestnet,
       transport: http(),
@@ -60,7 +60,7 @@ export class BlockchainService {
     console.log(this.defaultBlockchain)
   }
 
-  getSwapProvider(poolType: Blockchain = this.defaultBlockchain) {
+  getSwapProvider(poolType: Blockchain = this.defaultBlockchain): ISwapProvider {
     const swapProvider = this.swapProviders.get(poolType)
     if (!swapProvider) throw Error(this.messages.SWAP_PROVIDER_NOT_FOUND)
     return swapProvider
@@ -72,13 +72,12 @@ export class BlockchainService {
     return client
   }
 
-  async getBalance(address: Hex) {
+  async getBalance(address: Hex): Promise<bigint> {
     return await this.getClient().getBalance({ address: address })
   }
 
-  // TODO: добавить типы
-  async getTokensForPool(poolAddress: Hex) {
-    let [token0, token1] = await Promise.all([
+  async getTokensForPool(poolAddress: Hex): Promise<TokenAddressPair> {
+    let [tokenAddress0, tokenAddress1] = await Promise.all([
       this.getClient().readContract({
         address: poolAddress,
         abi: poolAbi,
@@ -91,10 +90,10 @@ export class BlockchainService {
       }),
     ])
 
-    token0 = token0.toLowerCase() as Hex
-    token1 = token1.toLowerCase() as Hex
+    tokenAddress0 = tokenAddress0.toLowerCase() as Hex
+    tokenAddress1 = tokenAddress1.toLowerCase() as Hex
 
-    return { token0, token1 }
+    return { tokenAddress0, tokenAddress1 }
   }
 
   async executeSwap(swap: Swap, tokenForPayment: PoolToken, user: User): Promise<void> {
@@ -145,11 +144,11 @@ const poolAbi = parseAbi([
 export const swapEventAbi = parseAbiItem(
   "event Swap(address indexed sender, address indexed recipient, int256 amount0, int256 amount1, uint160 sqrtPriceX96, uint128 liquidity, int24 tick)",
 )
-/*
-export type TokenInfo = {
-  symbol: string
-  decimals: number
-}*/
+
+export type TokenAddressPair = {
+  tokenAddress0: Hex
+  tokenAddress1: Hex
+}
 
 /*
 0xd0567bb38fa5bad45150026281c43fa6031577b9 - часто идут транзакции

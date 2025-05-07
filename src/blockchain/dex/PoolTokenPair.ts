@@ -1,6 +1,6 @@
 export type PoolTokenPair = {
-  token0: PoolToken
-  token1: PoolToken
+  tokenAddress0: PoolToken
+  tokenAddress1: PoolToken
 }
 
 export type PoolToken = {

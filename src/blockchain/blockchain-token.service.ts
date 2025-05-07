@@ -9,6 +9,7 @@ export class BlockchainTokenService {
     TOKEN_ERROR: "Ошибка с адресом токена. Возможно токен не принадлежит текущей сети.",
     TOKEN_CONTRACT_ERROR: "Не удалось прочитать контракт токена.",
     BALANCE_EMPTY: "Не хватает средств на балансе.",
+    TRANSFER_ERROR: "Ошибка при переводе ",
   } as const
 
   constructor(private readonly client: PublicClient) {}
@@ -65,7 +66,7 @@ export class BlockchainTokenService {
         account: fromAddress,
       })
     } catch (error) {
-      throw new ResponseBotError(`Ошибка при переводе ${token.symbol}.`, error)
+      throw new ResponseBotError(this.messages.TRANSFER_ERROR + token.symbol, error)
     }
   }
 }
