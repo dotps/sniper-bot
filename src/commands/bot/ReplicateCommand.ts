@@ -5,7 +5,7 @@ import { User } from "../../users/user.entity"
 import { BotCommands } from "./BotCommands"
 import { WalletService } from "../../blockchain/wallet.service"
 import { ErrorHandler } from "../../errors/ErrorHandler"
-import { Hex, isAddress } from "viem"
+import { Hex, isAddress, parseUnits } from "viem"
 import { TokenService } from "../../blockchain/token.service"
 import { ResponseBotError } from "../../errors/ResponseBotError"
 import { Token } from "../../blockchain/token.entity"
@@ -18,6 +18,9 @@ export class ReplicateCommand implements ICommand {
     INVALID_TOKEN: "Неверный формат адреса токена.",
     INVALID_LIMIT: "Неверный формат лимита.",
   } as const
+  private readonly commandIndex = 0
+  private readonly addressIndex = 1
+  private readonly limitIndex = 2
 
   constructor(
     private readonly walletService: WalletService,
@@ -27,7 +30,7 @@ export class ReplicateCommand implements ICommand {
   ) {}
 
   /*
-  формат команды
+   формат команды
    /replicate buy 0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619 100
    /replicate [buy/sell] [адрес_токена] [лимит_суммы_human_readable]
    */
@@ -51,17 +54,15 @@ export class ReplicateCommand implements ICommand {
   private async validateAndParseParams(): Promise<ReplicateParsedData> {
     const params = this.commandData.params || []
 
-    const command = params[0].toLowerCase()
+    const command = params[this.commandIndex].toLowerCase()
     if (!this.isValidCommand(command)) throw new ResponseBotError(this.messages.WRONG_COMMAND)
 
-    const tokenAddress = params[1].toLowerCase() as Hex
+    const tokenAddress = params[this.addressIndex].toLowerCase() as Hex
     if (!isAddress(tokenAddress)) throw new ResponseBotError(this.messages.INVALID_TOKEN)
 
     const token = await this.getUserTokenOrThrow(tokenAddress)
 
-    // TODO: конвертацию лимита из human в bigint + валидация
-    // const transferAmount = parseUnits(amount, token.decimals)
-    const limit = BigInt(params[2])
+    const limit = parseUnits(params[this.limitIndex], token.decimals)
     if (limit <= 0) throw new ResponseBotError(this.messages.INVALID_LIMIT)
 
     return { command, token, limit }

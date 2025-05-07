@@ -29,14 +29,9 @@ export class AddTokenCommand implements ICommand {
     const response: string[] = []
 
     const [tokenAddress] = this.commandData.params || []
-    console.log(tokenAddress)
     if (!tokenAddress || !isAddress(tokenAddress)) return new BotResponseData(this.messages.NEED_TOKEN)
 
     try {
-      // const tokenSymbol = await this.blockchainService.getTokenSymbol(tokenAddress)
-      // if (!tokenSymbol) return new BotResponseData(this.messages.WRONG_TOKEN)
-      // TODO: обработка ошибки если не может достать decimals или symbol и отправка сообщения в бота
-      // например 0xe592427a0aece92de3edee1f18e0157c05861564 или 0xd0567bb38fa5bad45150026281c43fa6031577b9 - разные ошибки
       const tokenInfo = await this.blockchainService.getTokenInfo(tokenAddress)
 
       const tokenDto: TokenDto = {
