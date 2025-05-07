@@ -31,7 +31,7 @@ export class BotsService implements OnModuleInit {
     this.bots.set(botClass, bot)
   }
 
-  async onModuleInit() {
+  async onModuleInit(): Promise<void> {
     this.addBot(TelegramApiProvider, this.telegramBot)
     // this.addBot(VkApiProvider, this.vkBot)
     await this.initBots()
@@ -56,7 +56,7 @@ export class BotsService implements OnModuleInit {
     await this.handleUpdatesAndSendResponse(bot, queryDataList)
   }
 
-  async handleRequest<T extends BotProvider>(data: RequestDto, botClass: new (...args: any[]) => T) {
+  async handleRequest<T extends BotProvider>(data: RequestDto, botClass: new (...args: any[]) => T): Promise<void> {
     if (!data.ok || !data.result) {
       Logger.error(this.messages.BOT_NOT_RESPONSE)
       return
@@ -70,7 +70,7 @@ export class BotsService implements OnModuleInit {
     await this.handleUpdatesAndSendResponse(bot, queryDataList)
   }
 
-  async handleUpdatesAndSendResponse(bot: BotProvider, updateDataList: IBotResponseDto[]) {
+  async handleUpdatesAndSendResponse(bot: BotProvider, updateDataList: IBotResponseDto[]): Promise<void> {
     for (const updateData of updateDataList) {
       updateData.botType = bot.getBotType()
       const response = await this.commandHandler.handleCommandFromUpdates(updateData)
@@ -90,7 +90,7 @@ export class BotsService implements OnModuleInit {
   }
 
   @OnEvent(events.SEND_BOT_RESPONSE)
-  async eventHandlerSendResponse(event: SendBotEvent) {
+  async eventHandlerSendResponse(event: SendBotEvent): Promise<void> {
     // TODO: убрать return
     console.log("сообщение отправлено, убрать return")
     return

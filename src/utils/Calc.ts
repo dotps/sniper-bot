@@ -18,7 +18,7 @@ function priceToSqrtPriceX96(price: number): bigint {
   return BigInt(Math.floor(sqrtPrice * Q96))
 }
 
-export function calculateSqrtPriceWithSlippage(sqrtPriceX96: bigint, slippagePercent: number, zeroForOne: boolean) {
+export function calculateSqrtPriceWithSlippage(sqrtPriceX96: bigint, slippagePercent: number, zeroForOne: boolean): bigint {
   const price = sqrtPriceX96ToPrice(sqrtPriceX96)
   const slippageFactor = zeroForOne ? 1 - slippagePercent / 100 : 1 + slippagePercent / 100
   const priceWithSlippage = price * slippageFactor

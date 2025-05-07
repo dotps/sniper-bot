@@ -13,7 +13,7 @@ export class Logger {
     Logger.loggerService.log(message)
   }
 
-  static error(message: any) {
+  static error(message: any): void {
     Logger.loggerService.error(message)
   }
 }

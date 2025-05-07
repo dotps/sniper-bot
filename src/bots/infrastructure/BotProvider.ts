@@ -12,4 +12,3 @@ export abstract class BotProvider implements IBotProvider {
   abstract isUseIntervalUpdate(): boolean
   abstract getUpdateInterval(): number
 }
-// TODO: перенести всех ботов в одно место выше

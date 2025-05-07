@@ -22,6 +22,10 @@ export class TelegramApiProvider implements IBotProvider {
   private isBotRunning: boolean = false
   private updateInterval: number = 5000
   private truePattern = "true"
+  private readonly messages = {
+    BOT_NOT_INIT: "Не удалось инициализировать бота.",
+    VALIDATION_ERROR: "Ошибка валидации ",
+  } as const
 
   constructor(
     private readonly webRequestService: IWebRequestService,
@@ -48,13 +52,13 @@ export class TelegramApiProvider implements IBotProvider {
       this.isBotRunning = true
       return
     } else {
-      Logger.error("Не удалось инициализировать бота.")
+      Logger.error(this.messages.BOT_NOT_INIT)
     }
   }
 
   async sendResponse(text: string, queryData: IBotResponseDto): Promise<void> {
     if (!this.isBotRunning) {
-      Logger.log("Бот не инициализирован.")
+      Logger.log(this.messages.BOT_NOT_INIT)
       return
     }
 
@@ -92,12 +96,12 @@ export class TelegramApiProvider implements IBotProvider {
     return this.updateInterval
   }
 
-  private async validateResponse(telegramResponseDto: TelegramUpdatesDto | TelegramBaseDto) {
+  private async validateResponse(telegramResponseDto: TelegramUpdatesDto | TelegramBaseDto): Promise<boolean> {
     if (!telegramResponseDto) return false
 
     const errors = await validate(telegramResponseDto)
     if (errors.length > 0) {
-      Logger.error("Ошибка валидации " + JSON.stringify(errors))
+      Logger.error(this.messages.VALIDATION_ERROR + JSON.stringify(errors))
       return false
     }
     return true

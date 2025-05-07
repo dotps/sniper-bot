@@ -64,7 +64,7 @@ export class ReplicateSwapCommand implements ICommand {
     return this.swapLog.amount0 > 0n && this.swapLog.amount1 < 0n
   }
 
-  private async handleSellOperation(replicate: Replicate, userWallet: Wallet, userLimit: bigint) {
+  private async handleSellOperation(replicate: Replicate, userWallet: Wallet, userLimit: bigint): Promise<void> {
     const amountSpecified = clampMax(absBigInt(this.swapLog.amount0), userLimit)
     const zeroForOne = true
     // в логе пул обслужил продажу token0 пользователем за token1 [token0 (-) ушел из пула, token1 (+) пришел в пул]
@@ -81,7 +81,7 @@ export class ReplicateSwapCommand implements ICommand {
     await this.blockchainPoolService.executeSwap(swap, this.swapLog.tokens.tokenAddress0, replicate.user)
   }
 
-  private async handleBuyOperation(replicate: Replicate, userWallet: Wallet, userLimit: bigint) {
+  private async handleBuyOperation(replicate: Replicate, userWallet: Wallet, userLimit: bigint): Promise<void> {
     const amountSpecified = clampMax(absBigInt(this.swapLog.amount1), userLimit)
     const zeroForOne = false
     // в логе пул обслужил покупку token0 пользователем за token1 [token0 (+) пришел в пул, token1 (-) ушел из пула]

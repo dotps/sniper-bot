@@ -50,7 +50,6 @@ export class WalletService {
     return createdWallet.address
   }
 
-  // TODO: вынести в blockchainService
   async getWalletClient(userId: number): Promise<WalletClient> {
     const wallet = await this.walletRepository.findOneBy({ userId: userId })
     if (!wallet) throw new ResponseBotError(this.messages.WALLET_NOT_FOUND)
@@ -92,7 +91,7 @@ export class WalletService {
     const followWallet = this.followRepository.create(followWalletDto)
     const wallet = await this.followRepository.save(followWallet)
 
-    this.swapObserverService.addFollowWalletIntoObserver(wallet) // TODO: через события отправить, чтобы не инжектить сервис
+    this.swapObserverService.addFollowWalletIntoObserver(wallet)
     return wallet
   }
 
@@ -137,7 +136,7 @@ export class WalletService {
     return result
   }
 
-  async unfollow(walletAddress: Hex, userId: number) {
+  async unfollow(walletAddress: Hex, userId: number): Promise<void> {
     const result = await this.followRepository.delete({
       userId: userId,
       wallet: walletAddress,
@@ -146,13 +145,8 @@ export class WalletService {
     if (!result || result.affected === 0) throw new ResponseBotError(this.messages.FOLLOW_WALLET_NOT_FOUND)
   }
 
-  async sendToken(tokenAddress: Hex, toAddress: Hex, transferAmount: bigint, userId: number) {
-    // await this.blockchainService.executeTokenTransfer(fromAddress, toAddress, transferAmount, this.user.id)
-    console.log(tokenAddress, toAddress, transferAmount, userId)
-  }
-
-  private encrypt(data: Hex) {
-    return data
+  private encrypt(data: Hex): string {
+    return data.toString()
   }
 
   private decrypt(data: string): Hex {

@@ -68,7 +68,7 @@ export class ReplicateCommand implements ICommand {
     return { command, token, limit }
   }
 
-  private async getUserTokenOrThrow(tokenAddress: Hex) {
+  private async getUserTokenOrThrow(tokenAddress: Hex): Promise<Token> {
     const userTokens = await this.tokenService.getUserTokens(this.user.id)
     const token = userTokens.find((token) => token.address === tokenAddress)
     if (!token) throw new ResponseBotError(this.messages.NOT_FOUND_TOKEN)

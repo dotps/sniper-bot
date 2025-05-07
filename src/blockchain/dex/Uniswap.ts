@@ -1,7 +1,6 @@
-import { Hex, parseAbi } from "viem"
+import { Hex } from "viem"
 import { ISwapProvider } from "./ISwapProvider"
 import { PoolTokenPair } from "./PoolTokenPair"
-import { BlockchainService } from "../blockchain.service"
 import { Logger } from "../../services/logger/Logger"
 import { BlockchainTokenService } from "../blockchain-token.service"
 import { BlockchainPoolService } from "../blockchain-pool.service"
@@ -10,7 +9,6 @@ export class Uniswap implements ISwapProvider {
   private pools: Map<Hex, PoolTokenPair> = new Map<Hex, PoolTokenPair>()
 
   constructor(
-    private readonly blockchainService: BlockchainService,
     private readonly blockchainTokenService: BlockchainTokenService,
     private readonly blockchainPoolService: BlockchainPoolService,
   ) {}
@@ -54,8 +52,3 @@ const poolAddresses: Hex[] = [
   "0x45dDa9cb7c25131DF268515131f647d726f50608", // USDC.e/WETH
   "0xA4D8c89f0c20efbe54cBa9e7e7a7E509056228D9", // USDC/WETH
 ]
-
-export const uniswapRouterAbi = parseAbi([
-  "function exactInputSingle((address tokenIn, address tokenOut, uint24 fee, address recipient, uint256 deadline, uint256 amountIn, uint256 amountOutMinimum, uint160 sqrtPriceLimitX96)) external payable returns (uint256 amountOut)",
-  "function exactOutputSingle((address tokenIn, address tokenOut, uint24 fee, address recipient, uint256 deadline, uint256 amountOut, uint256 amountInMaximum, uint160 sqrtPriceLimitX96)) external payable returns (uint256 amountIn)"
-])

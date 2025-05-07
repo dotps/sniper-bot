@@ -1,7 +1,7 @@
 import { ResponseBotError } from "./ResponseBotError"
 
 export class DBError {
-  static handle(error: unknown, textBefore?: string) {
+  static handle(error: unknown, textBefore?: string): void {
     const currentError = error as { code?: unknown }
     const code: string = currentError?.code?.toString() || ""
 

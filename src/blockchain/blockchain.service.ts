@@ -48,7 +48,7 @@ export class BlockchainService {
     this.clients.set(Blockchain.POLYGON, polygonClient)
     this.clients.set(Blockchain.BSC, bscClient)
 
-    this.swapProviders.set(Blockchain.POLYGON, new Uniswap(this, this.blockchainTokenService, this.blockchainPoolService))
+    this.swapProviders.set(Blockchain.POLYGON, new Uniswap(this.blockchainTokenService, this.blockchainPoolService))
     this.swapProviders.set(Blockchain.BSC, new Pancake())
 
     console.log(this.defaultBlockchain)
