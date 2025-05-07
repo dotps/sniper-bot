@@ -1,5 +1,5 @@
 import { forwardRef, Inject, Injectable, OnModuleInit } from "@nestjs/common"
-import { Hex, isAddress, Log, PublicClient, WatchEventOnLogsParameter } from "viem"
+import { Hex, isAddress, PublicClient, WatchEventOnLogsParameter } from "viem"
 import { BlockchainService, swapEventAbi } from "./blockchain.service"
 import { WalletService } from "./wallet/wallet.service"
 import { FollowWallet } from "./wallet/follow-wallet.entity"
@@ -20,7 +20,6 @@ export class SwapObserverService implements OnModuleInit {
     private readonly blockchainService: BlockchainService,
     @Inject(forwardRef(() => WalletService))
     private readonly walletService: WalletService,
-    private readonly userService: UserService,
   ) {
     this.client = this.blockchainService.getClient()
     this.swapProvider = this.blockchainService.getSwapProvider()
@@ -29,7 +28,7 @@ export class SwapObserverService implements OnModuleInit {
   async onModuleInit() {
     await this.swapProvider.init()
     await this.updateObservedWallets()
-    await this.watchSwaps()
+    this.watchSwaps()
   }
 
   private async updateObservedWallets() {
@@ -37,19 +36,19 @@ export class SwapObserverService implements OnModuleInit {
     console.log(this.observedWallets)
   }
 
-  async watchSwaps() {
+  watchSwaps() {
     try {
       this.pools = this.swapProvider.getPools()
       const poolsAddresses = [...this.pools.keys()]
 
-      const unwatch = this.client.watchEvent({
+      this.client.watchEvent({
         address: poolsAddresses,
         event: swapEventAbi,
         onLogs: (logs) => {
           const swaps = this.getSwapsOfObservableWallets(logs)
           for (const swap of swaps) {
             const command = new ReplicateSwapCommand(this.blockchainService, this.walletService, swap)
-            command.execute()
+            command.execute().catch((error) => Logger.error(error))
           }
         },
       })
@@ -64,42 +63,26 @@ export class SwapObserverService implements OnModuleInit {
     for (const log of logs) {
       const addresses = this.getAddressesFromLog(log)
       if (!addresses) continue
-      // TODO: вынести в одельный метод getValidatedAddresses + проверить рефакторинг
 
-      const { sender, recipient, poolAddress } = addresses
-
-      // if (!log.args) continue
-      // let sender = log.args.sender
-      // let recipient = log.args.recipient
-      //
-      // if (!sender || !isAddress(sender)) continue
-      // if (!recipient || !isAddress(recipient)) continue
-      //
-      // sender = sender.toLowerCase() as Hex
-      // recipient = recipient.toLowerCase() as Hex
-      //
-      // const poolAddress = log.address.toLowerCase() as Hex
-      //
-
-      const tokens = this.pools.get(poolAddress)
+      const tokens = this.pools.get(addresses.poolAddress)
       if (!tokens) continue
 
-      const subscribedUsersOnWallet = this.observedWallets.get(sender) ?? this.observedWallets.get(recipient)
-      if (subscribedUsersOnWallet) {
-        const swap: SwapLog = {
-          sender: sender,
-          recipient: recipient,
-          poolAddress: poolAddress,
-          amount0: log.args.amount0 ?? 0n,
-          amount1: log.args.amount1 ?? 0n,
-          sqrtPriceX96: log.args.sqrtPriceX96 ?? 0n,
-          liquidity: log.args.liquidity ?? 0n,
-          tick: log.args.tick ?? 0,
-          tokens: tokens,
-          users: subscribedUsersOnWallet,
-        }
-        swaps.push(swap)
+      const subscribedUsersOnWallet = this.observedWallets.get(addresses.sender) ?? this.observedWallets.get(addresses.recipient)
+      if (!subscribedUsersOnWallet) continue
+
+      const swap: SwapLog = {
+        sender: addresses.sender,
+        recipient: addresses.recipient,
+        poolAddress: addresses.poolAddress,
+        amount0: log.args.amount0 ?? 0n,
+        amount1: log.args.amount1 ?? 0n,
+        sqrtPriceX96: log.args.sqrtPriceX96 ?? 0n,
+        liquidity: log.args.liquidity ?? 0n,
+        tick: log.args.tick ?? 0,
+        tokens: tokens,
+        users: subscribedUsersOnWallet,
       }
+      swaps.push(swap)
     }
 
     return swaps
@@ -110,14 +93,16 @@ export class SwapObserverService implements OnModuleInit {
 
     const sender = log.args.sender
     const recipient = log.args.recipient
+    const poolAddress = log.address
 
     if (!sender || !isAddress(sender)) return null
     if (!recipient || !isAddress(recipient)) return null
+    if (!poolAddress || !isAddress(poolAddress)) return null
 
     return {
       sender: sender.toLowerCase() as Hex,
       recipient: recipient.toLowerCase() as Hex,
-      poolAddress: log.address.toLowerCase() as Hex,
+      poolAddress: poolAddress.toLowerCase() as Hex,
     }
   }
 
