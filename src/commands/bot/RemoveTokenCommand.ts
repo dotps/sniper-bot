@@ -1,5 +1,5 @@
 import { ICommand } from "../infrastructure/ICommand"
-import { ResponseData } from "../../data/ResponseData"
+import { BotResponseData } from "../../providers/bots/BotResponseData"
 import { Command } from "../infrastructure/BotCommandHandler"
 import { User } from "../../users/user.entity"
 import { TokenService } from "../../blockchain/token.service"
@@ -25,9 +25,9 @@ export class RemoveTokenCommand implements ICommand {
     this.commandData = commandData
   }
 
-  async execute(): Promise<ResponseData | null> {
+  async execute(): Promise<BotResponseData | null> {
     const [tokenAddress] = this.commandData.params || []
-    if (!tokenAddress) return new ResponseData(this.messages.NEED_TOKEN)
+    if (!tokenAddress) return new BotResponseData(this.messages.NEED_TOKEN)
 
     try {
       const canRemoveAllTokens = tokenAddress === this.removeAllTokensCommand
@@ -36,10 +36,10 @@ export class RemoveTokenCommand implements ICommand {
       if (canRemoveAllTokens) {
         await this.tokenService.removeAllTokens(this.user.id)
       } else {
-        if (!isAddress(tokenAddress)) return new ResponseData(this.messages.NEED_TOKEN)
+        if (!isAddress(tokenAddress)) return new BotResponseData(this.messages.NEED_TOKEN)
         await this.tokenService.removeToken(tokenAddress, this.user.id)
       }
-      return new ResponseData(successMessage)
+      return new BotResponseData(successMessage)
     } catch (error) {
       return ErrorHandler.handleAndResponse(error)
     }

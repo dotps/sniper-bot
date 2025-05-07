@@ -1,5 +1,5 @@
-import { ResponseData } from "../../data/ResponseData"
+import { BotResponseData } from "../../providers/bots/BotResponseData"
 
 export interface ICommand {
-  execute(): Promise<ResponseData | null>
+  execute(): Promise<BotResponseData | null>
 }

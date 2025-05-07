@@ -1,4 +1,4 @@
-import { ResponseData } from "../../data/ResponseData"
+import { BotResponseData } from "../../providers/bots/BotResponseData"
 import { ICommand } from "../infrastructure/ICommand"
 
 export class ExitCommand implements ICommand {
@@ -6,7 +6,7 @@ export class ExitCommand implements ICommand {
 
   constructor() {}
 
-  async execute(): Promise<ResponseData | null> {
-    return new ResponseData(this.response)
+  async execute(): Promise<BotResponseData | null> {
+    return new BotResponseData(this.response)
   }
 }

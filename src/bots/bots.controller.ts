@@ -1,7 +1,7 @@
 import { Body, Controller, HttpCode, HttpStatus, Post, UsePipes, ValidationPipe } from "@nestjs/common"
-import { TelegramUpdatesDto } from "./telegram/telegramUpdatesDto"
+import { TelegramUpdatesDto } from "./telegram/telegram-updates.dto"
 import { BotsService } from "./bots.service"
-import { RequestVkDto } from "./vk/request-vk.dto"
+import { VkUpdatesDto } from "./vk/vk-updates.dto"
 import { TelegramApiProvider } from "../providers/bots/telegram/TelegramApiProvider"
 import { VkApiProvider } from "../providers/bots/vk/VkApiProvider"
 
@@ -19,7 +19,7 @@ export class BotsController {
   @Post("vk")
   @HttpCode(HttpStatus.OK)
   @UsePipes(ValidationPipe)
-  async handleVkontakte(@Body() data: RequestVkDto): Promise<void> {
+  async handleVkontakte(@Body() data: VkUpdatesDto): Promise<void> {
     await this.botsService.handleRequest(data, VkApiProvider)
   }
 }

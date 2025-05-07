@@ -1,9 +1,4 @@
-import {
-  ExceptionFilter,
-  Catch,
-  ArgumentsHost,
-  BadRequestException,
-} from "@nestjs/common"
+import { ExceptionFilter, Catch, ArgumentsHost, BadRequestException } from "@nestjs/common"
 import { Response } from "express"
 
 @Catch(BadRequestException)
@@ -16,7 +11,7 @@ export class TelegramValidationFilter implements ExceptionFilter {
 
     const telegramResponse = {
       ok: false,
-      description: "Validation failed",
+      description: "Ошибка валидации.",
       errors: validationErrors.message,
     }
 

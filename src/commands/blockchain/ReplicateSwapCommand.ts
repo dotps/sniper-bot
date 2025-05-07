@@ -1,5 +1,5 @@
 import { ICommand } from "../infrastructure/ICommand"
-import { ResponseData } from "../../data/ResponseData"
+import { BotResponseData } from "../../providers/bots/BotResponseData"
 import { BlockchainService } from "../../blockchain/blockchain.service"
 import { SwapLog } from "../../blockchain/swap-observer.service"
 import { WalletService } from "../../blockchain/wallet.service"
@@ -18,7 +18,7 @@ export class ReplicateSwapCommand implements ICommand {
     private readonly swapLog: SwapLog,
   ) {}
 
-  async execute(): Promise<ResponseData | null> {
+  async execute(): Promise<BotResponseData | null> {
     const usersReplicates = await this.walletService.getReplicatesWithUserWallet(this.swapLog.users)
     if (!usersReplicates || usersReplicates.length === 0) return null
     if (this.swapLog.amount0 === 0n || this.swapLog.amount1 === 0n) return null

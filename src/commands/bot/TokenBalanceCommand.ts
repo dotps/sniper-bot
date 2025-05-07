@@ -1,5 +1,5 @@
 import { ICommand } from "../infrastructure/ICommand"
-import { ResponseData } from "../../data/ResponseData"
+import { BotResponseData } from "../../providers/bots/BotResponseData"
 import { User } from "../../users/user.entity"
 import { TokenService } from "../../blockchain/token.service"
 import { ResponseBotError } from "../../errors/ResponseBotError"
@@ -20,12 +20,12 @@ export class TokenBalanceCommand implements ICommand {
     private readonly user: User,
   ) {}
 
-  async execute(): Promise<ResponseData | null> {
+  async execute(): Promise<BotResponseData | null> {
     const response: string[] = []
 
     try {
       const tokens = await this.tokenService.getUserTokens(this.user.id)
-      if (tokens.length === 0) return new ResponseData(this.messages.TOKEN_NOT_FOUND)
+      if (tokens.length === 0) return new BotResponseData(this.messages.TOKEN_NOT_FOUND)
 
       const walletAddress = await this.walletService.getWalletAddress(this.user.id)
 
@@ -43,6 +43,6 @@ export class TokenBalanceCommand implements ICommand {
       if (error instanceof ResponseBotError) response.push(error.message)
       else Logger.error(error)
     }
-    return new ResponseData(response)
+    return new BotResponseData(response)
   }
 }

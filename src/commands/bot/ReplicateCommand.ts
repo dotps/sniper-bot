@@ -1,5 +1,5 @@
 import { ICommand } from "../infrastructure/ICommand"
-import { ResponseData } from "../../data/ResponseData"
+import { BotResponseData } from "../../providers/bots/BotResponseData"
 import { Command } from "../infrastructure/BotCommandHandler"
 import { User } from "../../users/user.entity"
 import { BotCommands } from "./BotCommands"
@@ -31,12 +31,12 @@ export class ReplicateCommand implements ICommand {
    /replicate buy 0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619 100
    /replicate [buy/sell] [адрес_токена] [лимит_суммы_human_readable]
    */
-  async execute(): Promise<ResponseData | null> {
+  async execute(): Promise<BotResponseData | null> {
     try {
       const { command, token, limit } = await this.validateAndParseParams()
       const replicate = await this.walletService.createReplicate(command, this.user.id, limit, token)
 
-      return new ResponseData(
+      return new BotResponseData(
         `${this.messages.SUCCESS}\nКоманда: ${replicate.command}\nТокен: ${replicate.token.symbol}\nЛимит: ${replicate.limit}`,
       )
     } catch (error) {

@@ -1,5 +1,5 @@
 import { ICommand } from "../infrastructure/ICommand"
-import { ResponseData } from "../../data/ResponseData"
+import { BotResponseData } from "../../providers/bots/BotResponseData"
 import { Command } from "../infrastructure/BotCommandHandler"
 import { User } from "../../users/user.entity"
 import { Hex, isAddress, parseUnits } from "viem"
@@ -29,19 +29,19 @@ export class SendCommand implements ICommand {
 
   // Формат команды /send 0x7ceb23fd6bc0add59e62ac25578270cff1b9f619 0.41 0xF6dD294C065DDE53CcA856249FB34ae67BE5C54C
   // адрес_токена сумма_human_формат адрес_кошелька
-  async execute(): Promise<ResponseData | null> {
+  async execute(): Promise<BotResponseData | null> {
     try {
       const { tokenAddress, amount, toAddress } = this.validateAndParseParams()
       const tokenInfo = await this.blockchainService.getTokenInfo(tokenAddress)
       const token = plainToClass(Token, { address: tokenAddress, ...tokenInfo })
 
       const transferAmount = parseUnits(amount, token.decimals)
-      if (!transferAmount) return new ResponseData(this.messages.NEED_AMOUNT)
+      if (!transferAmount) return new BotResponseData(this.messages.NEED_AMOUNT)
 
       const fromAddress = await this.walletService.getWalletAddress(this.user.id)
       await this.blockchainService.transferToken(fromAddress, toAddress, token, transferAmount)
 
-      return new ResponseData(this.messages.SUCCESS)
+      return new BotResponseData(this.messages.SUCCESS)
     } catch (error) {
       return ErrorHandler.handleAndResponse(error)
     }

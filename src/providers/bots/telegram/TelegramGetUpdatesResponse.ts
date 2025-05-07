@@ -1,17 +1,18 @@
-import { IBotResponseDto } from "../../providers/bots/IBotResponseDto"
-import { BotType } from "../../providers/bots/IBotProvider"
+import { IBotResponseDto } from "../IBotResponseDto"
+import { BotType } from "../IBotProvider"
+import { TelegramResultDto } from "../../../bots/telegram/telegram-updates.dto"
 
 export class TelegramGetUpdatesResponse {
   updates: IBotResponseDto[]
 
-  constructor(data: any) {
+  constructor(data: TelegramResultDto[]) {
     if (!Array.isArray(data)) {
       this.updates = []
       return
     }
+    console.log(data)
 
-    // TODO: все проверить и реализовать проще, по идее это все не нужно т.к есть QueryDto в bot контроллере
-    this.updates = data.map((update) => {
+    this.updates = data.map((update: TelegramResultDto) => {
       const updateData: IBotResponseDto = {
         updateId: Number(update?.update_id) || 0,
         chatId: Number(update?.message?.chat?.id) || 0,

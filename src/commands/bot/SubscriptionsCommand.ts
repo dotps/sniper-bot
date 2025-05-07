@@ -1,5 +1,5 @@
 import { ICommand } from "../infrastructure/ICommand"
-import { ResponseData } from "../../data/ResponseData"
+import { BotResponseData } from "../../providers/bots/BotResponseData"
 import { User } from "../../users/user.entity"
 import { WalletService } from "../../blockchain/wallet.service"
 import { ErrorHandler } from "../../errors/ErrorHandler"
@@ -17,13 +17,13 @@ export class SubscriptionsCommand implements ICommand {
     this.walletService = walletService
   }
 
-  async execute(): Promise<ResponseData | null> {
+  async execute(): Promise<BotResponseData | null> {
     try {
       const followWallets = await this.walletService.getFollowWalletsForUser(this.user.id)
-      if (followWallets.length === 0) return new ResponseData(this.messages.NOT_FOUND)
+      if (followWallets.length === 0) return new BotResponseData(this.messages.NOT_FOUND)
 
       const subscriptionMessage = followWallets.map((followWallet) => followWallet.wallet).join("\n")
-      return new ResponseData(this.messages.CURRENT_SUBSCRIPTIONS + subscriptionMessage)
+      return new BotResponseData(this.messages.CURRENT_SUBSCRIPTIONS + subscriptionMessage)
     } catch (error) {
       return ErrorHandler.handleAndResponse(error)
     }

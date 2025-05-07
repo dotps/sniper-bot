@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException, OnModuleInit } from "@nestjs/common"
-import { TelegramUpdatesDto } from "./telegram/telegramUpdatesDto"
+import { TelegramUpdatesDto } from "./telegram/telegram-updates.dto"
 import { BotProvider } from "../providers/bots/BotProvider"
 import { BotCommandHandler } from "../commands/infrastructure/BotCommandHandler"
 import { Logger } from "../utils/Logger"
 import { TelegramApiProvider } from "../providers/bots/telegram/TelegramApiProvider"
-import { RequestVkDto } from "./vk/request-vk.dto"
+import { VkUpdatesDto } from "./vk/vk-updates.dto"
 import { IBotResponseDto } from "../providers/bots/IBotResponseDto"
 import { OnEvent } from "@nestjs/event-emitter"
 import { events, SendBotEvent } from "../events/events"
@@ -100,4 +100,4 @@ export class BotsService implements OnModuleInit {
   }
 }
 
-export type RequestDto = TelegramUpdatesDto | RequestVkDto
+export type RequestDto = TelegramUpdatesDto | VkUpdatesDto

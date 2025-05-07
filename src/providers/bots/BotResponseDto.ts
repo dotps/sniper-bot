@@ -11,7 +11,7 @@ export class BotResponseDto implements IBotResponseDto {
   username: string
   botType: BotType
 
-  constructor(data?: any) {
+  constructor(data?: BotResponseDto) {
     this.text = data?.text || ""
     this.updateId = data?.updateId || 0
     this.chatId = data?.chatId || 0

@@ -1,5 +1,5 @@
 import { ICommand } from "../infrastructure/ICommand"
-import { ResponseData } from "../../data/ResponseData"
+import { BotResponseData } from "../../providers/bots/BotResponseData"
 import { Command } from "../infrastructure/BotCommandHandler"
 import { User } from "../../users/user.entity"
 import { TokenService } from "../../blockchain/token.service"
@@ -25,16 +25,16 @@ export class AddTokenCommand implements ICommand {
     private readonly commandData: Command,
   ) {}
 
-  async execute(): Promise<ResponseData | null> {
+  async execute(): Promise<BotResponseData | null> {
     const response: string[] = []
 
     const [tokenAddress] = this.commandData.params || []
     console.log(tokenAddress)
-    if (!tokenAddress || !isAddress(tokenAddress)) return new ResponseData(this.messages.NEED_TOKEN)
+    if (!tokenAddress || !isAddress(tokenAddress)) return new BotResponseData(this.messages.NEED_TOKEN)
 
     try {
       // const tokenSymbol = await this.blockchainService.getTokenSymbol(tokenAddress)
-      // if (!tokenSymbol) return new ResponseData(this.messages.WRONG_TOKEN)
+      // if (!tokenSymbol) return new BotResponseData(this.messages.WRONG_TOKEN)
       // TODO: обработка ошибки если не может достать decimals или symbol и отправка сообщения в бота
       // например 0xe592427a0aece92de3edee1f18e0157c05861564 или 0xd0567bb38fa5bad45150026281c43fa6031577b9 - разные ошибки
       const tokenInfo = await this.blockchainService.getTokenInfo(tokenAddress)
@@ -57,6 +57,6 @@ export class AddTokenCommand implements ICommand {
       if (error instanceof ResponseBotError) response.push(error.message)
       else Logger.error(error)
     }
-    return new ResponseData(response)
+    return new BotResponseData(response)
   }
 }

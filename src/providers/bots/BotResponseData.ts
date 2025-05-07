@@ -1,4 +1,4 @@
-export class ResponseData {
+export class BotResponseData {
   public data: string[] = []
 
   constructor(data?: string[] | string) {

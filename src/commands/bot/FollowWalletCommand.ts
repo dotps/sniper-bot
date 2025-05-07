@@ -1,5 +1,5 @@
 import { ICommand } from "../infrastructure/ICommand"
-import { ResponseData } from "../../data/ResponseData"
+import { BotResponseData } from "../../providers/bots/BotResponseData"
 import { Command } from "../infrastructure/BotCommandHandler"
 import { User } from "../../users/user.entity"
 import { BotCommands } from "./BotCommands"
@@ -22,13 +22,13 @@ export class FollowWalletCommand implements ICommand {
     this.commandData = commandData
   }
 
-  async execute(): Promise<ResponseData | null> {
+  async execute(): Promise<BotResponseData | null> {
     const [walletAddress] = this.commandData.params || []
-    if (!walletAddress || !isAddress(walletAddress)) return new ResponseData(this.messages.NEED_WALLET)
+    if (!walletAddress || !isAddress(walletAddress)) return new BotResponseData(this.messages.NEED_WALLET)
 
     try {
       await this.walletService.createFollowWallet(walletAddress, this.user.id)
-      return new ResponseData(this.messages.SUCCESS)
+      return new BotResponseData(this.messages.SUCCESS)
     } catch (error) {
       return ErrorHandler.handleAndResponse(error)
     }

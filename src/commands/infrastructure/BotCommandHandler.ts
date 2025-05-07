@@ -1,4 +1,4 @@
-import { ResponseData } from "../../data/ResponseData"
+import { BotResponseData } from "../../providers/bots/BotResponseData"
 import { IBotResponseDto } from "../../providers/bots/IBotResponseDto"
 import { Injectable } from "@nestjs/common"
 import { Logger } from "../../utils/Logger"
@@ -17,22 +17,22 @@ export class BotCommandHandler {
     private readonly userService: UserService,
   ) {}
 
-  async handleCommandFromUpdates(updateData: IBotResponseDto): Promise<ResponseData | null> {
+  async handleCommandFromUpdates(updateData: IBotResponseDto): Promise<BotResponseData | null> {
     try {
       const parsedCommand = this.parseCommand(updateData.text)
-      if (!parsedCommand) return new ResponseData(this.enterCommandMessage)
+      if (!parsedCommand) return new BotResponseData(this.enterCommandMessage)
 
       let user = await this.userService.getUser(updateData.userId, updateData.botType)
-      if (parsedCommand.command !== BotCommands.START && !user) return new ResponseData(this.needRegisterMessage)
+      if (parsedCommand.command !== BotCommands.START && !user) return new BotResponseData(this.needRegisterMessage)
       if (!user) user = this.userService.createUnregisteredUser(updateData)
 
       const command = this.commandFactory.createCommand(user, parsedCommand)
-      return command ? await command.execute() : new ResponseData(this.defaultMessage)
+      return command ? await command.execute() : new BotResponseData(this.defaultMessage)
     } catch (error) {
       Logger.error(error)
     }
 
-    return new ResponseData(this.defaultMessage)
+    return new BotResponseData(this.defaultMessage)
   }
 
   parseCommand(input: string): Command | null {
