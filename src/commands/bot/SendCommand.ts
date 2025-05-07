@@ -5,10 +5,10 @@ import { User } from "../../users/user.entity"
 import { Hex, isAddress, parseUnits } from "viem"
 import { BotCommands } from "./BotCommands"
 import { ErrorHandler } from "../../errors/ErrorHandler"
-import { WalletService } from "../../blockchain/wallet.service"
+import { WalletService } from "../../blockchain/wallet/wallet.service"
 import { BlockchainService } from "../../blockchain/blockchain.service"
 import { ResponseBotError } from "../../errors/ResponseBotError"
-import { Token } from "../../blockchain/token.entity"
+import { Token } from "../../blockchain/token/token.entity"
 import { plainToClass } from "class-transformer"
 
 export class SendCommand implements ICommand {

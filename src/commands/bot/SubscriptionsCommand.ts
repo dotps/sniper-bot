@@ -1,7 +1,7 @@
 import { ICommand } from "../infrastructure/ICommand"
 import { BotResponseData } from "../../bots/infrastructure/BotResponseData"
 import { User } from "../../users/user.entity"
-import { WalletService } from "../../blockchain/wallet.service"
+import { WalletService } from "../../blockchain/wallet/wallet.service"
 import { ErrorHandler } from "../../errors/ErrorHandler"
 
 export class SubscriptionsCommand implements ICommand {

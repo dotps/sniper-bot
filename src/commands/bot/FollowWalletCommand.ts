@@ -3,7 +3,7 @@ import { BotResponseData } from "../../bots/infrastructure/BotResponseData"
 import { Command } from "../infrastructure/BotCommandHandler"
 import { User } from "../../users/user.entity"
 import { BotCommands } from "./BotCommands"
-import { WalletService } from "../../blockchain/wallet.service"
+import { WalletService } from "../../blockchain/wallet/wallet.service"
 import { isAddress } from "viem"
 import { ErrorHandler } from "../../errors/ErrorHandler"
 

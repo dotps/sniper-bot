@@ -1,10 +1,9 @@
 import { forwardRef, Inject, Injectable, OnModuleInit } from "@nestjs/common"
-import { Hex, isAddress, Log, parseAbi, parseAbiItem, PublicClient, WatchEventOnLogsParameter } from "viem"
+import { Hex, isAddress, parseAbi, PublicClient } from "viem"
 import { Logger } from "../services/logger/Logger"
 import { BlockchainService } from "./blockchain.service"
-import { WalletService } from "./wallet.service"
-import { FollowWallet } from "./follow-wallet.entity"
-import { ReplicateSwapCommand } from "../commands/blockchain/ReplicateSwapCommand"
+import { WalletService } from "./wallet/wallet.service"
+import { FollowWallet } from "./wallet/follow-wallet.entity"
 
 @Injectable()
 export class TransactionObserverService implements OnModuleInit {
@@ -14,7 +13,7 @@ export class TransactionObserverService implements OnModuleInit {
 
   constructor(
     private readonly blockchainService: BlockchainService,
-    @Inject(forwardRef(() => WalletService)) // TODO: посмотреть как можно выйти из циклической зависимости
+    @Inject(forwardRef(() => WalletService))
     private readonly walletService: WalletService,
   ) {
     this.client = this.blockchainService.getClient()

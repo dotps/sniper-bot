@@ -3,16 +3,16 @@ import { InjectRepository } from "@nestjs/typeorm"
 import { In, Repository } from "typeorm"
 import { FollowWallet } from "./follow-wallet.entity"
 import { createWalletClient, Hex, http, WalletClient } from "viem"
-import { ResponseBotError } from "../errors/ResponseBotError"
-import { ReplicateDealCommand } from "../commands/bot/ReplicateCommand"
-import { Replicate } from "./replicate.entity"
-import { DBError } from "../errors/DBError"
+import { ResponseBotError } from "../../errors/ResponseBotError"
+import { ReplicateDealCommand } from "../../commands/bot/ReplicateCommand"
+import { Replicate } from "../replicate.entity"
+import { DBError } from "../../errors/DBError"
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts"
 import { Wallet } from "./wallet.entity"
-import { BlockchainService } from "./blockchain.service"
-import { BotCommands } from "../commands/bot/BotCommands"
-import { SwapObserverService } from "./swap-observer.service"
-import { Token } from "./token.entity"
+import { BlockchainService } from "../blockchain.service"
+import { BotCommands } from "../../commands/bot/BotCommands"
+import { SwapObserverService } from "../swap-observer.service"
+import { Token } from "../token/token.entity"
 
 @Injectable()
 export class WalletService {
@@ -31,7 +31,7 @@ export class WalletService {
     @InjectRepository(Replicate)
     private readonly replicateRepository: Repository<Replicate>,
     private readonly blockchainService: BlockchainService,
-    @Inject(forwardRef(() => SwapObserverService)) // TODO: посмотреть как можно выйти из циклической зависимости
+    @Inject(forwardRef(() => SwapObserverService))
     private readonly swapObserverService: SwapObserverService,
   ) {}
 
@@ -160,11 +160,9 @@ export class WalletService {
   }
 
   async getReplicatesWithUserWallet(users: number[]): Promise<Replicate[]> {
-    const commands = await this.replicateRepository.find({
+    return await this.replicateRepository.find({
       where: { userId: In(users) },
       relations: ["user.wallets", "token"],
     })
-
-    return commands
   }
 }

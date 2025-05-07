@@ -5,7 +5,7 @@ import { User } from "../../users/user.entity"
 import { isAddress } from "viem"
 import { BotCommands } from "./BotCommands"
 import { ErrorHandler } from "../../errors/ErrorHandler"
-import { WalletService } from "../../blockchain/wallet.service"
+import { WalletService } from "../../blockchain/wallet/wallet.service"
 
 export class UnfollowCommand implements ICommand {
   private readonly messages = {

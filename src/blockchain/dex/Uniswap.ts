@@ -1,6 +1,6 @@
 import { Hex, parseAbi } from "viem"
 import { ISwapProvider } from "./ISwapProvider"
-import { PoolTokenPair } from "../PoolTokenPair"
+import { PoolTokenPair } from "./PoolTokenPair"
 import { BlockchainService } from "../blockchain.service"
 import { Logger } from "../../services/logger/Logger"
 

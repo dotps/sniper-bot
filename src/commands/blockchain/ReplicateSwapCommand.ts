@@ -2,12 +2,13 @@ import { ICommand } from "../infrastructure/ICommand"
 import { BotResponseData } from "../../bots/infrastructure/BotResponseData"
 import { BlockchainService } from "../../blockchain/blockchain.service"
 import { SwapLog } from "../../blockchain/swap-observer.service"
-import { WalletService } from "../../blockchain/wallet.service"
+import { WalletService } from "../../blockchain/wallet/wallet.service"
 import { ReplicateDealCommand } from "../bot/ReplicateCommand"
 import { Hex, isAddress } from "viem"
 import { absBigInt, calculateSqrtPriceWithSlippage, clampMax } from "../../utils/Calc"
-import { Wallet } from "../../blockchain/wallet.entity"
+import { Wallet } from "../../blockchain/wallet/wallet.entity"
 import { Replicate } from "../../blockchain/replicate.entity"
+import { ErrorHandler } from "../../errors/ErrorHandler"
 
 export class ReplicateSwapCommand implements ICommand {
   private readonly slippagePercent = 0.5
@@ -21,12 +22,16 @@ export class ReplicateSwapCommand implements ICommand {
   async execute(): Promise<BotResponseData | null> {
     if (this.swapLog.amount0 === 0n || this.swapLog.amount1 === 0n) return null
 
-    const usersReplicates = await this.walletService.getReplicatesWithUserWallet(this.swapLog.users)
-    if (!usersReplicates || usersReplicates.length === 0) return null
+    try {
+      const usersReplicates = await this.walletService.getReplicatesWithUserWallet(this.swapLog.users)
+      if (!usersReplicates || usersReplicates.length === 0) return null
 
-    for (const replicate of usersReplicates) {
-      if (!this.isUserSubscribedOnToken(replicate.token.address)) continue // не подписаны на повтор сделки для токена
-      await this.executeReplicateOperation(replicate)
+      for (const replicate of usersReplicates) {
+        if (!this.isUserSubscribedOnToken(replicate.token.address)) continue // не подписаны на повтор сделки для токена
+        await this.executeReplicateOperation(replicate)
+      }
+    } catch (error) {
+      return ErrorHandler.handleAndResponse(error)
     }
 
     return null

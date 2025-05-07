@@ -3,12 +3,12 @@ import { BotResponseData } from "../../bots/infrastructure/BotResponseData"
 import { Command } from "../infrastructure/BotCommandHandler"
 import { User } from "../../users/user.entity"
 import { BotCommands } from "./BotCommands"
-import { WalletService } from "../../blockchain/wallet.service"
+import { WalletService } from "../../blockchain/wallet/wallet.service"
 import { ErrorHandler } from "../../errors/ErrorHandler"
 import { Hex, isAddress, parseUnits } from "viem"
-import { TokenService } from "../../blockchain/token.service"
+import { TokenService } from "../../blockchain/token/token.service"
 import { ResponseBotError } from "../../errors/ResponseBotError"
-import { Token } from "../../blockchain/token.entity"
+import { Token } from "../../blockchain/token/token.entity"
 
 export class ReplicateCommand implements ICommand {
   private readonly messages = {

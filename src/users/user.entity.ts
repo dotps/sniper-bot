@@ -1,9 +1,9 @@
 import { BotType } from "src/bots/infrastructure/IBotProvider"
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm"
 import { Expose } from "class-transformer"
-import { Token } from "../blockchain/token.entity"
-import { FollowWallet } from "../blockchain/follow-wallet.entity"
-import { Wallet } from "../blockchain/wallet.entity"
+import { Token } from "../blockchain/token/token.entity"
+import { FollowWallet } from "../blockchain/wallet/follow-wallet.entity"
+import { Wallet } from "../blockchain/wallet/wallet.entity"
 
 @Entity()
 export class User {
@@ -43,9 +43,6 @@ export class User {
 
   @OneToMany(() => FollowWallet, (followWallet) => followWallet.user)
   followWallets: FollowWallet[]
-
-  // @OneToMany(() => FollowWallet, (followWallet) => followWallet.user)
-  // followWallets: Relation<FollowWallet[]>
 
   @OneToMany(() => Wallet, (wallet) => wallet.user)
   wallets: Wallet[]
