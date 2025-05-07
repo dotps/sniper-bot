@@ -4,7 +4,6 @@ import { Logger } from "../../../utils/Logger"
 import { TelegramCommands } from "./TelegramCommands"
 import { TelegramGetUpdatesResponse } from "../../../data/Telegram/TelegramGetUpdatesResponse"
 import { IQueryData } from "../../../data/IQueryData"
-import { TelegramConfig } from "./TelegramConfig"
 import { RequestDto } from "../../../bots/bots.service"
 import { TelegramUpdatesDto, TelegramBaseDto } from "../../../bots/telegram/telegramUpdatesDto"
 import { plainToClass } from "class-transformer"
@@ -22,20 +21,17 @@ export class TelegramApiProvider implements IBotProvider {
   private lastUpdateId: number = 0
   private isBotRunning: boolean = false
   private updateInterval: number = 5000
+  private truePattern = "true"
 
   constructor(
     private readonly webRequestService: IWebRequestService,
     private readonly configService: ConfigService,
   ) {
-    // TODO: добавить загрузку настроек
     this.token = this.configService.get<string>(Config.TELEGRAM_TOKEN) ?? ""
     this.apiUrl = this.configService.get<string>(Config.TELEGRAM_API_URL) ?? ""
-    this.canUseWebhook = this.configService.get<boolean>(Config.TELEGRAM_USE_WEBHOOK) ?? true
-    this.canUseUpdate = this.configService.get<boolean>(Config.TELEGRAM_USE_UPDATE) ?? false
-    console.log(this.canUseWebhook)
-    console.log(this.canUseUpdate)
+    this.canUseWebhook = this.configService.get<string>(Config.TELEGRAM_USE_WEBHOOK)?.toLowerCase() === this.truePattern
+    this.canUseUpdate = this.configService.get<string>(Config.TELEGRAM_USE_UPDATE)?.toLowerCase() === this.truePattern
     this.baseUrl = this.apiUrl + this.token + "/"
-    // TODO: почему-то update продолжает работать
   }
 
   getBotType(): BotType {
@@ -75,10 +71,6 @@ export class TelegramApiProvider implements IBotProvider {
     const updatesUrl = `${this.baseUrl}${TelegramCommands.GET_UPDATES}?${offset}`
     const telegramResponse = await this.webRequestService.tryGet<TelegramUpdatesDto>(updatesUrl)
     const telegramResponseDto = plainToClass(TelegramUpdatesDto, telegramResponse)
-    // console.log(telegramResponse)
-    // console.log(telegramResponseDto)
-    // TODO: добавить поле fromUser для создания DTO
-    // updateData.botType = bot.getBotType()
 
     return (await this.validateResponse(telegramResponseDto)) ? this.getUpdatesData(telegramResponseDto) : []
   }
