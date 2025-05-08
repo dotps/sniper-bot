@@ -31,25 +31,56 @@ export class BlockchainTokenService {
     }
   }
 
-  async getTokenInfo(tokenAddress: Hex): Promise<TokenInfo> {
-    try {
-      const [symbol, decimals] = await Promise.all([
-        this.client.readContract({
-          address: tokenAddress,
-          abi: erc20Abi,
-          functionName: "symbol",
-        }),
-        this.client.readContract({
-          address: tokenAddress,
-          abi: erc20Abi,
-          functionName: "decimals",
-        }),
-      ])
+  async getTokenInfo(address: Hex): Promise<TokenInfo>
+  async getTokenInfo(addresses: Hex[]): Promise<TokenInfo[]>
+  async getTokenInfo(addresses: Hex | Hex[]): Promise<TokenInfo | TokenInfo[]> {
+    addresses = Array.isArray(addresses) ? addresses : [addresses]
 
-      return { symbol, decimals }
+    try {
+      const contracts: Promise<ContractResult>[] = []
+      for (const address of addresses) {
+        contracts.push(
+          this.client.readContract({ address: address, abi: erc20Abi, functionName: "symbol" }),
+          this.client.readContract({ address: address, abi: erc20Abi, functionName: "decimals" }),
+        )
+      }
+      const results = await Promise.all(contracts)
+
+      const tokens: TokenInfo[] = []
+      for (let i = 0; i < results.length; i += 2) {
+        tokens.push({
+          symbol: results[i] as string,
+          decimals: results[i + 1] as number,
+        })
+      }
+
+      // const promises: Promise<ContractResult>[] = [
+      //   this.client.readContract({ address, abi: erc20Abi, functionName: "symbol" }),
+      //   this.client.readContract({ address, abi: erc20Abi, functionName: "decimals" }),
+      //   // ...
+      // ];
+      //
+      // const results = await Promise.all(promises)
+
+      // const [symbol, decimals] = await Promise.all([
+      //   this.client.readContract({
+      //     address: tokenAddress,
+      //     abi: erc20Abi,
+      //     functionName: "symbol",
+      //   }),
+      //   this.client.readContract({
+      //     address: tokenAddress,
+      //     abi: erc20Abi,
+      //     functionName: "decimals",
+      //   }),
+      // ])
+
+      // return { symbol, decimals }
+      return Array.isArray(addresses) ? tokens : tokens[0]
     } catch (error) {
       Logger.error(error)
-      throw new ResponseBotError(`${this.messages.TOKEN_CONTRACT_ERROR}\n ${tokenAddress}`)
+      // throw new ResponseBotError(`${this.messages.TOKEN_CONTRACT_ERROR}\n ${tokenAddress}`)
+      throw new ResponseBotError(`${this.messages.TOKEN_CONTRACT_ERROR}\n`)
     }
   }
 
@@ -75,3 +106,5 @@ export type TokenInfo = {
   symbol: string
   decimals: number
 }
+
+type ContractResult = string | number
