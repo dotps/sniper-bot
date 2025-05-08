@@ -28,6 +28,7 @@ export class ReplicateSwapCommand implements ICommand {
 
       for (const replicate of usersReplicates) {
         if (!this.isUserSubscribedOnToken(replicate.token.address)) continue // не подписаны на повтор сделки для токена
+        console.log("Подписка на кошельки. Запущена репликация токена ", replicate.token)
         await this.executeReplicateOperation(replicate)
       }
     } catch (error) {

@@ -35,10 +35,12 @@ export class BlockchainTokenService {
   async getTokenInfo(addresses: Hex[]): Promise<TokenInfo[]>
   async getTokenInfo(addresses: Hex | Hex[]): Promise<TokenInfo | TokenInfo[]> {
     addresses = Array.isArray(addresses) ? addresses : [addresses]
+    let currentTokenAddress: Hex = "0x"
 
     try {
       const contracts: Promise<ContractResult>[] = []
       for (const address of addresses) {
+        currentTokenAddress = address
         contracts.push(
           this.client.readContract({ address: address, abi: erc20Abi, functionName: "symbol" }),
           this.client.readContract({ address: address, abi: erc20Abi, functionName: "decimals" }),
@@ -54,33 +56,10 @@ export class BlockchainTokenService {
         })
       }
 
-      // const promises: Promise<ContractResult>[] = [
-      //   this.client.readContract({ address, abi: erc20Abi, functionName: "symbol" }),
-      //   this.client.readContract({ address, abi: erc20Abi, functionName: "decimals" }),
-      //   // ...
-      // ];
-      //
-      // const results = await Promise.all(promises)
-
-      // const [symbol, decimals] = await Promise.all([
-      //   this.client.readContract({
-      //     address: tokenAddress,
-      //     abi: erc20Abi,
-      //     functionName: "symbol",
-      //   }),
-      //   this.client.readContract({
-      //     address: tokenAddress,
-      //     abi: erc20Abi,
-      //     functionName: "decimals",
-      //   }),
-      // ])
-
-      // return { symbol, decimals }
       return Array.isArray(addresses) ? tokens : tokens[0]
     } catch (error) {
       Logger.error(error)
-      // throw new ResponseBotError(`${this.messages.TOKEN_CONTRACT_ERROR}\n ${tokenAddress}`)
-      throw new ResponseBotError(`${this.messages.TOKEN_CONTRACT_ERROR}\n`)
+      throw new ResponseBotError(`${this.messages.TOKEN_CONTRACT_ERROR}\n ${currentTokenAddress}`)
     }
   }
 

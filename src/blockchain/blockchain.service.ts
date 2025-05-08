@@ -30,9 +30,13 @@ export class BlockchainService {
     this.defaultBlockchain = Object.values(Blockchain).includes(blockchain as Blockchain)
       ? (blockchain as Blockchain)
       : Blockchain.POLYGON
+
     this.initBlockchainClients()
+
     this.blockchainTokenService = new BlockchainTokenService(this.getClient())
     this.blockchainPoolService = new BlockchainPoolService(this.getClient(), this.blockchainTokenService, eventEmitter)
+
+    this.initSwapProviders()
   }
 
   private initBlockchainClients(): void {
@@ -48,10 +52,12 @@ export class BlockchainService {
     this.clients.set(Blockchain.POLYGON, polygonClient)
     this.clients.set(Blockchain.BSC, bscClient)
 
+    console.log(this.defaultBlockchain)
+  }
+
+  private initSwapProviders(): void {
     this.swapProviders.set(Blockchain.POLYGON, new Uniswap(this.blockchainTokenService, this.blockchainPoolService))
     this.swapProviders.set(Blockchain.BSC, new Pancake())
-
-    console.log(this.defaultBlockchain)
   }
 
   getSwapProvider(poolType: Blockchain = this.defaultBlockchain): ISwapProvider {
