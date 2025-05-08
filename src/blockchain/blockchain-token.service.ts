@@ -21,7 +21,7 @@ export class BlockchainTokenService {
     try {
       return await this.client.readContract({
         address: token.address,
-        abi: erc20Abi, // TODO: в настройки, еще где-то встречается
+        abi: erc20Abi,
         functionName: "balanceOf",
         args: [walletAddress],
       })
