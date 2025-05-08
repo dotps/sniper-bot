@@ -35,7 +35,7 @@ export class SwapObserverService implements OnModuleInit {
 
   private async updateObservedWallets(): Promise<void> {
     this.observedWallets = await this.walletService.getFollowWallets()
-    console.log(this.observedWallets)
+    console.log("Наблюдаемые кошельки и пользователи", this.observedWallets)
   }
 
   watchSwaps(): void {
