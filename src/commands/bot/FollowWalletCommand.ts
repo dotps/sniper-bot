@@ -23,12 +23,16 @@ export class FollowWalletCommand implements ICommand {
   }
 
   async execute(): Promise<BotResponseData | null> {
-    const [walletAddress] = this.commandData.params || []
-    if (!walletAddress || !isAddress(walletAddress)) return new BotResponseData(this.messages.NEED_WALLET)
+    const addresses = this.commandData.params || []
 
     try {
-      await this.walletService.createFollowWallet(walletAddress, this.user.id)
-      return new BotResponseData(this.messages.SUCCESS)
+      const response: string[] = []
+      for (const address of addresses) {
+        if (!address || !isAddress(address)) return new BotResponseData(this.messages.NEED_WALLET)
+        await this.walletService.createFollowWallet(address, this.user.id)
+        response.push(address + " " + this.messages.SUCCESS)
+      }
+      return new BotResponseData(response)
     } catch (error) {
       return ErrorHandler.handleAndResponse(error)
     }
