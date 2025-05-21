@@ -34,12 +34,13 @@ export class BlockchainTokenService {
   async getTokenInfo(address: Hex): Promise<TokenInfo>
   async getTokenInfo(addresses: Hex[]): Promise<TokenInfo[]>
   async getTokenInfo(addresses: Hex | Hex[]): Promise<TokenInfo | TokenInfo[]> {
-    addresses = Array.isArray(addresses) ? addresses : [addresses]
+    const isArray = Array.isArray(addresses)
+    const addressesArray = isArray ? addresses : [addresses]
     let currentTokenAddress: Hex = "0x"
 
     try {
       const contracts: Promise<ContractResult>[] = []
-      for (const address of addresses) {
+      for (const address of addressesArray) {
         currentTokenAddress = address
         contracts.push(
           this.client.readContract({ address: address, abi: erc20Abi, functionName: "symbol" }),
@@ -56,7 +57,7 @@ export class BlockchainTokenService {
         })
       }
 
-      return Array.isArray(addresses) ? tokens : tokens[0]
+      return isArray ? tokens : tokens[0]
     } catch (error) {
       Logger.error(error)
       throw new ResponseBotError(`${this.messages.TOKEN_CONTRACT_ERROR}\n ${currentTokenAddress}`)
