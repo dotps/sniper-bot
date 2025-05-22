@@ -28,7 +28,7 @@ export class SendCommand implements ICommand {
   ) {}
 
   // Формат команды /send 0x7ceb23fd6bc0add59e62ac25578270cff1b9f619 0.41 0xF6dD294C065DDE53CcA856249FB34ae67BE5C54C
-  // адрес_токена сумма_human_формат адрес_кошелька
+  // /send адрес_токена сумма_human_readable адрес_кошелька
   async execute(): Promise<BotResponseData | null> {
     try {
       const { tokenAddress, amount, toAddress } = this.validateAndParseParams()

@@ -32,7 +32,6 @@ export class AddTokenCommand implements ICommand {
 
     try {
       const tokenInfo = await this.blockchainTokenService.getTokenInfo(tokenAddress)
-
       const tokenDto: TokenDto = {
         balance: 0n,
         address: tokenAddress.toLowerCase() as Hex,

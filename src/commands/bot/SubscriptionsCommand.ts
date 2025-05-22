@@ -9,7 +9,7 @@ export class SubscriptionsCommand implements ICommand {
   private readonly user: User
   private readonly messages = {
     NOT_FOUND: "Подписки не найдены.",
-    CURRENT_SUBSCRIPTIONS: "Текушие подписки:\n",
+    CURRENT_SUBSCRIPTIONS: "Вы подписаны на кошельки:\n",
   } as const
 
   constructor(walletService: WalletService, user: User) {

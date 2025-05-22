@@ -5,7 +5,7 @@ import { User } from "../../users/user.entity"
 import { BotCommands } from "./BotCommands"
 import { WalletService } from "../../blockchain/wallet/wallet.service"
 import { ErrorHandler } from "../../errors/ErrorHandler"
-import { Hex, isAddress, parseUnits } from "viem"
+import { formatUnits, Hex, isAddress, parseUnits } from "viem"
 import { TokenService } from "../../blockchain/token/token.service"
 import { ResponseBotError } from "../../errors/ResponseBotError"
 import { Token } from "../../blockchain/token/token.entity"
@@ -32,7 +32,7 @@ export class ReplicateCommand implements ICommand {
   /*
    формат команды
    /replicate buy 0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619 100
-   /replicate [buy/sell] [адрес_токена] [лимит_суммы_human_readable]
+   /replicate buy/sell адрес_токена лимит_суммы_human_readable
    */
   async execute(): Promise<BotResponseData | null> {
     try {
@@ -40,7 +40,7 @@ export class ReplicateCommand implements ICommand {
       const replicate = await this.walletService.createReplicate(command, this.user.id, limit, token)
 
       return new BotResponseData(
-        `${this.messages.SUCCESS}\nКоманда: ${replicate.command}\nТокен: ${replicate.token.symbol}\nЛимит: ${replicate.limit}`,
+        `${this.messages.SUCCESS}\nКоманда: ${replicate.command}\nТокен: ${replicate.token.symbol}\nЛимит: ${formatUnits(replicate.limit, replicate.token.decimals)}`,
       )
     } catch (error) {
       return ErrorHandler.handleAndResponse(error)

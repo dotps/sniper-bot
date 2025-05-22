@@ -1,0 +1,445 @@
+{
+	"info": {
+		"_postman_id": "f767b2e4-c06d-4caf-83c1-c8e0405f8d65",
+		"name": "Sniper",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "30363017"
+	},
+	"item": [
+		{
+			"name": "1. Регистрация",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"ok\": true,\r\n    \"result\": [\r\n        {\r\n            \"update_id\": 362309960,\r\n            \"message\": {\r\n                \"message_id\": 197,\r\n                \"from\": {\r\n                    \"id\": {{chatId}},\r\n                    \"is_bot\": false,\r\n                    \"first_name\": \"Name\",\r\n                    \"last_name\": \"Test\",\r\n                    \"username\": \"tester\",\r\n                    \"language_code\": \"ru\"\r\n                },\r\n                \"chat\": {\r\n                    \"id\": {{chatId}},\r\n                    \"first_name\": \"Name\",\r\n                    \"last_name\": \"Test\",\r\n                    \"username\": \"tester\",\r\n                    \"type\": \"private\"\r\n                },\r\n                \"date\": 1742476287,\r\n                \"text\": \"/start\",\r\n                \"entities\": [\r\n                    {\r\n                        \"offset\": 0,\r\n                        \"length\": 6,\r\n                        \"type\": \"bot_command\"\r\n                    }\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/bots/telegram",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"bots",
+						"telegram"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2. Добавление токена WETH",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"ok\": true,\r\n    \"result\": [\r\n        {\r\n            \"update_id\": 362309960,\r\n            \"message\": {\r\n                \"message_id\": 197,\r\n                \"from\": {\r\n                    \"id\": {{chatId}},\r\n                    \"is_bot\": false,\r\n                    \"first_name\": \"Name\",\r\n                    \"last_name\": \"Test\",\r\n                    \"username\": \"tester\",\r\n                    \"language_code\": \"ru\"\r\n                },\r\n                \"chat\": {\r\n                    \"id\": {{chatId}},\r\n                    \"first_name\": \"Name\",\r\n                    \"last_name\": \"Test\",\r\n                    \"username\": \"tester\",\r\n                    \"type\": \"private\"\r\n                },\r\n                \"date\": 1742476287,\r\n                \"text\": \"/addtoken 0x7ceb23fd6bc0add59e62ac25578270cff1b9f619\",\r\n                \"entities\": [\r\n                    {\r\n                        \"offset\": 0,\r\n                        \"length\": 6,\r\n                        \"type\": \"bot_command\"\r\n                    }\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/bots/telegram",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"bots",
+						"telegram"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3. Добавление токена USDC",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"ok\": true,\r\n    \"result\": [\r\n        {\r\n            \"update_id\": 362309960,\r\n            \"message\": {\r\n                \"message_id\": 197,\r\n                \"from\": {\r\n                    \"id\": {{chatId}},\r\n                    \"is_bot\": false,\r\n                    \"first_name\": \"Name\",\r\n                    \"last_name\": \"Test\",\r\n                    \"username\": \"tester\",\r\n                    \"language_code\": \"ru\"\r\n                },\r\n                \"chat\": {\r\n                    \"id\": {{chatId}},\r\n                    \"first_name\": \"Name\",\r\n                    \"last_name\": \"Test\",\r\n                    \"username\": \"tester\",\r\n                    \"type\": \"private\"\r\n                },\r\n                \"date\": 1742476287,\r\n                \"text\": \"/addtoken 0x3c499c542cef5e3811e1192ce70d8cc03d5c3359\",\r\n                \"entities\": [\r\n                    {\r\n                        \"offset\": 0,\r\n                        \"length\": 6,\r\n                        \"type\": \"bot_command\"\r\n                    }\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/bots/telegram",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"bots",
+						"telegram"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4. Добавление токена REQ",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"ok\": true,\r\n    \"result\": [\r\n        {\r\n            \"update_id\": 362309960,\r\n            \"message\": {\r\n                \"message_id\": 197,\r\n                \"from\": {\r\n                    \"id\": {{chatId}},\r\n                    \"is_bot\": false,\r\n                    \"first_name\": \"Name\",\r\n                    \"last_name\": \"Test\",\r\n                    \"username\": \"tester\",\r\n                    \"language_code\": \"ru\"\r\n                },\r\n                \"chat\": {\r\n                    \"id\": {{chatId}},\r\n                    \"first_name\": \"Name\",\r\n                    \"last_name\": \"Test\",\r\n                    \"username\": \"tester\",\r\n                    \"type\": \"private\"\r\n                },\r\n                \"date\": 1742476287,\r\n                \"text\": \"/addtoken 0x3c499c542cef5e3811e1192ce70d8cc03d5c3359\",\r\n                \"entities\": [\r\n                    {\r\n                        \"offset\": 0,\r\n                        \"length\": 6,\r\n                        \"type\": \"bot_command\"\r\n                    }\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/bots/telegram",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"bots",
+						"telegram"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "5. Просмотр балансов токенов",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"ok\": true,\r\n    \"result\": [\r\n        {\r\n            \"update_id\": 362309960,\r\n            \"message\": {\r\n                \"message_id\": 197,\r\n                \"from\": {\r\n                    \"id\": {{chatId}},\r\n                    \"is_bot\": false,\r\n                    \"first_name\": \"Name\",\r\n                    \"last_name\": \"Test\",\r\n                    \"username\": \"tester\",\r\n                    \"language_code\": \"ru\"\r\n                },\r\n                \"chat\": {\r\n                    \"id\": {{chatId}},\r\n                    \"first_name\": \"Name\",\r\n                    \"last_name\": \"Test\",\r\n                    \"username\": \"tester\",\r\n                    \"type\": \"private\"\r\n                },\r\n                \"date\": 1742476287,\r\n                \"text\": \"/balance\",\r\n                \"entities\": [\r\n                    {\r\n                        \"offset\": 0,\r\n                        \"length\": 6,\r\n                        \"type\": \"bot_command\"\r\n                    }\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/bots/telegram",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"bots",
+						"telegram"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "6. Удалить токен REQ",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"ok\": true,\r\n    \"result\": [\r\n        {\r\n            \"update_id\": 362309960,\r\n            \"message\": {\r\n                \"message_id\": 197,\r\n                \"from\": {\r\n                    \"id\": {{chatId}},\r\n                    \"is_bot\": false,\r\n                    \"first_name\": \"Name\",\r\n                    \"last_name\": \"Test\",\r\n                    \"username\": \"tester\",\r\n                    \"language_code\": \"ru\"\r\n                },\r\n                \"chat\": {\r\n                    \"id\": {{chatId}},\r\n                    \"first_name\": \"Name\",\r\n                    \"last_name\": \"Test\",\r\n                    \"username\": \"tester\",\r\n                    \"type\": \"private\"\r\n                },\r\n                \"date\": 1742476287,\r\n                \"text\": \"/removetoken 0xB25e20De2F2eBb4CfFD4D16a55C7B395e8a94762\",\r\n                \"entities\": [\r\n                    {\r\n                        \"offset\": 0,\r\n                        \"length\": 6,\r\n                        \"type\": \"bot_command\"\r\n                    }\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/bots/telegram",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"bots",
+						"telegram"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "7. Подписка на кошельки",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"ok\": true,\r\n    \"result\": [\r\n        {\r\n            \"update_id\": 362309960,\r\n            \"message\": {\r\n                \"message_id\": 197,\r\n                \"from\": {\r\n                    \"id\": {{chatId}},\r\n                    \"is_bot\": false,\r\n                    \"first_name\": \"Name\",\r\n                    \"last_name\": \"Test\",\r\n                    \"username\": \"tester\",\r\n                    \"language_code\": \"ru\"\r\n                },\r\n                \"chat\": {\r\n                    \"id\": {{chatId}},\r\n                    \"first_name\": \"Name\",\r\n                    \"last_name\": \"Test\",\r\n                    \"username\": \"tester\",\r\n                    \"type\": \"private\"\r\n                },\r\n                \"date\": 1742476287,\r\n                \"text\": \"/follow 0x85cd07ea01423b1e937929b44e4ad8c40bbb5e61 0x85cd07ea01423b1e937929b44e4ad8c40bbb5e71 0x7f20a7a526d1bab092e3be0733d96287e93cef59 0xe592427a0aece92de3edee1f18e0157c05861564 0x802b65b5d9016621e66003aed0b16615093f328b\",\r\n                \"entities\": [\r\n                    {\r\n                        \"offset\": 0,\r\n                        \"length\": 6,\r\n                        \"type\": \"bot_command\"\r\n                    }\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/bots/telegram",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"bots",
+						"telegram"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "8. Повторные сделки BUY WETH",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"ok\": true,\r\n    \"result\": [\r\n        {\r\n            \"update_id\": 362309960,\r\n            \"message\": {\r\n                \"message_id\": 197,\r\n                \"from\": {\r\n                    \"id\": {{chatId}},\r\n                    \"is_bot\": false,\r\n                    \"first_name\": \"Name\",\r\n                    \"last_name\": \"Test\",\r\n                    \"username\": \"tester\",\r\n                    \"language_code\": \"ru\"\r\n                },\r\n                \"chat\": {\r\n                    \"id\": {{chatId}},\r\n                    \"first_name\": \"Name\",\r\n                    \"last_name\": \"Test\",\r\n                    \"username\": \"tester\",\r\n                    \"type\": \"private\"\r\n                },\r\n                \"date\": 1742476287,\r\n                \"text\": \"/replicate buy 0x7ceb23fd6bc0add59e62ac25578270cff1b9f619 1\",\r\n                \"entities\": [\r\n                    {\r\n                        \"offset\": 0,\r\n                        \"length\": 6,\r\n                        \"type\": \"bot_command\"\r\n                    }\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/bots/telegram",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"bots",
+						"telegram"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "9. Повторные сделки SELL WETH",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"ok\": true,\r\n    \"result\": [\r\n        {\r\n            \"update_id\": 362309960,\r\n            \"message\": {\r\n                \"message_id\": 197,\r\n                \"from\": {\r\n                    \"id\": {{chatId}},\r\n                    \"is_bot\": false,\r\n                    \"first_name\": \"Name\",\r\n                    \"last_name\": \"Test\",\r\n                    \"username\": \"tester\",\r\n                    \"language_code\": \"ru\"\r\n                },\r\n                \"chat\": {\r\n                    \"id\": {{chatId}},\r\n                    \"first_name\": \"Name\",\r\n                    \"last_name\": \"Test\",\r\n                    \"username\": \"tester\",\r\n                    \"type\": \"private\"\r\n                },\r\n                \"date\": 1742476287,\r\n                \"text\": \"/replicate sell 0x7ceb23fd6bc0add59e62ac25578270cff1b9f619 1\",\r\n                \"entities\": [\r\n                    {\r\n                        \"offset\": 0,\r\n                        \"length\": 6,\r\n                        \"type\": \"bot_command\"\r\n                    }\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/bots/telegram",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"bots",
+						"telegram"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "10. Повторные сделки BUY USDC",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"ok\": true,\r\n    \"result\": [\r\n        {\r\n            \"update_id\": 362309960,\r\n            \"message\": {\r\n                \"message_id\": 197,\r\n                \"from\": {\r\n                    \"id\": {{chatId}},\r\n                    \"is_bot\": false,\r\n                    \"first_name\": \"Name\",\r\n                    \"last_name\": \"Test\",\r\n                    \"username\": \"tester\",\r\n                    \"language_code\": \"ru\"\r\n                },\r\n                \"chat\": {\r\n                    \"id\": {{chatId}},\r\n                    \"first_name\": \"Name\",\r\n                    \"last_name\": \"Test\",\r\n                    \"username\": \"tester\",\r\n                    \"type\": \"private\"\r\n                },\r\n                \"date\": 1742476287,\r\n                \"text\": \"/replicate buy 0x3c499c542cef5e3811e1192ce70d8cc03d5c3359 2\",\r\n                \"entities\": [\r\n                    {\r\n                        \"offset\": 0,\r\n                        \"length\": 6,\r\n                        \"type\": \"bot_command\"\r\n                    }\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/bots/telegram",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"bots",
+						"telegram"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "11. Повторные сделки SELL USDC",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"ok\": true,\r\n    \"result\": [\r\n        {\r\n            \"update_id\": 362309960,\r\n            \"message\": {\r\n                \"message_id\": 197,\r\n                \"from\": {\r\n                    \"id\": {{chatId}},\r\n                    \"is_bot\": false,\r\n                    \"first_name\": \"Name\",\r\n                    \"last_name\": \"Test\",\r\n                    \"username\": \"tester\",\r\n                    \"language_code\": \"ru\"\r\n                },\r\n                \"chat\": {\r\n                    \"id\": {{chatId}},\r\n                    \"first_name\": \"Name\",\r\n                    \"last_name\": \"Test\",\r\n                    \"username\": \"tester\",\r\n                    \"type\": \"private\"\r\n                },\r\n                \"date\": 1742476287,\r\n                \"text\": \"/replicate sell 0x3c499c542cef5e3811e1192ce70d8cc03d5c3359 3\",\r\n                \"entities\": [\r\n                    {\r\n                        \"offset\": 0,\r\n                        \"length\": 6,\r\n                        \"type\": \"bot_command\"\r\n                    }\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/bots/telegram",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"bots",
+						"telegram"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "12. Просмотр подписок",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"ok\": true,\r\n    \"result\": [\r\n        {\r\n            \"update_id\": 362309960,\r\n            \"message\": {\r\n                \"message_id\": 197,\r\n                \"from\": {\r\n                    \"id\": {{chatId}},\r\n                    \"is_bot\": false,\r\n                    \"first_name\": \"Name\",\r\n                    \"last_name\": \"Test\",\r\n                    \"username\": \"tester\",\r\n                    \"language_code\": \"ru\"\r\n                },\r\n                \"chat\": {\r\n                    \"id\": {{chatId}},\r\n                    \"first_name\": \"Name\",\r\n                    \"last_name\": \"Test\",\r\n                    \"username\": \"tester\",\r\n                    \"type\": \"private\"\r\n                },\r\n                \"date\": 1742476287,\r\n                \"text\": \"/replicate sell 0x3c499c542cef5e3811e1192ce70d8cc03d5c3359 3\",\r\n                \"entities\": [\r\n                    {\r\n                        \"offset\": 0,\r\n                        \"length\": 6,\r\n                        \"type\": \"bot_command\"\r\n                    }\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/bots/telegram",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"bots",
+						"telegram"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "13. Удалить кошелек из подписок",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"ok\": true,\r\n    \"result\": [\r\n        {\r\n            \"update_id\": 362309960,\r\n            \"message\": {\r\n                \"message_id\": 197,\r\n                \"from\": {\r\n                    \"id\": {{chatId}},\r\n                    \"is_bot\": false,\r\n                    \"first_name\": \"Name\",\r\n                    \"last_name\": \"Test\",\r\n                    \"username\": \"tester\",\r\n                    \"language_code\": \"ru\"\r\n                },\r\n                \"chat\": {\r\n                    \"id\": {{chatId}},\r\n                    \"first_name\": \"Name\",\r\n                    \"last_name\": \"Test\",\r\n                    \"username\": \"tester\",\r\n                    \"type\": \"private\"\r\n                },\r\n                \"date\": 1742476287,\r\n                \"text\": \"/unfollow 0x85cd07ea01423b1e937929b44e4ad8c40bbb5e61\",\r\n                \"entities\": [\r\n                    {\r\n                        \"offset\": 0,\r\n                        \"length\": 6,\r\n                        \"type\": \"bot_command\"\r\n                    }\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/bots/telegram",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"bots",
+						"telegram"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "14. Перевод токенов",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"ok\": true,\r\n    \"result\": [\r\n        {\r\n            \"update_id\": 362309960,\r\n            \"message\": {\r\n                \"message_id\": 197,\r\n                \"from\": {\r\n                    \"id\": {{chatId}},\r\n                    \"is_bot\": false,\r\n                    \"first_name\": \"Name\",\r\n                    \"last_name\": \"Test\",\r\n                    \"username\": \"tester\",\r\n                    \"language_code\": \"ru\"\r\n                },\r\n                \"chat\": {\r\n                    \"id\": {{chatId}},\r\n                    \"first_name\": \"Name\",\r\n                    \"last_name\": \"Test\",\r\n                    \"username\": \"tester\",\r\n                    \"type\": \"private\"\r\n                },\r\n                \"date\": 1742476287,\r\n                \"text\": \"/send 0x3c499c542cef5e3811e1192ce70d8cc03d5c3359 1 0x55179F1bB0F26640f12994e94D0A49968Ddc462E\",\r\n                \"entities\": [\r\n                    {\r\n                        \"offset\": 0,\r\n                        \"length\": 6,\r\n                        \"type\": \"bot_command\"\r\n                    }\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/bots/telegram",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"bots",
+						"telegram"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "chatId",
+			"value": "318745628",
+			"type": "string"
+		}
+	]
+}

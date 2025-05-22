@@ -25,8 +25,10 @@ export class RemoveTokenCommand implements ICommand {
   }
 
   async execute(): Promise<BotResponseData | null> {
-    const [tokenAddress] = this.commandData.params || []
+    let [tokenAddress] = this.commandData.params || []
     if (!tokenAddress) return new BotResponseData(this.messages.NEED_TOKEN)
+
+    tokenAddress = tokenAddress.toLowerCase()
 
     try {
       const canRemoveAllTokens = tokenAddress === this.removeAllTokensCommand

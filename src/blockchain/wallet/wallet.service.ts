@@ -137,6 +137,7 @@ export class WalletService {
   }
 
   async unfollow(walletAddress: Hex, userId: number): Promise<void> {
+    // TODO: тут репликации не удалаляются, проверить
     const result = await this.followRepository.delete({
       userId: userId,
       wallet: walletAddress,
