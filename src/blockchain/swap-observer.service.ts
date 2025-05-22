@@ -48,7 +48,7 @@ export class SwapObserverService implements OnModuleInit {
         event: swapEventAbi,
         onLogs: (logs) => {
           const swaps = this.getSwapsOfObservableWallets(logs)
-          console.log("Подписка на кошельки. Зафиксированы обмены в DEX", swaps.length)
+          // console.log("Подписка на кошельки. Зафиксированы обмены в DEX", swaps.length)
           for (const swap of swaps) {
             const command = new ReplicateSwapCommand(this.blockchainPoolService, this.walletService, swap)
             command.execute().catch((error) => Logger.error(error))
