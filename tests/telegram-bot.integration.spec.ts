@@ -39,9 +39,10 @@ describe("TelegramBot (интеграционный): ", () => {
 
   beforeAll(async () => {
     Logger.init({
-      isEnabled: () => false,
-      log: jest.fn(),
+      isEnabled: () => true,
+      log: (text) => console.log("[LOG]", text),
       error: jest.fn(),
+      // error: (text) => console.error("[ERROR]", text),
     })
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -122,34 +123,60 @@ describe("TelegramBot (интеграционный): ", () => {
     })
 
     it("успешная регистрация нового пользователя", async () => {
-      const userId = 123456789
+      // Используем последние 6 цифр из timestamp
+      const userId = Number(Date.now().toString().slice(-6))
       const textCommand = BotCommands.START
       const update = mockTelegramUpdate(textCommand, userId)
 
-      const response = await request(app.getHttpServer()).post("/bots/telegram").send(update).expect(200)
+      // Проверяем, что пользователя еще нет в БД
+      const userBefore = await userService.getUser(userId, BotType.TELEGRAM)
+      expect(userBefore).toBeNull()
+
+      console.log("Запрос:", {
+        command: textCommand,
+        userId: userId,
+      })
+
+      await request(app.getHttpServer()).post("/bots/telegram").send(update).expect(200)
 
       const user = await userService.getUser(userId, BotType.TELEGRAM)
       expect(user).not.toBeNull()
       if (user) {
         expect(user.id).toBeDefined()
         expect(user.botType).toBe(BotType.TELEGRAM)
+        expect(user.botUserId).toBe(userId)
       }
-
-      console.log("Запрос:", textCommand)
-      console.log("Ответ:", response.body)
     })
 
-    /*
     it("повторная регистрация существующего пользователя", async () => {
-      const userId = 987654321
-      const update = mockTelegramUpdate(BotCommands.START, userId)
+      // Используем последние 6 цифр из timestamp
+      const userId = Number(Date.now().toString().slice(-6))
+      const textCommand = BotCommands.START
+      const update = mockTelegramUpdate(textCommand, userId)
+
+      // Первая регистрация
+      console.log("Первая регистрация:", {
+        command: textCommand,
+        userId: userId,
+      })
 
       await request(app.getHttpServer()).post("/bots/telegram").send(update).expect(200)
 
-      const response = await request(app.getHttpServer()).post("/bots/telegram").send(update).expect(200)
+      // Повторная регистрация
+      console.log("Повторная регистрация:", {
+        command: textCommand,
+        userId: userId,
+      })
+
+      await request(app.getHttpServer()).post("/bots/telegram").send(update).expect(200)
 
       const user = await userService.getUser(userId, BotType.TELEGRAM)
       expect(user).not.toBeNull()
-    })*/
+      if (user) {
+        expect(user.id).toBeDefined()
+        expect(user.botType).toBe(BotType.TELEGRAM)
+        expect(user.botUserId).toBe(userId)
+      }
+    })
   })
 })
