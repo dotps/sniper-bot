@@ -15,13 +15,23 @@ import { FollowWallet } from "../src/blockchain/wallet/follow-wallet.entity"
 import { Replicate } from "../src/blockchain/replicate.entity"
 import { Wallet } from "../src/blockchain/wallet/wallet.entity"
 import { Logger } from "../src/services/logger/Logger"
+import { BlockchainModule } from "../src/blockchain/blockchain.module"
 
-jest.mock("../src/blockchain/blockchain.service", () => ({
-  BlockchainService: jest.fn().mockImplementation(() => ({
-    initBlockchainClients: jest.fn().mockResolvedValue(undefined),
-    getSwapProvider: jest.fn().mockReturnValue({}),
-    getClient: jest.fn().mockReturnValue({}),
-    getTokenService: jest.fn().mockReturnValue({}),
+const mockLog = jest.fn((text) => {
+  console.log("[LOG]", text)
+})
+Logger.init({
+  isEnabled: () => true,
+  log: mockLog,
+  error: jest.fn(),
+})
+
+jest.mock("../src/services/web-request/WebRequestFetchService", () => ({
+  WebRequestFetchService: jest.fn().mockImplementation(() => ({
+    tryGet: jest.fn().mockImplementation(async (url: string) => {
+      Logger.log(`Query: ${url}`)
+      return { ok: true, result: {} }
+    }),
   })),
 }))
 
@@ -31,23 +41,43 @@ jest.mock("../src/blockchain/swap-observer.service", () => ({
   })),
 }))
 
+const mockTelegramUpdate = (text: string, userId: number): TelegramUpdatesDto => ({
+  ok: true,
+  result: [
+    {
+      update_id: 123456789,
+      message: {
+        message_id: 1,
+        from: {
+          id: userId,
+          is_bot: false,
+          first_name: "Test",
+          last_name: "User",
+          username: "testuser",
+          language_code: "ru",
+        },
+        chat: {
+          id: userId,
+          first_name: "Test",
+          last_name: "User",
+          username: "testuser",
+          type: "private",
+        },
+        date: Date.now(),
+        text: text,
+      },
+    },
+  ],
+})
+
 describe("TelegramBot (интеграционный): ", () => {
   jest.setTimeout(30000)
 
   let app: INestApplication
   let userService: UserService
-  let mockLog: jest.Mock
+  let globalUserId = 0
 
   beforeAll(async () => {
-    mockLog = jest.fn((text) => {
-      console.log("[LOG]", text)
-    })
-    Logger.init({
-      isEnabled: () => true,
-      log: mockLog,
-      error: jest.fn(),
-    })
-
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
         ConfigModule.forRoot({
@@ -66,6 +96,7 @@ describe("TelegramBot (интеграционный): ", () => {
         }),
         UserModule,
         BotsModule,
+        BlockchainModule,
       ],
     }).compile()
 
@@ -90,45 +121,16 @@ describe("TelegramBot (интеграционный): ", () => {
     await app.close()
   })
 
-  beforeEach(async () => {
+  beforeEach(() => {
     console.log("======================================================================")
     console.log(expect.getState().currentTestName)
-    // Очищаем моки перед каждым тестом
     jest.clearAllMocks()
   })
 
   describe("команда /start: ", () => {
-    const mockTelegramUpdate = (text: string, userId: number): TelegramUpdatesDto => ({
-      ok: true,
-      result: [
-        {
-          update_id: 123456789,
-          message: {
-            message_id: 1,
-            from: {
-              id: userId,
-              is_bot: false,
-              first_name: "Test",
-              last_name: "User",
-              username: "testuser",
-              language_code: "ru",
-            },
-            chat: {
-              id: userId,
-              first_name: "Test",
-              last_name: "User",
-              username: "testuser",
-              type: "private",
-            },
-            date: Date.now(),
-            text: text,
-          },
-        },
-      ],
-    })
-
     it("успешная регистрация нового пользователя", async () => {
       const userId = Number(Date.now().toString().slice(-6))
+      globalUserId = userId
       const textCommand = BotCommands.START
       const update = mockTelegramUpdate(textCommand, userId)
 
@@ -153,7 +155,6 @@ describe("TelegramBot (интеграционный): ", () => {
 
       expect(mockLog).toHaveBeenCalledWith(expect.stringContaining("Регистрация в сервисе прошла успешно"))
     })
-
     it("запрет повторной регистрации существующего пользователя", async () => {
       const userId = Number(Date.now().toString().slice(-6))
       const textCommand = BotCommands.START
@@ -176,6 +177,82 @@ describe("TelegramBot (интеграционный): ", () => {
       await request(app.getHttpServer()).post("/bots/telegram").send(update).expect(200)
 
       expect(mockLog).toHaveBeenCalledWith(expect.stringContaining("Вы уже зарегистрированы в сервисе"))
+    })
+  })
+
+  describe("несуществующие команды: ", () => {
+    it("/test", async () => {
+      const userId = globalUserId
+      const textCommand = "/test"
+      const update = mockTelegramUpdate(textCommand, userId)
+
+      const user = await userService.getUser(userId, BotType.TELEGRAM)
+      expect(user).not.toBeNull()
+
+      console.log("Запрос:", {
+        command: textCommand,
+        userId: userId,
+      })
+
+      await request(app.getHttpServer()).post("/bots/telegram").send(update).expect(200)
+
+      expect(mockLog).toHaveBeenCalledWith(expect.stringContaining("Неизвестная команда"))
+    })
+
+    it("test", async () => {
+      const userId = globalUserId
+      const textCommand = "test"
+      const update = mockTelegramUpdate(textCommand, userId)
+
+      const user = await userService.getUser(userId, BotType.TELEGRAM)
+      expect(user).not.toBeNull()
+
+      console.log("Запрос:", {
+        command: textCommand,
+        userId: userId,
+      })
+
+      await request(app.getHttpServer()).post("/bots/telegram").send(update).expect(200)
+
+      expect(mockLog).toHaveBeenCalledWith(
+        expect.stringContaining("Для взаимодействия с ботом необходимо ввести команду"),
+      )
+    })
+  })
+
+  describe("работа с токенами: ", () => {
+    const commands = [
+      { command: "/addtoken", expect: "Укажите токен" },
+      { command: "/addtoken test", expect: "Укажите токен" },
+      { command: "/addtoken 0x7ceb23fd6bc0add59e62ac25578270cff1b9f619", expect: "Токен успешно добавлен" },
+      { command: "/addtoken 0x3c499c542cef5e3811e1192ce70d8cc03d5c3359", expect: "Токен успешно добавлен" },
+      { command: "/addtoken 0xB25e20De2F2eBb4CfFD4D16a55C7B395e8a94762", expect: "Токен успешно добавлен" },
+      { command: "/addtoken 0x7ceb23fd6bc0add59e62ac25578270cff1b9f619", expect: "Такой токен уже добавлен" },
+      { command: "/addtoken 0x3c499c542cef5e3811e1192ce70d8cc03d5c3359", expect: "Такой токен уже добавлен" },
+      { command: "/addtoken 0xB25e20De2F2eBb4CfFD4D16a55C7B395e8a94762", expect: "Такой токен уже добавлен" },
+      { command: "/removetoken 0xB25e20De2F2eBb4CfFD4D16a55C7B395e8a94762", expect: "Токен успешно удален" },
+      { command: "/removetoken 0xB25e20De2F2eBb4CfFD4D16a55C7B395e8a94762", expect: "Токен не найден" },
+      { command: "/removetoken test", expect: "Требуется адрес токена" },
+      { command: "/removetoken all", expect: "Все токены успешно удалены" },
+      { command: "/addtoken 0x7ceb23fd6bc0add59e62ac25578270cff1b9f619", expect: "Токен успешно добавлен" },
+      { command: "/addtoken 0x3c499c542cef5e3811e1192ce70d8cc03d5c3359", expect: "Токен успешно добавлен" },
+      { command: "/addtoken 0xB25e20De2F2eBb4CfFD4D16a55C7B395e8a94762", expect: "Токен успешно добавлен" },
+    ]
+
+    commands.forEach((command) => {
+      it(command.command, async () => {
+        const userId = globalUserId
+        const update = mockTelegramUpdate(command.command, userId)
+
+        console.log("Запрос:", {
+          command: command.command,
+          userId: userId,
+        })
+
+        await request(app.getHttpServer()).post("/bots/telegram").send(update).expect(200)
+
+        expect(mockLog).toHaveBeenCalledWith(expect.stringContaining(command.expect))
+      })
     })
   })
 })

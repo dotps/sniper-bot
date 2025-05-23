@@ -47,6 +47,7 @@ export class AddTokenCommand implements ICommand {
       response.push(this.messages.ADDED)
       response.push(this.messages.TOKEN_LIST + addresses)
     } catch (error) {
+      // Logger.log(error.message)
       return ErrorHandler.handleAndResponse(error)
     }
     return new BotResponseData(response)
