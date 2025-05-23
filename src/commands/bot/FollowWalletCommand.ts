@@ -6,6 +6,7 @@ import { BotCommands } from "./BotCommands"
 import { WalletService } from "../../blockchain/wallet/wallet.service"
 import { isAddress } from "viem"
 import { ErrorHandler } from "../../errors/ErrorHandler"
+import { Logger } from "../../services/logger/Logger"
 
 export class FollowWalletCommand implements ICommand {
   private readonly walletService: WalletService
@@ -24,6 +25,7 @@ export class FollowWalletCommand implements ICommand {
 
   async execute(): Promise<BotResponseData | null> {
     const addresses = this.commandData.params || []
+    if (addresses.length === 0) return new BotResponseData(this.messages.NEED_WALLET)
 
     try {
       const response: string[] = []
@@ -34,6 +36,7 @@ export class FollowWalletCommand implements ICommand {
       }
       return new BotResponseData(response)
     } catch (error) {
+      // Logger.log(error.message)
       return ErrorHandler.handleAndResponse(error)
     }
   }

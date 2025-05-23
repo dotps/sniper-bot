@@ -9,6 +9,7 @@ import { formatUnits, Hex, isAddress, parseUnits } from "viem"
 import { TokenService } from "../../blockchain/token/token.service"
 import { ResponseBotError } from "../../errors/ResponseBotError"
 import { Token } from "../../blockchain/token/token.entity"
+import { Logger } from "../../services/logger/Logger"
 
 export class ReplicateCommand implements ICommand {
   private readonly messages = {
@@ -43,6 +44,7 @@ export class ReplicateCommand implements ICommand {
         `${this.messages.SUCCESS}\nКоманда: ${replicate.command}\nТокен: ${replicate.token.symbol}\nЛимит: ${formatUnits(replicate.limit, replicate.token.decimals)}`,
       )
     } catch (error) {
+      // Logger.log(error.message)
       return ErrorHandler.handleAndResponse(error)
     }
   }
@@ -53,6 +55,7 @@ export class ReplicateCommand implements ICommand {
 
   private async validateAndParseParams(): Promise<ReplicateParsedData> {
     const params = this.commandData.params || []
+    if (params.length === 0) throw new ResponseBotError(this.messages.WRONG_COMMAND)
 
     const command = params[this.commandIndex].toLowerCase()
     if (!this.isValidCommand(command)) throw new ResponseBotError(this.messages.WRONG_COMMAND)
@@ -61,8 +64,14 @@ export class ReplicateCommand implements ICommand {
     if (!isAddress(tokenAddress)) throw new ResponseBotError(this.messages.INVALID_TOKEN)
 
     const token = await this.getUserTokenOrThrow(tokenAddress)
+    let limit = 0n
 
-    const limit = parseUnits(params[this.limitIndex], token.decimals)
+    try {
+      limit = parseUnits(params[this.limitIndex], token.decimals)
+    } catch (error) {
+      throw new ResponseBotError(this.messages.INVALID_LIMIT)
+    }
+
     if (limit <= 0) throw new ResponseBotError(this.messages.INVALID_LIMIT)
 
     return { command, token, limit }
