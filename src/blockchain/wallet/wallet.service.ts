@@ -43,7 +43,7 @@ export class WalletService {
     const wallet = this.walletRepository.create({
       userId,
       encryptedKey,
-      address: account.address,
+      address: account.address.toLowerCase() as Hex,
     })
 
     const createdWallet = await this.walletRepository.save(wallet)

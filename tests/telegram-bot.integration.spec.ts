@@ -36,13 +36,16 @@ describe("TelegramBot (интеграционный): ", () => {
 
   let app: INestApplication
   let userService: UserService
+  let mockLog: jest.Mock
 
   beforeAll(async () => {
+    mockLog = jest.fn((text) => {
+      console.log("[LOG]", text)
+    })
     Logger.init({
       isEnabled: () => true,
-      log: (text) => console.log("[LOG]", text),
+      log: mockLog,
       error: jest.fn(),
-      // error: (text) => console.error("[ERROR]", text),
     })
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -90,6 +93,8 @@ describe("TelegramBot (интеграционный): ", () => {
   beforeEach(async () => {
     console.log("======================================================================")
     console.log(expect.getState().currentTestName)
+    // Очищаем моки перед каждым тестом
+    jest.clearAllMocks()
   })
 
   describe("команда /start: ", () => {
@@ -123,12 +128,10 @@ describe("TelegramBot (интеграционный): ", () => {
     })
 
     it("успешная регистрация нового пользователя", async () => {
-      // Используем последние 6 цифр из timestamp
       const userId = Number(Date.now().toString().slice(-6))
       const textCommand = BotCommands.START
       const update = mockTelegramUpdate(textCommand, userId)
 
-      // Проверяем, что пользователя еще нет в БД
       const userBefore = await userService.getUser(userId, BotType.TELEGRAM)
       expect(userBefore).toBeNull()
 
@@ -141,20 +144,21 @@ describe("TelegramBot (интеграционный): ", () => {
 
       const user = await userService.getUser(userId, BotType.TELEGRAM)
       expect(user).not.toBeNull()
+
       if (user) {
         expect(user.id).toBeDefined()
         expect(user.botType).toBe(BotType.TELEGRAM)
         expect(user.botUserId).toBe(userId)
       }
+
+      expect(mockLog).toHaveBeenCalledWith(expect.stringContaining("Регистрация в сервисе прошла успешно"))
     })
 
-    it("повторная регистрация существующего пользователя", async () => {
-      // Используем последние 6 цифр из timestamp
+    it("запрет повторной регистрации существующего пользователя", async () => {
       const userId = Number(Date.now().toString().slice(-6))
       const textCommand = BotCommands.START
       const update = mockTelegramUpdate(textCommand, userId)
 
-      // Первая регистрация
       console.log("Первая регистрация:", {
         command: textCommand,
         userId: userId,
@@ -162,21 +166,16 @@ describe("TelegramBot (интеграционный): ", () => {
 
       await request(app.getHttpServer()).post("/bots/telegram").send(update).expect(200)
 
-      // Повторная регистрация
       console.log("Повторная регистрация:", {
         command: textCommand,
         userId: userId,
       })
 
+      jest.clearAllMocks()
+
       await request(app.getHttpServer()).post("/bots/telegram").send(update).expect(200)
 
-      const user = await userService.getUser(userId, BotType.TELEGRAM)
-      expect(user).not.toBeNull()
-      if (user) {
-        expect(user.id).toBeDefined()
-        expect(user.botType).toBe(BotType.TELEGRAM)
-        expect(user.botUserId).toBe(userId)
-      }
+      expect(mockLog).toHaveBeenCalledWith(expect.stringContaining("Вы уже зарегистрированы в сервисе"))
     })
   })
 })
