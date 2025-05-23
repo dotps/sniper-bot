@@ -10,7 +10,7 @@ export class TelegramGetUpdatesResponse {
       this.updates = []
       return
     }
-    console.log(data)
+    // console.log(data)
 
     this.updates = data.map((update: TelegramResultDto) => {
       const updateData: IBotResponseDto = {

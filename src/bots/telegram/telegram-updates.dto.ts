@@ -87,7 +87,7 @@ export class TelegramResultDto {
 export class TelegramUpdatesDto {
   @IsNotEmpty()
   @IsBoolean()
-  ok: string
+  ok: boolean
 
   @IsNotEmpty()
   @IsArray()
@@ -99,5 +99,5 @@ export class TelegramUpdatesDto {
 export class TelegramBaseDto {
   @IsNotEmpty()
   @IsBoolean()
-  ok: string
+  ok: boolean
 }
