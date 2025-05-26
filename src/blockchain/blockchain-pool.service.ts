@@ -50,7 +50,7 @@ export class BlockchainPoolService {
         user: user,
         text: this.messages.EMPTY_BALANCE + token.symbol,
       }
-      // this.eventEmitter.emit(events.SEND_BOT_RESPONSE, event) // TODO: раскомментировать после завершения работ, а то спамит о нехватке баланса
+      this.eventEmitter.emit(events.SEND_BOT_RESPONSE, event) // TODO: раскомментировать после завершения работ, а то спамит о нехватке баланса
       return
     }
 

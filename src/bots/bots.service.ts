@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException, OnModuleInit } from "@nestjs/common"
 import { TelegramUpdatesDto } from "./telegram/telegram-updates.dto"
-import { BotProvider } from "./infrastructure/BotProvider"
 import { BotCommandHandler } from "../commands/infrastructure/BotCommandHandler"
 import { Logger } from "../services/logger/Logger"
 import { TelegramApiProvider } from "./telegram/TelegramApiProvider"
@@ -8,13 +7,13 @@ import { VkUpdatesDto } from "./vk/vk-updates.dto"
 import { IBotResponseDto } from "./infrastructure/IBotResponseDto"
 import { OnEvent } from "@nestjs/event-emitter"
 import { events, SendBotEvent } from "../events/events"
-import { BotType } from "./infrastructure/IBotProvider"
+import { BotType, IBotProvider } from "./infrastructure/IBotProvider"
 import { plainToClass } from "class-transformer"
 import { BotResponseDto } from "./infrastructure/BotResponseDto"
 
 @Injectable()
 export class BotsService implements OnModuleInit {
-  private bots: Map<new (...args: any[]) => BotProvider, BotProvider> = new Map()
+  private bots: Map<BotsClassType, IBotProvider> = new Map()
   private readonly messages = {
     BOT_ERROR: "Ошибка обработки данных от провайдера бота.",
     BOT_NOT_RESPONSE: "Данные от бота не получены.",
@@ -27,7 +26,7 @@ export class BotsService implements OnModuleInit {
     private readonly commandHandler: BotCommandHandler,
   ) {}
 
-  addBot<T extends BotProvider>(botClass: new (...args: any[]) => T, bot: T): void {
+  addBot<T extends IBotProvider>(botClass: BotsClassType, bot: T): void {
     this.bots.set(botClass, bot)
   }
 
@@ -50,13 +49,13 @@ export class BotsService implements OnModuleInit {
     }
   }
 
-  private async getUpdates(bot: BotProvider): Promise<void> {
+  private async getUpdates(bot: IBotProvider): Promise<void> {
     const queryDataList = await bot.getUpdates()
     if (!queryDataList) return
     await this.handleUpdatesAndSendResponse(bot, queryDataList)
   }
 
-  async handleRequest<T extends BotProvider>(data: RequestDto, botClass: new (...args: any[]) => T): Promise<void> {
+  async handleRequest(data: RequestDto, botClass: BotsClassType): Promise<void> {
     if (!data.ok || !data.result) {
       Logger.error(this.messages.BOT_NOT_RESPONSE)
       return
@@ -70,19 +69,22 @@ export class BotsService implements OnModuleInit {
     await this.handleUpdatesAndSendResponse(bot, queryDataList)
   }
 
-  async handleUpdatesAndSendResponse(bot: BotProvider, updateDataList: IBotResponseDto[]): Promise<void> {
+  async handleUpdatesAndSendResponse(bot: IBotProvider, updateDataList: IBotResponseDto[]): Promise<void> {
     for (const updateData of updateDataList) {
       updateData.botType = bot.getBotType()
+
       const response = await this.commandHandler.handleCommandFromUpdates(updateData)
       if (!response) continue
+
       const responseData = response?.data || []
+
       for (const text of responseData) {
         await bot.sendResponse(text, updateData)
       }
     }
   }
 
-  getBotByType(botType: BotType): BotProvider {
+  getBotByType(botType: BotType): IBotProvider {
     for (const bot of this.bots.values()) {
       if (bot.getBotType() === botType) return bot
     }
@@ -102,3 +104,4 @@ export class BotsService implements OnModuleInit {
 }
 
 export type RequestDto = TelegramUpdatesDto | VkUpdatesDto
+export type BotsClassType<T extends IBotProvider = IBotProvider> = new (...args: any[]) => T
