@@ -1,5 +1,5 @@
-import { BotType } from "src/bots/infrastructure/IBotProvider"
-import { IBotResponseDto } from "./IBotResponseDto"
+import { BotType } from "src/bots/infrastructure/bot-provider.interface"
+import { IBotResponseDto } from "./bot-response-dto.interface"
 
 export class BotResponseDto implements IBotResponseDto {
   text: string

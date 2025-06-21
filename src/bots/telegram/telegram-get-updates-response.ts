@@ -1,5 +1,5 @@
-import { IBotResponseDto } from "../infrastructure/IBotResponseDto"
-import { BotType } from "../infrastructure/IBotProvider"
+import { IBotResponseDto } from "../infrastructure/bot-response-dto.interface"
+import { BotType } from "../infrastructure/bot-provider.interface"
 import { TelegramResultDto } from "./telegram-updates.dto"
 
 export class TelegramGetUpdatesResponse {

@@ -1,12 +1,12 @@
-import { ICommand } from "../infrastructure/ICommand"
-import { BotResponseData } from "../../bots/infrastructure/BotResponseData"
-import { Command } from "../infrastructure/BotCommandHandler"
+import { ICommand } from "../infrastructure/command.interface"
+import { BotResponseData } from "../../bots/infrastructure/bot-response-data"
+import { Command } from "../infrastructure/bot-command.handler"
 import { User } from "../../users/user.entity"
 import { TokenService } from "../../blockchain/token/token.service"
 import { TokenDto } from "../../blockchain/token/token.dto"
 import { Hex, isAddress } from "viem"
-import { BotCommands } from "./BotCommands"
-import { ErrorHandler } from "../../errors/ErrorHandler"
+import { BotCommands } from "./bot-commands"
+import { ErrorHandler } from "../../errors/error.handler"
 import { BlockchainTokenService } from "../../blockchain/blockchain-token.service"
 
 export class AddTokenCommand implements ICommand {

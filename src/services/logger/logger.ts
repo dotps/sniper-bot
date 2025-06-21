@@ -1,4 +1,4 @@
-import { ILoggerService } from "./ILoggerService"
+import { ILoggerService } from "./logger-service.interface"
 
 export class Logger {
   private static loggerService: ILoggerService

@@ -1,4 +1,4 @@
-import { IBotResponseDto } from "./IBotResponseDto"
+import { IBotResponseDto } from "./bot-response-dto.interface"
 import { RequestDto } from "../bots.service"
 
 export interface IBotProvider {

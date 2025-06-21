@@ -1,8 +1,8 @@
-import { ICommand } from "../infrastructure/ICommand"
-import { BotResponseData } from "../../bots/infrastructure/BotResponseData"
+import { ICommand } from "../infrastructure/command.interface"
+import { BotResponseData } from "../../bots/infrastructure/bot-response-data"
 import { User } from "../../users/user.entity"
 import { WalletService } from "../../blockchain/wallet/wallet.service"
-import { ErrorHandler } from "../../errors/ErrorHandler"
+import { ErrorHandler } from "../../errors/error.handler"
 
 export class WalletCommand implements ICommand {
   private readonly messages = {

@@ -1,13 +1,13 @@
-import { ICommand } from "../infrastructure/ICommand"
-import { BotResponseData } from "../../bots/infrastructure/BotResponseData"
+import { ICommand } from "../infrastructure/command.interface"
+import { BotResponseData } from "../../bots/infrastructure/bot-response-data"
 import { SwapLog } from "../../blockchain/swap-observer.service"
 import { WalletService } from "../../blockchain/wallet/wallet.service"
-import { ReplicateDealCommand } from "../bot/ReplicateCommand"
+import { ReplicateDealCommand } from "../bot/replicate.command"
 import { Hex, isAddress } from "viem"
-import { absBigInt, calculateSqrtPriceWithSlippage, clampMax } from "../../utils/Calc"
+import { absBigInt, calculateSqrtPriceWithSlippage, clampMax } from "../../utils/calc"
 import { Wallet } from "../../blockchain/wallet/wallet.entity"
 import { Replicate } from "../../blockchain/replicate.entity"
-import { ErrorHandler } from "../../errors/ErrorHandler"
+import { ErrorHandler } from "../../errors/error.handler"
 import { BlockchainPoolService } from "../../blockchain/blockchain-pool.service"
 
 export class ReplicateSwapCommand implements ICommand {

@@ -1,12 +1,12 @@
-import { ICommand } from "../infrastructure/ICommand"
-import { BotResponseData } from "../../bots/infrastructure/BotResponseData"
-import { Command } from "../infrastructure/BotCommandHandler"
+import { ICommand } from "../infrastructure/command.interface"
+import { BotResponseData } from "../../bots/infrastructure/bot-response-data"
+import { Command } from "../infrastructure/bot-command.handler"
 import { User } from "../../users/user.entity"
-import { BotCommands } from "./BotCommands"
+import { BotCommands } from "./bot-commands"
 import { WalletService } from "../../blockchain/wallet/wallet.service"
 import { isAddress } from "viem"
-import { ErrorHandler } from "../../errors/ErrorHandler"
-import { Logger } from "../../services/logger/Logger"
+import { ErrorHandler } from "../../errors/error.handler"
+import { Logger } from "../../services/logger/logger"
 
 export class FollowWalletCommand implements ICommand {
   private readonly walletService: WalletService

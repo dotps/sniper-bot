@@ -1,10 +1,10 @@
-import { ICommand } from "../infrastructure/ICommand"
-import { BotResponseData } from "../../bots/infrastructure/BotResponseData"
-import { Command } from "../infrastructure/BotCommandHandler"
+import { ICommand } from "../infrastructure/command.interface"
+import { BotResponseData } from "../../bots/infrastructure/bot-response-data"
+import { Command } from "../infrastructure/bot-command.handler"
 import { User } from "../../users/user.entity"
 import { isAddress } from "viem"
-import { BotCommands } from "./BotCommands"
-import { ErrorHandler } from "../../errors/ErrorHandler"
+import { BotCommands } from "./bot-commands"
+import { ErrorHandler } from "../../errors/error.handler"
 import { WalletService } from "../../blockchain/wallet/wallet.service"
 
 export class UnfollowCommand implements ICommand {

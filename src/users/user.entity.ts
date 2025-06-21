@@ -1,4 +1,4 @@
-import { BotType } from "src/bots/infrastructure/IBotProvider"
+import { BotType } from "src/bots/infrastructure/bot-provider.interface"
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm"
 import { Expose } from "class-transformer"
 import { Token } from "../blockchain/token/token.entity"

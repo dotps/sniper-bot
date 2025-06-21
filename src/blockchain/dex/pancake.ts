@@ -1,6 +1,6 @@
 import { Hex } from "viem"
-import { ISwapProvider } from "./ISwapProvider"
-import { PoolTokenPair } from "./PoolTokenPair"
+import { ISwapProvider } from "./swap-provider.interface"
+import { PoolTokenPair } from "./pool-token-pair"
 
 export class Pancake implements ISwapProvider {
   getPools(): Map<Hex, PoolTokenPair> {

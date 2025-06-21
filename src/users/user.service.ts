@@ -2,8 +2,8 @@ import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
 import { User } from "./user.entity"
-import { BotType } from "../bots/infrastructure/IBotProvider"
-import { IBotResponseDto } from "../bots/infrastructure/IBotResponseDto"
+import { BotType } from "../bots/infrastructure/bot-provider.interface"
+import { IBotResponseDto } from "../bots/infrastructure/bot-response-dto.interface"
 import { plainToClass } from "class-transformer"
 
 @Injectable()

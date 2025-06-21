@@ -1,9 +1,9 @@
-import { BotResponseData } from "../../bots/infrastructure/BotResponseData"
-import { IBotResponseDto } from "../../bots/infrastructure/IBotResponseDto"
+import { BotResponseData } from "../../bots/infrastructure/bot-response-data"
+import { IBotResponseDto } from "../../bots/infrastructure/bot-response-dto.interface"
 import { Injectable } from "@nestjs/common"
-import { Logger } from "../../services/logger/Logger"
-import { ICommandFactory } from "./ICommandFactory"
-import { BotCommands } from "../bot/BotCommands"
+import { Logger } from "../../services/logger/logger"
+import { ICommandFactory } from "./command-factory.interface"
+import { BotCommands } from "../bot/bot-commands"
 import { UserService } from "../../users/user.service"
 
 @Injectable()

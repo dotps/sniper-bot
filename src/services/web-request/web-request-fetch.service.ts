@@ -1,5 +1,5 @@
-import { Logger } from "../logger/Logger"
-import { IWebRequestService } from "./IWebRequestService"
+import { Logger } from "../logger/logger"
+import { IWebRequestService } from "./web-request-service.interface"
 
 export class WebRequestFetchService implements IWebRequestService {
   async tryGet<T>(url: string): Promise<T | null> {

@@ -1,10 +1,10 @@
-import { ICommand } from "../infrastructure/ICommand"
-import { BotResponseData } from "../../bots/infrastructure/BotResponseData"
+import { ICommand } from "../infrastructure/command.interface"
+import { BotResponseData } from "../../bots/infrastructure/bot-response-data"
 import { User } from "../../users/user.entity"
 import { TokenService } from "../../blockchain/token/token.service"
 import { BlockchainService } from "../../blockchain/blockchain.service"
 import { WalletService } from "../../blockchain/wallet/wallet.service"
-import { ErrorHandler } from "../../errors/ErrorHandler"
+import { ErrorHandler } from "../../errors/error.handler"
 import { BlockchainTokenService } from "../../blockchain/blockchain-token.service"
 
 export class TokenBalanceCommand implements ICommand {

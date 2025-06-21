@@ -1,4 +1,4 @@
-import { ResponseBotError } from "./ResponseBotError"
+import { ResponseBotError } from "./response-bot-error"
 
 export class DBError {
   static handle(error: unknown, textBefore?: string): void {

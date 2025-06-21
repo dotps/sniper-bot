@@ -1,5 +1,5 @@
-import { BotResponseData } from "../../bots/infrastructure/BotResponseData"
-import { ICommand } from "../infrastructure/ICommand"
+import { BotResponseData } from "../../bots/infrastructure/bot-response-data"
+import { ICommand } from "../infrastructure/command.interface"
 
 export class ExitCommand implements ICommand {
   private response: string[] = ["Выход."]

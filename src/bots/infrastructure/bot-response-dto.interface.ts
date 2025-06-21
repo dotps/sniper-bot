@@ -1,4 +1,4 @@
-import { BotType } from "./IBotProvider"
+import { BotType } from "./bot-provider.interface"
 
 export interface IBotResponseDto {
   updateId: number

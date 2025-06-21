@@ -8,13 +8,13 @@ import { UserService } from "../src/users/user.service"
 import * as request from "supertest"
 import { BotsModule } from "../src/bots/bots.module"
 import { TelegramUpdatesDto } from "../src/bots/telegram/telegram-updates.dto"
-import { BotType } from "../src/bots/infrastructure/IBotProvider"
-import { BotCommands } from "../src/commands/bot/BotCommands"
+import { BotType } from "../src/bots/infrastructure/bot-provider.interface"
+import { BotCommands } from "../src/commands/bot/bot-commands"
 import { Token } from "../src/blockchain/token/token.entity"
 import { FollowWallet } from "../src/blockchain/wallet/follow-wallet.entity"
 import { Replicate } from "../src/blockchain/replicate.entity"
 import { Wallet } from "../src/blockchain/wallet/wallet.entity"
-import { Logger } from "../src/services/logger/Logger"
+import { Logger } from "../src/services/logger/logger"
 import { BlockchainModule } from "../src/blockchain/blockchain.module"
 
 const mockLog = jest.fn((text) => {
@@ -26,7 +26,7 @@ Logger.init({
   error: jest.fn(),
 })
 
-jest.mock("../src/services/web-request/WebRequestFetchService", () => ({
+jest.mock("../src/services/web-request/web-request-fetch.service", () => ({
   WebRequestFetchService: jest.fn().mockImplementation(() => ({
     tryGet: jest.fn().mockImplementation(async (url: string) => {
       Logger.log(`Query: ${url}`)

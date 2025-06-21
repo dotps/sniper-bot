@@ -1,15 +1,15 @@
-import { ICommand } from "../infrastructure/ICommand"
-import { BotResponseData } from "../../bots/infrastructure/BotResponseData"
-import { Command } from "../infrastructure/BotCommandHandler"
+import { ICommand } from "../infrastructure/command.interface"
+import { BotResponseData } from "../../bots/infrastructure/bot-response-data"
+import { Command } from "../infrastructure/bot-command.handler"
 import { User } from "../../users/user.entity"
-import { BotCommands } from "./BotCommands"
+import { BotCommands } from "./bot-commands"
 import { WalletService } from "../../blockchain/wallet/wallet.service"
-import { ErrorHandler } from "../../errors/ErrorHandler"
+import { ErrorHandler } from "../../errors/error.handler"
 import { formatUnits, Hex, isAddress, parseUnits } from "viem"
 import { TokenService } from "../../blockchain/token/token.service"
-import { ResponseBotError } from "../../errors/ResponseBotError"
+import { ResponseBotError } from "../../errors/response-bot-error"
 import { Token } from "../../blockchain/token/token.entity"
-import { Logger } from "../../services/logger/Logger"
+import { Logger } from "../../services/logger/logger"
 
 export class ReplicateCommand implements ICommand {
   private readonly messages = {
