@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common"
 import { configModule } from "./libs/config/config"
-import { databaseService } from "./services/db/database.service"
+import { databaseService } from "./libs/repository/database.service"
 import { BotsModule } from "./bots/bots.module"
 import { ConsoleLogger } from "./services/logger/console-logger"
 import { Logger } from "./services/logger/logger"
