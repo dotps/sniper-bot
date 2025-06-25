@@ -7,7 +7,8 @@ import { ISwapProvider } from "./dex/swap-provider.interface"
 import { PoolTokenPair } from "./dex/pool-token-pair"
 import { ReplicateSwapCommand } from "../commands/blockchain/replicate-swap.command"
 import { Logger } from "src/services/logger/logger"
-import { BlockchainPoolService, swapEventAbi } from "./blockchain-pool.service"
+import { BlockchainPoolService } from "./blockchain-pool.service"
+import { swapEventAbi } from "../libs/constants/pool.abi"
 
 @Injectable()
 export class SwapObserverService implements OnModuleInit {

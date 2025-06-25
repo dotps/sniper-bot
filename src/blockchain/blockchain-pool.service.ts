@@ -1,4 +1,4 @@
-import { Hex, parseAbi, parseAbiItem, PublicClient } from "viem"
+import { Hex, PublicClient } from "viem"
 import { Swap } from "../commands/blockchain/replicate-swap.command"
 import { PoolToken } from "./dex/pool-token-pair"
 import { User } from "../users/user.entity"
@@ -9,6 +9,8 @@ import { events, SendBotEvent } from "../events/events"
 import { Logger } from "../services/logger/logger"
 import { BlockchainTokenService } from "./blockchain-token.service"
 import { EventEmitter2 } from "@nestjs/event-emitter"
+import { poolAbi } from "../libs/constants/pool.abi"
+
 export class BlockchainPoolService {
   private isSimulateSwap: boolean = false
   private readonly messages = {
@@ -69,17 +71,6 @@ export class BlockchainPoolService {
     }
   }
 }
-
-const poolAbi = parseAbi([
-  "function token0() view returns (address)",
-  "function token1() view returns (address)",
-  "function swap(address recipient, bool zeroForOne, int256 amountSpecified, uint160 sqrtPriceLimitX96, bytes calldata data) external returns (int256 amount0, int256 amount1)",
-  "function slot0() view returns (uint160 sqrtPriceX96, int24 tick, uint16 observationIndex, uint16 observationCardinality, uint16 observationCardinalityNext, uint8 feeProtocol, bool unlocked)",
-])
-
-export const swapEventAbi = parseAbiItem(
-  "event Swap(address indexed sender, address indexed recipient, int256 amount0, int256 amount1, uint160 sqrtPriceX96, uint128 liquidity, int24 tick)",
-)
 
 export type TokenAddressPair = {
   tokenAddress0: Hex
