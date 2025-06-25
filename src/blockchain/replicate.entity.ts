@@ -2,13 +2,11 @@ import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, Unique } from "typeo
 import { User } from "../users/user.entity"
 import { ReplicateDealCommand } from "../commands/bot/replicate.command"
 import { Token } from "./token/token.entity"
+import { BaseEntity } from "../libs/entities/base.entity"
 
 @Entity()
 @Unique(["command", "userId", "token", "limit"])
-export class Replicate {
-  @PrimaryGeneratedColumn()
-  readonly id: number
-
+export class Replicate extends BaseEntity {
   @Column("bigint")
   readonly limit: bigint
 

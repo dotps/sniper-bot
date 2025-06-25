@@ -1,13 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, Unique } from "typeorm"
+import { Entity, Column, ManyToOne, Unique } from "typeorm"
 import { Hex } from "viem"
 import { User } from "../../users/user.entity"
+import { BaseEntity } from "../../libs/entities/base.entity"
 
 @Entity()
 @Unique(["address", "userId"])
-export class Wallet {
-  @PrimaryGeneratedColumn()
-  readonly id: number
-
+export class Wallet extends BaseEntity {
   @Column()
   readonly encryptedKey: string
 

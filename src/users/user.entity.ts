@@ -1,15 +1,13 @@
 import { BotType } from "src/bots/infrastructure/bot-provider.interface"
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm"
+import { Entity, Column, OneToMany } from "typeorm"
 import { Expose } from "class-transformer"
 import { Token } from "../blockchain/token/token.entity"
 import { FollowWallet } from "../blockchain/wallet/follow-wallet.entity"
 import { Wallet } from "../blockchain/wallet/wallet.entity"
+import { BaseEntity } from "../libs/entities/base.entity"
 
 @Entity()
-export class User {
-  @PrimaryGeneratedColumn()
-  readonly id: number
-
+export class User extends BaseEntity {
   @Expose()
   @Column()
   readonly firstName: string
