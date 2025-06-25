@@ -1,4 +1,4 @@
-import { User } from "../users/user.entity"
+import { User } from "../../users/user.entity"
 
 export enum events {
   SendBotResponse = "send.bot.response",
