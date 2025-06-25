@@ -9,7 +9,7 @@ import { TelegramUpdatesDto, TelegramBaseDto } from "./telegram-updates.dto"
 import { plainToClass } from "class-transformer"
 import { validate } from "class-validator"
 import { ConfigService } from "@nestjs/config"
-import { Config } from "../../config/config"
+import { Config } from "../../libs/config/config"
 
 export class TelegramApiProvider implements IBotProvider {
   private readonly apiUrl: string

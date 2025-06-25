@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common"
-import { configModule } from "./config/config"
+import { configModule } from "./libs/config/config"
 import { databaseService } from "./services/db/database.service"
 import { BotsModule } from "./bots/bots.module"
 import { ConsoleLogger } from "./services/logger/console-logger"
