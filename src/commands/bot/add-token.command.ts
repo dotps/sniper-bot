@@ -13,7 +13,7 @@ export class AddTokenCommand implements ICommand {
   private readonly messages = {
     TOKEN_LIST: "Список токенов:\n",
     ADDED: "Токен успешно добавлен.",
-    NEED_TOKEN: "Укажите токен. " + BotCommands.ADD_TOKEN + " адрес_токена",
+    NEED_TOKEN: "Укажите токен. " + BotCommands.AddToken + " адрес_токена",
     WRONG_TOKEN: "Токен не валиден для текущей сети.",
   } as const
 

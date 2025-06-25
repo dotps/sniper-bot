@@ -20,7 +20,7 @@ export class WalletService {
     FOLLOW_WALLET_EXIST: "Такой кошелек уже отслеживается.",
     FOLLOW_WALLET_NOT_FOUND: "Подписка не найдена.",
     REPEATED_DEALS: "Повторные сделки: ",
-    WALLET_NOT_FOUND: `Кошелек не найден. ${BotCommands.WALLET} для создания кошелька.`,
+    WALLET_NOT_FOUND: `Кошелек не найден. ${BotCommands.Wallet} для создания кошелька.`,
   } as const
 
   constructor(

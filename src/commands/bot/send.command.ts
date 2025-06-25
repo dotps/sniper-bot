@@ -13,9 +13,9 @@ import { BlockchainTokenService } from "../../blockchain/blockchain-token.servic
 
 export class SendCommand implements ICommand {
   private readonly messages = {
-    NEED_TOKEN: `Требуется адрес токена.\n${BotCommands.SEND} адрес_токена сумма адрес_получателя`,
-    NEED_TO_ADDRESS: `Требуется адрес получателя.\n${BotCommands.SEND} адрес_токена сумма адрес_получателя`,
-    NEED_AMOUNT: `Требуется сумма для перевода.\n${BotCommands.SEND} адрес_токена сумма адрес_получателя`,
+    NEED_TOKEN: `Требуется адрес токена.\n${BotCommands.Send} адрес_токена сумма адрес_получателя`,
+    NEED_TO_ADDRESS: `Требуется адрес получателя.\n${BotCommands.Send} адрес_токена сумма адрес_получателя`,
+    NEED_AMOUNT: `Требуется сумма для перевода.\n${BotCommands.Send} адрес_токена сумма адрес_получателя`,
     SUCCESS: "Перевод на кошелек успешно проведен.",
     ERROR: "Ошибка при переводе.",
   } as const

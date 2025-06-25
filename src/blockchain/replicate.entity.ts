@@ -21,7 +21,7 @@ export class Replicate {
   @Column({
     type: "enum",
     enum: ReplicateDealCommand,
-    default: ReplicateDealCommand.BUY,
+    default: ReplicateDealCommand.Buy,
   })
   readonly command: ReplicateDealCommand
 

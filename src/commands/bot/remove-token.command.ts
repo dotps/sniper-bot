@@ -12,7 +12,7 @@ export class RemoveTokenCommand implements ICommand {
   private readonly commandData: Command
   private readonly user: User
   private readonly messages = {
-    NEED_TOKEN: `Требуется адрес токена или all для удаления всех токенов из списка.\n${BotCommands.REMOVE_TOKEN} адрес_токена\n${BotCommands.REMOVE_TOKEN} all`,
+    NEED_TOKEN: `Требуется адрес токена или all для удаления всех токенов из списка.\n${BotCommands.RemoveToken} адрес_токена\n${BotCommands.RemoveToken} all`,
     SUCCESS: "Токен успешно удален.",
     SUCCESS_ALL: "Все токены успешно удалены.",
   } as const

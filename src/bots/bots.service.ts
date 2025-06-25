@@ -91,7 +91,7 @@ export class BotsService implements OnModuleInit {
     throw new NotFoundException("Бот не найден.")
   }
 
-  @OnEvent(events.SEND_BOT_RESPONSE)
+  @OnEvent(events.SendBotResponse)
   async eventHandlerSendResponse(event: SendBotEvent): Promise<void> {
     try {
       const bot = this.getBotByType(event.user.botType)

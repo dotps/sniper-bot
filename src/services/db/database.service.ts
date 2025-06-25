@@ -10,7 +10,7 @@ import { Wallet } from "../../blockchain/wallet/wallet.entity"
 export const databaseService = TypeOrmModule.forRootAsync({
   useFactory: (configService: ConfigService) => ({
     type: "postgres",
-    url: configService.get<string>(Config.DATABASE_URL),
+    url: configService.get<string>(Config.DatabaseUrl),
     entities: [User, Token, FollowWallet, Replicate, Wallet],
     synchronize: true,
     logging: false,

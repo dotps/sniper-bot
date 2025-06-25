@@ -26,10 +26,10 @@ export class BlockchainService {
     private readonly eventEmitter: EventEmitter2,
     private readonly configService: ConfigService,
   ) {
-    const blockchain = this.configService.get<string>(Config.BLOCKCHAIN)
+    const blockchain = this.configService.get<string>(Config.Blockchain)
     this.defaultBlockchain = Object.values(Blockchain).includes(blockchain as Blockchain)
       ? (blockchain as Blockchain)
-      : Blockchain.POLYGON
+      : Blockchain.Polygon
 
     this.initBlockchainClients()
 
@@ -49,15 +49,15 @@ export class BlockchainService {
       transport: http(),
     })
 
-    this.clients.set(Blockchain.POLYGON, polygonClient)
-    this.clients.set(Blockchain.BSC, bscClient)
+    this.clients.set(Blockchain.Polygon, polygonClient)
+    this.clients.set(Blockchain.Bsc, bscClient)
 
     console.log(this.defaultBlockchain)
   }
 
   private initSwapProviders(): void {
-    this.swapProviders.set(Blockchain.POLYGON, new Uniswap(this.blockchainTokenService, this.blockchainPoolService))
-    this.swapProviders.set(Blockchain.BSC, new Pancake())
+    this.swapProviders.set(Blockchain.Polygon, new Uniswap(this.blockchainTokenService, this.blockchainPoolService))
+    this.swapProviders.set(Blockchain.Bsc, new Pancake())
   }
 
   getSwapProvider(poolType: Blockchain = this.defaultBlockchain): ISwapProvider {
@@ -86,8 +86,8 @@ export class BlockchainService {
 }
 
 enum Blockchain {
-  BSC = "bsc",
-  POLYGON = "polygon",
+  Bsc = "bsc",
+  Polygon = "polygon",
 }
 
 /*

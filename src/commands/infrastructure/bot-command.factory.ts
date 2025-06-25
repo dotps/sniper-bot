@@ -33,15 +33,15 @@ export class BotCommandFactory implements ICommandFactory {
 
   createCommand(user: User, commandData: Command): ICommand | null {
     switch (commandData.command) {
-      case BotCommands.EXIT:
+      case BotCommands.Exit:
         return new ExitCommand()
-      case BotCommands.START:
+      case BotCommands.Start:
         return new StartCommand(this.userService, this.walletService, user)
-      case BotCommands.ADD_TOKEN:
+      case BotCommands.AddToken:
         return new AddTokenCommand(this.tokenService, this.blockchainTokenService, user, commandData)
-      case BotCommands.REMOVE_TOKEN:
+      case BotCommands.RemoveToken:
         return new RemoveTokenCommand(this.tokenService, user, commandData)
-      case BotCommands.BALANCE:
+      case BotCommands.Balance:
         return new TokenBalanceCommand(
           this.tokenService,
           this.blockchainService,
@@ -49,17 +49,17 @@ export class BotCommandFactory implements ICommandFactory {
           this.walletService,
           user,
         )
-      case BotCommands.FOLLOW:
+      case BotCommands.Follow:
         return new FollowWalletCommand(this.walletService, user, commandData)
-      case BotCommands.UNFOLLOW:
+      case BotCommands.Unfollow:
         return new UnfollowCommand(this.walletService, user, commandData)
-      case BotCommands.REPLICATE:
+      case BotCommands.Replicate:
         return new ReplicateCommand(this.walletService, user, commandData, this.tokenService)
-      case BotCommands.SUBSCRIPTIONS:
+      case BotCommands.Subscriptions:
         return new SubscriptionsCommand(this.walletService, user)
-      case BotCommands.SEND:
+      case BotCommands.Send:
         return new SendCommand(this.blockchainTokenService, this.walletService, user, commandData)
-      case BotCommands.WALLET:
+      case BotCommands.Wallet:
         return new WalletCommand(this.walletService, user)
       default:
         return null

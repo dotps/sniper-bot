@@ -13,8 +13,8 @@ import { Logger } from "../../services/logger/logger"
 
 export class ReplicateCommand implements ICommand {
   private readonly messages = {
-    WRONG_COMMAND: `Неверные параметры команды.\nПример: ${BotCommands.REPLICATE} buy/sell адрес_токена лимит_суммы.\nПроверьте правильность команды, адреса токена и формат лимита.`,
-    NOT_FOUND_TOKEN: `Токен не обнаружен в списке для торговли.\nИспользуйте команду ${BotCommands.ADD_TOKEN} чтобы добавить.`,
+    WRONG_COMMAND: `Неверные параметры команды.\nПример: ${BotCommands.Replicate} buy/sell адрес_токена лимит_суммы.\nПроверьте правильность команды, адреса токена и формат лимита.`,
+    NOT_FOUND_TOKEN: `Токен не обнаружен в списке для торговли.\nИспользуйте команду ${BotCommands.AddToken} чтобы добавить.`,
     SUCCESS: "Повторные сделки подключены.",
     INVALID_TOKEN: "Неверный формат адреса токена.",
     INVALID_LIMIT: "Неверный формат лимита.",
@@ -86,8 +86,8 @@ export class ReplicateCommand implements ICommand {
 }
 
 export enum ReplicateDealCommand {
-  BUY = "buy",
-  SELL = "sell",
+  Buy = "buy",
+  Sell = "sell",
 }
 
 type ReplicateParsedData = {

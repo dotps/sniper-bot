@@ -9,8 +9,8 @@ import { UserService } from "../../users/user.service"
 @Injectable()
 export class BotCommandHandler {
   private defaultMessage: string = "Неизвестная команда."
-  private needRegisterMessage: string = `Для взаимодействия с ботом необходимо зарегистрироваться. Отправьте ${BotCommands.START} для начала.`
-  private enterCommandMessage: string = `Для взаимодействия с ботом необходимо ввести команду. Отправьте ${BotCommands.START} для начала.`
+  private needRegisterMessage: string = `Для взаимодействия с ботом необходимо зарегистрироваться. Отправьте ${BotCommands.Start} для начала.`
+  private enterCommandMessage: string = `Для взаимодействия с ботом необходимо ввести команду. Отправьте ${BotCommands.Start} для начала.`
 
   constructor(
     private commandFactory: ICommandFactory,
@@ -23,7 +23,7 @@ export class BotCommandHandler {
       if (!parsedCommand) return new BotResponseData(this.enterCommandMessage)
 
       let user = await this.userService.getUser(updateData.userId, updateData.botType)
-      if (parsedCommand.command !== BotCommands.START && !user) return new BotResponseData(this.needRegisterMessage)
+      if (parsedCommand.command !== BotCommands.Start && !user) return new BotResponseData(this.needRegisterMessage)
       if (!user) user = this.userService.createUnregisteredUser(updateData)
 
       const command = this.commandFactory.createCommand(user, parsedCommand)

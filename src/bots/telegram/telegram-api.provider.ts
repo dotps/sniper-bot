@@ -17,7 +17,7 @@ export class TelegramApiProvider implements IBotProvider {
   private readonly baseUrl: string
   private readonly canUseWebhook: boolean
   private readonly canUseUpdate: boolean
-  private readonly botType: BotType = BotType.TELEGRAM
+  private readonly botType: BotType = BotType.Telegram
   private lastUpdateId: number = 0
   private isBotRunning: boolean = false
   private updateInterval: number = 5000
@@ -31,10 +31,10 @@ export class TelegramApiProvider implements IBotProvider {
     private readonly webRequestService: IWebRequestService,
     private readonly configService: ConfigService,
   ) {
-    this.token = this.configService.get<string>(Config.TELEGRAM_TOKEN) ?? ""
-    this.apiUrl = this.configService.get<string>(Config.TELEGRAM_API_URL) ?? ""
-    this.canUseWebhook = this.configService.get<string>(Config.TELEGRAM_USE_WEBHOOK)?.toLowerCase() === this.truePattern
-    this.canUseUpdate = this.configService.get<string>(Config.TELEGRAM_USE_UPDATE)?.toLowerCase() === this.truePattern
+    this.token = this.configService.get<string>(Config.TelegramToken) ?? ""
+    this.apiUrl = this.configService.get<string>(Config.TelegramApiUrl) ?? ""
+    this.canUseWebhook = this.configService.get<string>(Config.TelegramUseWebhook)?.toLowerCase() === this.truePattern
+    this.canUseUpdate = this.configService.get<string>(Config.TelegramUseUpdate)?.toLowerCase() === this.truePattern
     this.baseUrl = this.apiUrl + this.token + "/"
   }
 
@@ -44,7 +44,7 @@ export class TelegramApiProvider implements IBotProvider {
 
   async init(): Promise<void> {
     const telegramResponse = await this.webRequestService.tryGet<TelegramBaseDto>(
-      this.baseUrl + TelegramCommands.GET_ME,
+      this.baseUrl + TelegramCommands.GetMe,
     )
     const telegramResponseDto = plainToClass(TelegramBaseDto, telegramResponse)
 
@@ -64,7 +64,7 @@ export class TelegramApiProvider implements IBotProvider {
 
     if (queryData.updateId) this.lastUpdateId = queryData.updateId
 
-    const url = `${this.baseUrl}${TelegramCommands.SEND_MESSAGE}?chat_id=${queryData.chatId}&text=${text}`
+    const url = `${this.baseUrl}${TelegramCommands.SendMessage}?chat_id=${queryData.chatId}&text=${text}`
     const telegramResponse = await this.webRequestService.tryGet<TelegramBaseDto>(url)
     const telegramResponseDto = plainToClass(TelegramBaseDto, telegramResponse)
     await this.validateResponse(telegramResponseDto)
@@ -72,7 +72,7 @@ export class TelegramApiProvider implements IBotProvider {
 
   async getUpdates(): Promise<IBotResponseDto[]> {
     const offset = this.lastUpdateId ? `offset=${this.lastUpdateId + 1}&` : ``
-    const updatesUrl = `${this.baseUrl}${TelegramCommands.GET_UPDATES}?${offset}`
+    const updatesUrl = `${this.baseUrl}${TelegramCommands.GetUpdates}?${offset}`
     const telegramResponse = await this.webRequestService.tryGet<TelegramUpdatesDto>(updatesUrl)
     const telegramResponseDto = plainToClass(TelegramUpdatesDto, telegramResponse)
 

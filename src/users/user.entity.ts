@@ -34,7 +34,7 @@ export class User {
   @Column({
     type: "enum",
     enum: BotType,
-    default: BotType.TELEGRAM,
+    default: BotType.Telegram,
   })
   readonly botType: BotType
 

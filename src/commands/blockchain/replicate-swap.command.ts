@@ -44,9 +44,9 @@ export class ReplicateSwapCommand implements ICommand {
 
     if (!userWallet || !isAddress(userWallet.address)) return
 
-    if (this.isToken0SoldInPool() && replicate.command === ReplicateDealCommand.SELL) {
+    if (this.isToken0SoldInPool() && replicate.command === ReplicateDealCommand.Sell) {
       await this.handleSellOperation(replicate, userWallet, limit)
-    } else if (this.isToken0BoughtInPool() && replicate.command === ReplicateDealCommand.BUY) {
+    } else if (this.isToken0BoughtInPool() && replicate.command === ReplicateDealCommand.Buy) {
       await this.handleBuyOperation(replicate, userWallet, limit)
     }
   }

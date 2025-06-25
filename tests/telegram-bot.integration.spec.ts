@@ -132,10 +132,10 @@ describe("TelegramBot (интеграционный): ", () => {
     it("успешная регистрация нового пользователя", async () => {
       const userId = Number(Date.now().toString().slice(-6))
       globalUserId = userId
-      const textCommand = BotCommands.START
+      const textCommand = BotCommands.Start
       const update = mockTelegramUpdate(textCommand, userId)
 
-      const userBefore = await userService.getUser(userId, BotType.TELEGRAM)
+      const userBefore = await userService.getUser(userId, BotType.Telegram)
       expect(userBefore).toBeNull()
 
       console.log("Запрос:", {
@@ -145,12 +145,12 @@ describe("TelegramBot (интеграционный): ", () => {
 
       await request(app.getHttpServer()).post("/bots/telegram").send(update).expect(200)
 
-      const user = await userService.getUser(userId, BotType.TELEGRAM)
+      const user = await userService.getUser(userId, BotType.Telegram)
       expect(user).not.toBeNull()
 
       if (user) {
         expect(user.id).toBeDefined()
-        expect(user.botType).toBe(BotType.TELEGRAM)
+        expect(user.botType).toBe(BotType.Telegram)
         expect(user.botUserId).toBe(userId)
       }
 
@@ -158,7 +158,7 @@ describe("TelegramBot (интеграционный): ", () => {
     })
     it("запрет повторной регистрации существующего пользователя", async () => {
       const userId = Number(Date.now().toString().slice(-6))
-      const textCommand = BotCommands.START
+      const textCommand = BotCommands.Start
       const update = mockTelegramUpdate(textCommand, userId)
 
       console.log("Первая регистрация:", {
@@ -187,7 +187,7 @@ describe("TelegramBot (интеграционный): ", () => {
       const textCommand = "/test"
       const update = mockTelegramUpdate(textCommand, userId)
 
-      const user = await userService.getUser(userId, BotType.TELEGRAM)
+      const user = await userService.getUser(userId, BotType.Telegram)
       expect(user).not.toBeNull()
 
       console.log("Запрос:", {
@@ -205,7 +205,7 @@ describe("TelegramBot (интеграционный): ", () => {
       const textCommand = "test"
       const update = mockTelegramUpdate(textCommand, userId)
 
-      const user = await userService.getUser(userId, BotType.TELEGRAM)
+      const user = await userService.getUser(userId, BotType.Telegram)
       expect(user).not.toBeNull()
 
       console.log("Запрос:", {

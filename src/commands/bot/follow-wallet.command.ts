@@ -13,7 +13,7 @@ export class FollowWalletCommand implements ICommand {
   private readonly commandData: Command
   private readonly user: User
   private readonly messages = {
-    NEED_WALLET: `Требуется адрес кошелька.\n${BotCommands.FOLLOW} адрес_кошелька`,
+    NEED_WALLET: `Требуется адрес кошелька.\n${BotCommands.Follow} адрес_кошелька`,
     SUCCESS: "Подписка на кошелек успешно оформлена.",
   } as const
 

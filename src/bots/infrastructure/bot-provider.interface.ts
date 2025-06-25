@@ -13,6 +13,6 @@ export interface IBotProvider {
 }
 
 export enum BotType {
-  TELEGRAM = "TELEGRAM",
-  VK = "VK",
+  Telegram = "TELEGRAM",
+  Vk = "VK",
 }

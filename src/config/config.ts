@@ -6,11 +6,11 @@ export const configModule = ConfigModule.forRoot({
 })
 
 export enum Config {
-  APP_PORT = "APP_PORT",
-  DATABASE_URL = "DATABASE_URL",
-  BLOCKCHAIN = "BLOCKCHAIN",
-  TELEGRAM_API_URL = "TELEGRAM_API_URL",
-  TELEGRAM_TOKEN = "TELEGRAM_TOKEN",
-  TELEGRAM_USE_WEBHOOK = "TELEGRAM_USE_WEBHOOK",
-  TELEGRAM_USE_UPDATE = "TELEGRAM_USE_UPDATE",
+  AppPort = "APP_PORT",
+  DatabaseUrl = "DATABASE_URL",
+  Blockchain = "BLOCKCHAIN",
+  TelegramApiUrl = "TELEGRAM_API_URL",
+  TelegramToken = "TELEGRAM_TOKEN",
+  TelegramUseWebhook = "TELEGRAM_USE_WEBHOOK",
+  TelegramUseUpdate = "TELEGRAM_USE_WEBHOOK",
 }

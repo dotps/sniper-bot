@@ -21,7 +21,7 @@ export class TelegramGetUpdatesResponse {
         firstName: update?.message?.from?.first_name?.toString() || "",
         lastName: update?.message?.from?.last_name?.toString() || "",
         username: update?.message?.from?.username?.toString() || "",
-        botType: BotType.TELEGRAM,
+        botType: BotType.Telegram,
       }
       return updateData
     })

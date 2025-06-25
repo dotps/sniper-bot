@@ -9,7 +9,7 @@ import { WalletService } from "../../blockchain/wallet/wallet.service"
 
 export class UnfollowCommand implements ICommand {
   private readonly messages = {
-    NEED_WALLET: `Требуется адрес кошелька.\n${BotCommands.UNFOLLOW} адрес_кошелька`,
+    NEED_WALLET: `Требуется адрес кошелька.\n${BotCommands.Unfollow} адрес_кошелька`,
     SUCCESS: "Подписка на кошелек успешно удалена.",
   } as const
 
