@@ -4,7 +4,7 @@ import { Command } from "../infrastructure/bot-command.handler"
 import { User } from "../../users/user.entity"
 import { isAddress } from "viem"
 import { BotCommands } from "./bot-commands"
-import { ErrorHandler } from "../../errors/error.handler"
+import { ErrorHandler } from "../../libs/core/errors/error.handler"
 import { WalletService } from "../../blockchain/wallet/wallet.service"
 
 export class UnfollowCommand implements ICommand {

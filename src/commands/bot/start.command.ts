@@ -3,7 +3,7 @@ import { BotResponseData } from "../../bots/infrastructure/bot-response-data"
 import { UserService } from "../../users/user.service"
 import { User } from "../../users/user.entity"
 import { WalletService } from "../../blockchain/wallet/wallet.service"
-import { ErrorHandler } from "../../errors/error.handler"
+import { ErrorHandler } from "../../libs/core/errors/error.handler"
 
 export class StartCommand implements ICommand {
   private readonly messages = {

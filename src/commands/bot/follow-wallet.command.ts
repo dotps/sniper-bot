@@ -5,8 +5,8 @@ import { User } from "../../users/user.entity"
 import { BotCommands } from "./bot-commands"
 import { WalletService } from "../../blockchain/wallet/wallet.service"
 import { isAddress } from "viem"
-import { ErrorHandler } from "../../errors/error.handler"
-import { Logger } from "../../services/logger/logger"
+import { ErrorHandler } from "../../libs/core/errors/error.handler"
+import { Logger } from "../../libs/core/logger/logger"
 
 export class FollowWalletCommand implements ICommand {
   private readonly walletService: WalletService

@@ -5,7 +5,7 @@ import { User } from "../../users/user.entity"
 import { TokenService } from "../../blockchain/token/token.service"
 import { isAddress } from "viem"
 import { BotCommands } from "./bot-commands"
-import { ErrorHandler } from "../../errors/error.handler"
+import { ErrorHandler } from "../../libs/core/errors/error.handler"
 
 export class RemoveTokenCommand implements ICommand {
   private readonly tokenService: TokenService

@@ -1,6 +1,6 @@
-import { BotResponseData } from "../bots/infrastructure/bot-response-data"
+import { BotResponseData } from "../../../bots/infrastructure/bot-response-data"
 import { ResponseBotError } from "./response-bot-error"
-import { Logger } from "../services/logger/logger"
+import { Logger } from "../logger/logger"
 
 export class ErrorHandler {
   static handleAndResponse(error: unknown): BotResponseData | null {

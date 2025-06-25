@@ -1,4 +1,4 @@
-import { Logger } from "../services/logger/logger"
+import { Logger } from "../logger/logger"
 
 export class ResponseBotError extends Error {
   error?: unknown

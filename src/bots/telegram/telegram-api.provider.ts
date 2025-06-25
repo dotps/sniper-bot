@@ -1,6 +1,6 @@
 import { BotType, IBotProvider } from "../infrastructure/bot-provider.interface"
-import { IWebRequestService } from "../../services/web-request/web-request-service.interface"
-import { Logger } from "../../services/logger/logger"
+import { IWebRequestService } from "../../libs/core/web-request/web-request-service.interface"
+import { Logger } from "../../libs/core/logger/logger"
 import { TelegramCommands } from "./telegram-commands"
 import { TelegramGetUpdatesResponse } from "./telegram-get-updates-response"
 import { IBotResponseDto } from "../infrastructure/bot-response-dto.interface"

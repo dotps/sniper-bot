@@ -2,7 +2,7 @@ import { ICommand } from "../infrastructure/command.interface"
 import { BotResponseData } from "../../bots/infrastructure/bot-response-data"
 import { User } from "../../users/user.entity"
 import { WalletService } from "../../blockchain/wallet/wallet.service"
-import { ErrorHandler } from "../../errors/error.handler"
+import { ErrorHandler } from "../../libs/core/errors/error.handler"
 
 export class SubscriptionsCommand implements ICommand {
   private readonly walletService: WalletService

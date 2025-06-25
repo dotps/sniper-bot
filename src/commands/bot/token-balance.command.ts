@@ -4,7 +4,7 @@ import { User } from "../../users/user.entity"
 import { TokenService } from "../../blockchain/token/token.service"
 import { BlockchainService } from "../../blockchain/blockchain.service"
 import { WalletService } from "../../blockchain/wallet/wallet.service"
-import { ErrorHandler } from "../../errors/error.handler"
+import { ErrorHandler } from "../../libs/core/errors/error.handler"
 import { BlockchainTokenService } from "../../blockchain/blockchain-token.service"
 
 export class TokenBalanceCommand implements ICommand {

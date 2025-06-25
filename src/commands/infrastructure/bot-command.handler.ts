@@ -1,7 +1,7 @@
 import { BotResponseData } from "../../bots/infrastructure/bot-response-data"
 import { IBotResponseDto } from "../../bots/infrastructure/bot-response-dto.interface"
 import { Injectable } from "@nestjs/common"
-import { Logger } from "../../services/logger/logger"
+import { Logger } from "../../libs/core/logger/logger"
 import { ICommandFactory } from "./command-factory.interface"
 import { BotCommands } from "../bot/bot-commands"
 import { UserService } from "../../users/user.service"

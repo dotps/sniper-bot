@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, OnModuleInit } from "@nestjs/common"
 import { TelegramUpdatesDto } from "./telegram/telegram-updates.dto"
 import { BotCommandHandler } from "../commands/infrastructure/bot-command.handler"
-import { Logger } from "../services/logger/logger"
+import { Logger } from "../libs/core/logger/logger"
 import { TelegramApiProvider } from "./telegram/telegram-api.provider"
 import { VkUpdatesDto } from "./vk/vk-updates.dto"
 import { IBotResponseDto } from "./infrastructure/bot-response-dto.interface"

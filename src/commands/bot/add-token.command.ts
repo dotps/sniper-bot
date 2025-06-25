@@ -6,7 +6,7 @@ import { TokenService } from "../../blockchain/token/token.service"
 import { TokenDto } from "../../blockchain/token/token.dto"
 import { Hex, isAddress } from "viem"
 import { BotCommands } from "./bot-commands"
-import { ErrorHandler } from "../../errors/error.handler"
+import { ErrorHandler } from "../../libs/core/errors/error.handler"
 import { BlockchainTokenService } from "../../blockchain/blockchain-token.service"
 
 export class AddTokenCommand implements ICommand {

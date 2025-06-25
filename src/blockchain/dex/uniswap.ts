@@ -1,7 +1,7 @@
 import { Hex } from "viem"
 import { ISwapProvider } from "./swap-provider.interface"
 import { PoolTokenPair } from "./pool-token-pair"
-import { Logger } from "../../services/logger/logger"
+import { Logger } from "../../libs/core/logger/logger"
 import { BlockchainTokenService } from "../blockchain-token.service"
 import { BlockchainPoolService } from "../blockchain-pool.service"
 

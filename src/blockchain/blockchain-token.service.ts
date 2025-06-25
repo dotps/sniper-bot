@@ -1,7 +1,7 @@
 import { erc20Abi, Hex, isAddress, PublicClient } from "viem"
 import { Token } from "./token/token.entity"
-import { ResponseBotError } from "../errors/response-bot-error"
-import { Logger } from "../services/logger/logger"
+import { ResponseBotError } from "../libs/core/errors/response-bot-error"
+import { Logger } from "../libs/core/logger/logger"
 
 export class BlockchainTokenService {
   private readonly messages = {
