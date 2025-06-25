@@ -12,5 +12,5 @@ export enum Config {
   TelegramApiUrl = "TELEGRAM_API_URL",
   TelegramToken = "TELEGRAM_TOKEN",
   TelegramUseWebhook = "TELEGRAM_USE_WEBHOOK",
-  TelegramUseUpdate = "TELEGRAM_USE_WEBHOOK",
+  TelegramUseUpdate = "TELEGRAM_USE_UPDATE",
 }
